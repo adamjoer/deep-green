@@ -1,31 +1,34 @@
 #pragma once
 
-enum class Type {
-    King,
-    Queen,
-    Rook,
-    Bishop,
-    Knight,
-    Pawn,
-};
+namespace Chess {
 
-enum class Color {
-    White,
-    Black,
-};
+    enum class Type {
+        King,
+        Queen,
+        Rook,
+        Bishop,
+        Knight,
+        Pawn,
+    };
 
-struct Piece {
-    Piece() = delete;
+    enum class Color {
+        White,
+        Black,
+    };
 
-    Piece(Type type, Color color)
-        : type(type),
-          color(color) {
-    }
+    struct Piece {
+        Piece() = delete;
 
-    ~Piece() = default;
+        Piece(Type type, Color color)
+            : type(type),
+              color(color) {
+        }
 
-    const Type type;
-    const Color color;
+        ~Piece() = default;
 
-    bool hasMoved = false;
-};
+        const Type type;
+        const Color color;
+
+        bool hasMoved = false;
+    };
+}
