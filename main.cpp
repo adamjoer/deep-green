@@ -4,7 +4,7 @@
 
 int main() {
     Chess::Game game;
-    const auto possibleMoves = game.getPossibleMoves({3, 3});
+    const auto possibleMoves = game.getPossibleMoves({3, 1});
 
     std::wcout << '{';
     bool first = true;

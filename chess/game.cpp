@@ -65,9 +65,9 @@ namespace Chess {
         FILL_COLUMN(7, Rook)
 
         // For quick and dirty testing; remember to remove!
-        mBoard[3][3] = make_shared<Bishop>(Color::White, Position(3, 3));
-        mBoard[2][2] = make_shared<Pawn>(Color::White, Position(2, 2));
-        mBoard[1][5] = make_shared<Pawn>(Color::Black, Position(1, 5));
+        mBoard[2][2] = make_shared<Pawn>(Color::Black, Position(2, 2));
+        mBoard[3][3] = make_shared<Pawn>(Color::Black, Position(3, 3));
+        mBoard[4][2] = make_shared<Pawn>(Color::White, Position(4, 2));
     }
 
     /**
