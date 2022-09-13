@@ -9,20 +9,11 @@
 
 namespace Chess {
 
-    /**
-     * Type representing the coordinates of a certain square on the board.
-     * These coordinates follow the typical system in chess where origin is in
-     * the bottom left corner.
-     */
-    using Position = std::pair<int, int>;
-
     class Game {
     public:
         Game();
 
         ~Game() = default;
-
-        static const int BOARD_SIZE = 8;
 
         void resetGame();
 
@@ -33,8 +24,7 @@ namespace Chess {
         void printBoard(const std::vector<Position> &possibleMoves = {}) const;
 
     private:
-        std::array<std::array<std::shared_ptr<Piece>, BOARD_SIZE>, BOARD_SIZE> mBoard
-            {nullptr};
+        Board mBoard{nullptr};
 
         Color mCurrentTurn = Color::White;
     };
