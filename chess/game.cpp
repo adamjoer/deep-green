@@ -11,12 +11,12 @@
 #include <algorithm>
 #include <iostream>
 
-#include "king.h"
-#include "queen.h"
-#include "rook.h"
-#include "bishop.h"
-#include "knight.h"
-#include "pawn.h"
+#include "piece/king.h"
+#include "piece/queen.h"
+#include "piece/rook.h"
+#include "piece/bishop.h"
+#include "piece/knight.h"
+#include "piece/pawn.h"
 
 #define FILL_COLUMN(index, type)                                 \
     mBoard[index] = {                                            \

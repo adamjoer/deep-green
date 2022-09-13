@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-#include "piece.h"
+#include "piece/piece.h"
 
 namespace Chess {
 
