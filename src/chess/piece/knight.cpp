@@ -5,6 +5,8 @@
 
 namespace Chess {
     std::vector<Position> Knight::possibleMoves(const Board &board) const {
+        assert(board[mPosition.first][mPosition.second].get() == this);
+
         std::vector<Position> moves;
 
         const std::array<Position, 8> possibleMoves{

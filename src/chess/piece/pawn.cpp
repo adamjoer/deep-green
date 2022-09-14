@@ -2,6 +2,8 @@
 
 namespace Chess {
     std::vector<Position> Pawn::possibleMoves(const Board &board) const {
+        assert(board[mPosition.first][mPosition.second].get() == this);
+
         // TODO: Handle "en passant" and "promotion" moves... somehow
 
         if ((this->color == Color::White && mPosition.second == BOARD_SIZE - 1)||

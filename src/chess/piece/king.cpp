@@ -4,6 +4,8 @@
 
 namespace Chess {
     std::vector<Position> King::possibleMoves(const Board &board) const {
+        assert(board[mPosition.first][mPosition.second].get() == this);
+
         // TODO: Handle "castling" move
         
         std::vector<Position> moves;

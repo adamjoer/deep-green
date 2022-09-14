@@ -2,6 +2,8 @@
 
 namespace Chess {
     std::vector<Position> Rook::possibleMoves(const Board &board) const {
+        assert(board[mPosition.first][mPosition.second].get() == this);
+
         std::vector<Position> moves;
 
         // FIXME: Do this so the same for-loop isn't copy-pasted four times
