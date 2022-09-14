@@ -4,6 +4,8 @@
 #include <array>
 #include <memory>
 #include <vector>
+#include <algorithm>
+#include <cassert>
 
 namespace Chess {
 
@@ -59,11 +61,30 @@ namespace Chess {
             mHasMoved = true;
         }
 
+        /**
+         * Check if this piece can move to the given position.
+         * Positions where this piece can capture an enemy piece are also included.
+         *
+         * @param destination Position to check
+         * @param board The current state of the board
+         * @return Whether this piece can move to 'destination'
+         */
+        [[nodiscard]] bool canMoveTo(const Position &destination, const Board &board) const {
+
+            // FIXME: There is most definitely a more efficient way to check this.
+            //        This solution is just the quickest and easiest way to implement
+            //        function right now.
+            const auto possibleMoves = this->possibleMoves(board);
+            return std::find(possibleMoves.begin(), possibleMoves.end(),
+                             destination) != possibleMoves.end();
+        }
+
         // Abstract member functions to be implemented by inheriting pieces
 
         /**
          * Get all possible positions where this chess piece can move, given the
          * current state of the board.
+         * Positions where this piece can capture an enemy piece are also included.
          *
          * @param board The current state of the board
          * @return A vector containing all the positions this piece can move to
@@ -71,7 +92,7 @@ namespace Chess {
         [[nodiscard]] virtual std::vector<Position> possibleMoves(const Board &board) const = 0;
 
         /**
-         * Print the unicode symbol corresponding to this chess piece.
+         * Get the unicode symbol corresponding to this chess piece.
          * https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
          *
          * @return The unicode symbol for this chess piece
