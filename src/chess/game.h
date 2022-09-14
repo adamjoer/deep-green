@@ -23,6 +23,8 @@ namespace Chess {
 
         void printBoard(const std::vector<Position> &possibleMoves = {}) const;
 
+        [[nodiscard]] Color turn() const { return mCurrentTurn; }
+
     private:
         Board mBoard{nullptr};
 
