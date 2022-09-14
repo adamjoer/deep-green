@@ -91,9 +91,29 @@ namespace Chess {
      *
      * @param from The position where the moving piece is standing
      * @param to The position to which the piece will move
+     * @return Whether the piece at the 'from' position was moved
      */
-    void Game::move(const Position &from, const Position &to) {
-        // TODO: Implement
+    bool Game::move(const Position &from, const Position &to) {
+        auto &piece = mBoard.at(from.first).at(from.second);
+        if (!piece)
+            throw invalid_argument("Position does not contain chess piece");
+
+        if (piece->color != mCurrentTurn)
+            return false;
+
+        if (!piece->canMoveTo(to, mBoard))
+            return false;
+
+        piece->move(to);
+
+        mBoard[to.first][to.second] = piece;
+        mBoard[from.first][from.second] = nullptr;
+
+        mCurrentTurn = mCurrentTurn == Color::White ? Color::Black : Color::White;
+
+        // TODO: Check for checkmate
+
+        return true;
     }
 
     /**

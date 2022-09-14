@@ -19,7 +19,7 @@ namespace Chess {
 
         [[nodiscard]] std::vector<Position> getPossibleMoves(Position position) const;
 
-        void move(const Position &from, const Position &to);
+        bool move(const Position &from, const Position &to);
 
         void printBoard(const std::vector<Position> &possibleMoves = {}) const;
 
