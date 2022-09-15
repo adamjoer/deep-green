@@ -15,5 +15,10 @@ namespace Chess {
         ~Pawn() override = default;
 
         [[nodiscard]] std::vector<Position> possibleMoves(const Board &board) const override;
+
+        void move(const Position &destination) override;
+
+    private:
+        bool mHasMoved = false;
     };
 }

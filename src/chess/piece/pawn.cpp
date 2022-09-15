@@ -6,7 +6,7 @@ namespace Chess {
 
         // TODO: Handle "en passant" and "promotion" moves... somehow
 
-        if ((this->color == Color::White && mPosition.second == BOARD_SIZE - 1)||
+        if ((this->color == Color::White && mPosition.second == BOARD_SIZE - 1) ||
             (this->color == Color::Black && mPosition.second == 0))
             return {};
 
@@ -38,5 +38,13 @@ namespace Chess {
         }
 
         return moves;
+    }
+
+    void Pawn::move(const Position &destination) {
+        if (destination == mPosition)
+            return;
+
+        Piece::move(destination);
+        mHasMoved = true;
     }
 }

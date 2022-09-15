@@ -54,12 +54,8 @@ namespace Chess {
          *
          * @param destination The position to which this piece will be moved
          */
-        void move(const Position &destination) {
-            if (destination == mPosition)
-                return;
-
+        virtual void move(const Position &destination) {
             mPosition = destination;
-            mHasMoved = true;
         }
 
         /**
@@ -74,7 +70,7 @@ namespace Chess {
 
             // FIXME: There is most definitely a more efficient way to check this.
             //        This solution is just the quickest and easiest way to implement
-            //        function right now.
+            //        this function right now.
             const auto possibleMoves = this->possibleMoves(board);
             return std::find(possibleMoves.begin(), possibleMoves.end(),
                              destination) != possibleMoves.end();
@@ -101,8 +97,6 @@ namespace Chess {
         const wchar_t symbol;
 
     protected:
-        bool mHasMoved = false;
-
         Position mPosition;
     };
 }
