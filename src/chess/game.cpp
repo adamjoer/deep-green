@@ -124,6 +124,11 @@ namespace Chess {
         // See this very helpful SO-answer for a bit of info:
         // https://stackoverflow.com/a/33206814/18713517
 
+        wcout << ' ';
+        for (int i = 0; i < BOARD_SIZE; ++i)
+            wcout << (char) ('a' + i);
+        wcout << '\n';
+
         bool evenRow = false;
         for (int y = BOARD_SIZE - 1; y >= 0; --y) {
             bool evenColumn = evenRow;
@@ -151,6 +156,7 @@ namespace Chess {
             }
 
             wcout << "\033[0m";
+            wcout << (y + 1);
             wcout << '\n';
             evenRow = !evenRow;
         }
