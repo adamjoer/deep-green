@@ -14,6 +14,10 @@ int main() {
     string status = "Welcome";
     vector<Chess::Position> highlightedMoves;
 
+    // TODO: Use proper algebraic notation?
+    //       https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
+    const regex moveRegex("^([a-hA-H][1-8])(?:->([a-hA-H][1-8]))?$");
+
     while (true) {
         wcout << "\033[1;1H\033[2J";
         game.printBoard(highlightedMoves);
@@ -37,18 +41,15 @@ int main() {
             continue;
         }
 
-        // TODO: Use proper algebraic notation?
-        //       https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
         smatch moveRegexMatches;
-        if (!regex_match(input, moveRegexMatches,
-                         regex("^([a-hA-H][1-8])(?:->([a-hA-H][1-8]))?$"))) {
+        if (!regex_match(input, moveRegexMatches,moveRegex)) {
             status = "Invalid input";
             continue;
         }
 
         Chess::Position from(
-            tolower(moveRegexMatches[1].str()[0]) - 'a',
-            moveRegexMatches[1].str()[1] - '0' - 1
+                tolower(moveRegexMatches[1].str()[0]) - 'a',
+                moveRegexMatches[1].str()[1] - '0' - 1
         );
 
         try {
@@ -58,8 +59,8 @@ int main() {
 
             } else {
                 Chess::Position to(
-                    tolower(moveRegexMatches[2].str()[0]) - 'a',
-                    moveRegexMatches[2].str()[1] - '0' - 1
+                        tolower(moveRegexMatches[2].str()[0]) - 'a',
+                        moveRegexMatches[2].str()[1] - '0' - 1
                 );
 
                 if (game.move(from, to)) {
