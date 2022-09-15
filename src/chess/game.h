@@ -15,7 +15,7 @@ namespace Chess {
 
         ~Game() = default;
 
-        void resetGame();
+        void reset();
 
         [[nodiscard]] std::vector<Position> getPossibleMoves(Position position) const;
 

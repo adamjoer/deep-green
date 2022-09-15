@@ -27,8 +27,15 @@ int main() {
         string input;
         cin >> input;
 
-        if (input == "exit")
+        if (input == "exit") {
             break;
+        } else if (input == "reset") {
+            game.reset();
+            highlightedMoves.clear();
+
+            status = "Reset game";
+            continue;
+        }
 
         // TODO: Use proper algebraic notation?
         //       https://en.wikipedia.org/wiki/Algebraic_notation_(chess)

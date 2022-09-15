@@ -45,14 +45,14 @@ namespace Chess {
         setlocale(LC_ALL, "en_US.UTF-8");
 #endif
 
-        resetGame();
+        reset();
     }
 
     /**
      * Reset the game, so all pieces are standing at their starting positions,
      * and it is white's turn to move.
      */
-    void Game::resetGame() {
+    void Game::reset() {
         mCurrentTurn = Color::White;
 
         FILL_COLUMN(0, Rook)
