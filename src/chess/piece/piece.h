@@ -41,9 +41,10 @@ namespace Chess {
     public:
         Piece() = delete;
 
-        Piece(Color color, Position position)
+        Piece(Color color, Position position, wchar_t symbol)
             : color(color),
-              mPosition(std::move(position)) {
+              mPosition(std::move(position)),
+              symbol(symbol) {
         }
 
         virtual ~Piece() = default;
@@ -91,15 +92,13 @@ namespace Chess {
          */
         [[nodiscard]] virtual std::vector<Position> possibleMoves(const Board &board) const = 0;
 
-        /**
-         * Get the unicode symbol corresponding to this chess piece.
-         * https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
-         *
-         * @return The unicode symbol for this chess piece
-         */
-        [[nodiscard]] virtual wchar_t symbol() const = 0;
-
         const Color color;
+
+        /**
+         * The unicode symbol corresponding to this chess piece.
+         * See https://en.wikipedia.org/wiki/Chess_symbols_in_Unicode
+         */
+        const wchar_t symbol;
 
     protected:
         bool mHasMoved = false;

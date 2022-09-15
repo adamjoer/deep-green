@@ -150,7 +150,7 @@ namespace Chess {
                     wcout << "\033[0m";
 
                 const auto &square = mBoard[x][y];
-                wcout << (square ? square->symbol() : L' ');
+                wcout << (square ? square->symbol : L' ');
 
                 evenColumn = !evenColumn;
             }
