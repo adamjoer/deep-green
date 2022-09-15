@@ -28,7 +28,9 @@ namespace Chess {
             if (leftDiagonalSquare && leftDiagonalSquare->color != this->color)
                 moves.emplace_back(mPosition.first - 1, mPosition.second + yOffset);
 
-        } else if (mPosition.first < BOARD_SIZE - 1) {
+        }
+
+        if (mPosition.first < BOARD_SIZE - 1) {
             const auto &rightDiagonalSquare
                 = board[mPosition.first + 1][mPosition.second + yOffset];
             if (rightDiagonalSquare && rightDiagonalSquare->color != this->color)
