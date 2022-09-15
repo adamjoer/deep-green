@@ -23,10 +23,9 @@ int main() {
         game.printBoard(highlightedMoves);
 
         wcout << "Status: " << status.c_str()
-              << "\nIt is "
-              << (game.turn() == Chess::Color::White ? "white's" : "black's")
-              << " turn\n"
-                 ">";
+              << "\nTurn: "
+              << (game.turn() == Chess::Color::White ? "White" : "Black")
+              << "\n> ";
 
         string input;
         cin >> input;
