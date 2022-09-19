@@ -2,49 +2,48 @@
 
 namespace Chess {
     std::vector<Position> Pawn::possibleMoves(const Board &board) const {
-        assert(board[mPosition.first][mPosition.second].get() == this);
+        assert(board[this->position.first][this->position.second].get() == this);
 
         // TODO: Handle "en passant" and "promotion" moves... somehow
 
-        if ((this->color == Color::White && mPosition.second == BOARD_SIZE - 1) ||
-            (this->color == Color::Black && mPosition.second == 0))
+        if ((this->color == Color::White && this->position.second == BOARD_SIZE - 1) ||
+            (this->color == Color::Black && this->position.second == 0))
             return {};
 
         std::vector<Position> moves;
 
         const int yOffset = (this->color == Color::White) ? 1 : -1;
 
-        if (!board[mPosition.first][mPosition.second + yOffset]) {
-            moves.emplace_back(mPosition.first, mPosition.second + yOffset);
+        if (!board[this->position.first][this->position.second + yOffset]) {
+            moves.emplace_back(this->position.first, this->position.second + yOffset);
 
-            if (!mHasMoved
-                && !board[mPosition.first][mPosition.second + (2 * yOffset)])
-                moves.emplace_back(mPosition.first,mPosition.second + (2 * yOffset));
+            if (!this->hasMoved
+                && !board[this->position.first][this->position.second + (2 * yOffset)])
+                moves.emplace_back(this->position.first, this->position.second + (2 * yOffset));
         }
 
-        if (mPosition.first > 0) {
+        if (this->position.first > 0) {
             const auto &leftDiagonalSquare
-                = board[mPosition.first - 1][mPosition.second + yOffset];
+                = board[this->position.first - 1][this->position.second + yOffset];
             if (leftDiagonalSquare && leftDiagonalSquare->color != this->color)
-                moves.emplace_back(mPosition.first - 1, mPosition.second + yOffset);
-
+                moves.emplace_back(this->position.first - 1, this->position.second + yOffset);
         }
 
-        if (mPosition.first < BOARD_SIZE - 1) {
+        if (this->position.first < BOARD_SIZE - 1) {
             const auto &rightDiagonalSquare
-                = board[mPosition.first + 1][mPosition.second + yOffset];
+                = board[this->position.first + 1][this->position.second + yOffset];
             if (rightDiagonalSquare && rightDiagonalSquare->color != this->color)
-                moves.emplace_back(mPosition.first + 1, mPosition.second + yOffset);
+                moves.emplace_back(this->position.first + 1, this->position.second + yOffset);
         }
 
         return moves;
     }
 
     void Pawn::move(const Position &destination) {
-        if (destination == mPosition)
+        if (destination == this->position)
             return;
 
         Piece::move(destination);
-        mHasMoved = true;
+        this->hasMoved = true;
     }
 }

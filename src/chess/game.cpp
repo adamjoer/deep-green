@@ -19,7 +19,7 @@
 #include "piece/pawn.h"
 
 #define FILL_COLUMN(index, type)                                 \
-    mBoard[index] = {                                            \
+    this->board[index] = {                                       \
         {                                                        \
             make_shared<type>(Color::White, Position(index, 0)), \
             make_shared<Pawn>(Color::White, Position(index, 1)), \
@@ -53,7 +53,7 @@ namespace Chess {
      * and it is white's turn to move.
      */
     void Game::reset() {
-        mCurrentTurn = Color::White;
+        this->currentTurn = Color::White;
 
         FILL_COLUMN(0, Rook)
         FILL_COLUMN(1, Knight)
@@ -72,11 +72,11 @@ namespace Chess {
      * @return A vector containing all the positions the piece can move to
      */
     vector <Position> Game::getPossibleMoves(const Position position) const {
-        const auto &piece = mBoard.at(position.first).at(position.second);
+        const auto &piece = this->board.at(position.first).at(position.second);
         if (!piece)
             throw invalid_argument("Position does not contain chess piece");
 
-        return piece->possibleMoves(mBoard);
+        return piece->possibleMoves(this->board);
     }
 
     /**
@@ -89,22 +89,22 @@ namespace Chess {
      * @return Whether the piece at the 'from' position was moved
      */
     bool Game::move(const Position &from, const Position &to) {
-        auto &piece = mBoard.at(from.first).at(from.second);
+        auto &piece = this->board.at(from.first).at(from.second);
         if (!piece)
             throw invalid_argument("Position does not contain chess piece");
 
-        if (piece->color != mCurrentTurn)
+        if (piece->color != this->currentTurn)
             return false;
 
-        if (!piece->canMoveTo(to, mBoard))
+        if (!piece->canMoveTo(to, this->board))
             return false;
 
         piece->move(to);
 
-        mBoard[to.first][to.second] = piece;
-        mBoard[from.first][from.second] = nullptr;
+        this->board[to.first][to.second] = piece;
+        this->board[from.first][from.second] = nullptr;
 
-        mCurrentTurn = mCurrentTurn == Color::White ? Color::Black : Color::White;
+        this->currentTurn = this->currentTurn == Color::White ? Color::Black : Color::White;
 
         // TODO: Check for checkmate
 
@@ -149,7 +149,7 @@ namespace Chess {
                     // Dark squares are default console color
                     wcout << "\033[0m";
 
-                const auto &square = mBoard[x][y];
+                const auto &square = this->board[x][y];
                 wcout << (square ? square->symbol : L' ');
 
                 evenColumn = !evenColumn;

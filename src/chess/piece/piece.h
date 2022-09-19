@@ -43,7 +43,7 @@ namespace Chess {
 
         Piece(Color color, Position position, wchar_t symbol)
             : color(color),
-              mPosition(std::move(position)),
+              position(std::move(position)),
               symbol(symbol) {
         }
 
@@ -55,7 +55,7 @@ namespace Chess {
          * @param destination The position to which this piece will be moved
          */
         virtual void move(const Position &destination) {
-            mPosition = destination;
+            this->position = destination;
         }
 
         /**
@@ -97,6 +97,6 @@ namespace Chess {
         const wchar_t symbol;
 
     protected:
-        Position mPosition;
+        Position position;
     };
 }

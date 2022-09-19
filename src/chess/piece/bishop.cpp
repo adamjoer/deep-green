@@ -2,14 +2,14 @@
 
 namespace Chess {
     std::vector<Position> Bishop::possibleMoves(const Board &board) const {
-        assert(board[mPosition.first][mPosition.second].get() == this);
+        assert(board[this->position.first][this->position.second].get() == this);
 
         std::vector<Position> moves;
 
         // FIXME: Do this so the same for-loop isn't copy-pasted four times
 
         // Right and up
-        for (int x = mPosition.first + 1, y = mPosition.second + 1;
+        for (int x = this->position.first + 1, y = this->position.second + 1;
              x < BOARD_SIZE && y < BOARD_SIZE; ++x, ++y) {
             const auto &square = board[x][y];
             if (square) {
@@ -22,7 +22,7 @@ namespace Chess {
         }
 
         // Right and down
-        for (int x = mPosition.first + 1, y = mPosition.second - 1;
+        for (int x = this->position.first + 1, y = this->position.second - 1;
              x < BOARD_SIZE && y >= 0; ++x, --y) {
             const auto &square = board[x][y];
             if (square) {
@@ -35,7 +35,7 @@ namespace Chess {
         }
 
         // Left and down
-        for (int x = mPosition.first - 1, y = mPosition.second - 1;
+        for (int x = this->position.first - 1, y = this->position.second - 1;
              x >= 0 && y >= 0; --x, --y) {
             const auto &square = board[x][y];
             if (square) {
@@ -48,7 +48,7 @@ namespace Chess {
         }
 
         // Left and up
-        for (int x = mPosition.first - 1, y = mPosition.second + 1;
+        for (int x = this->position.first - 1, y = this->position.second + 1;
              x >= 0 && y < BOARD_SIZE; --x, ++y) {
             const auto &square = board[x][y];
             if (square) {

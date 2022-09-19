@@ -19,6 +19,6 @@ namespace Chess {
         void move(const Position &destination) override;
 
     private:
-        bool mHasMoved = false;
+        bool hasMoved = false;
     };
 }

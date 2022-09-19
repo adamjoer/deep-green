@@ -23,11 +23,11 @@ namespace Chess {
 
         void printBoard(const std::vector<Position> &possibleMoves = {}) const;
 
-        [[nodiscard]] Color turn() const { return mCurrentTurn; }
+        [[nodiscard]] Color turn() const { return this->currentTurn; }
 
     private:
-        Board mBoard{nullptr};
+        Board board{nullptr};
 
-        Color mCurrentTurn = Color::White;
+        Color currentTurn = Color::White;
     };
 }

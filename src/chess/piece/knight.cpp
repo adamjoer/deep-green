@@ -5,20 +5,20 @@
 
 namespace Chess {
     std::vector<Position> Knight::possibleMoves(const Board &board) const {
-        assert(board[mPosition.first][mPosition.second].get() == this);
+        assert(board[this->position.first][this->position.second].get() == this);
 
         std::vector<Position> moves;
 
         const std::array<Position, 8> possibleMoves{
             {
-                {mPosition.first + 1, mPosition.second + 2},
-                {mPosition.first + 2, mPosition.second + 1},
-                {mPosition.first + 2, mPosition.second - 1},
-                {mPosition.first + 1, mPosition.second - 2},
-                {mPosition.first - 1, mPosition.second - 2},
-                {mPosition.first - 2, mPosition.second - 1},
-                {mPosition.first - 2, mPosition.second + 1},
-                {mPosition.first - 1, mPosition.second + 2},
+                {this->position.first + 1, this->position.second + 2},
+                {this->position.first + 2, this->position.second + 1},
+                {this->position.first + 2, this->position.second - 1},
+                {this->position.first + 1, this->position.second - 2},
+                {this->position.first - 1, this->position.second - 2},
+                {this->position.first - 2, this->position.second - 1},
+                {this->position.first - 2, this->position.second + 1},
+                {this->position.first - 1, this->position.second + 2},
             }
         };
 
@@ -26,7 +26,7 @@ namespace Chess {
             try {
                 const auto &square = board.at(move.first).at(move.second);
 
-                if (!square || square->color != color)
+                if (!square || square->color != this->color)
                     moves.push_back(move);
 
             } catch (std::out_of_range &) {
