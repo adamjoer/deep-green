@@ -21,14 +21,14 @@
 #define FILL_COLUMN(index, type)                                 \
     this->board[index] = {                                       \
         {                                                        \
-            make_shared<type>(Color::White, Position(index, 0)), \
-            make_shared<Pawn>(Color::White, Position(index, 1)), \
+            make_unique<type>(Color::White, Position(index, 0)), \
+            make_unique<Pawn>(Color::White, Position(index, 1)), \
             nullptr,                                             \
             nullptr,                                             \
             nullptr,                                             \
             nullptr,                                             \
-            make_shared<Pawn>(Color::Black, Position(index, 6)), \
-            make_shared<type>(Color::Black, Position(index, 7)), \
+            make_unique<Pawn>(Color::Black, Position(index, 6)), \
+            make_unique<type>(Color::Black, Position(index, 7)), \
         }                                                        \
     };
 
@@ -101,7 +101,7 @@ namespace Chess {
 
         piece->move(to);
 
-        this->board[to.first][to.second] = piece;
+        this->board[to.first][to.second] = std::move(piece);
         this->board[from.first][from.second] = nullptr;
 
         this->currentTurn = this->currentTurn == Color::White ? Color::Black : Color::White;

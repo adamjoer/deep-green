@@ -30,7 +30,7 @@ namespace Chess {
      * it points to the piece standing at that position.
      * The 'Position' type can be used as index in this array.
      */
-    using Board = std::array<std::array<std::shared_ptr<Piece>, BOARD_SIZE>, BOARD_SIZE>;
+    using Board = std::array<std::array<std::unique_ptr<Piece>, BOARD_SIZE>, BOARD_SIZE>;
 
     enum class Color {
         White,
