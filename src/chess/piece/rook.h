@@ -8,12 +8,12 @@ namespace Chess {
     public:
         Rook() = delete;
 
-        Rook(Color color, Position position)
-            : Piece(color, position, color == Color::White ? L'\u2656' : L'\u265C') {
+        explicit Rook(Color color)
+            : Piece(color, color == Color::White ? L'♖' : L'♜') {
         }
 
         ~Rook() override = default;
 
-        [[nodiscard]] std::vector<Position> possibleMoves(const Board &board) const override;
+        [[nodiscard]] std::vector<Position> possibleMoves(const BoardState &state) const override;
     };
 }

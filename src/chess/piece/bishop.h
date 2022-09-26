@@ -8,12 +8,12 @@ namespace Chess {
     public:
         Bishop() = delete;
 
-        Bishop(Color color, Position position)
-            : Piece(color, position, color == Color::White ? L'\u2657' : L'\u265D') {
+        explicit Bishop(Color color)
+            : Piece(color, color == Color::White ? L'♗' : L'♝') {
         }
 
         ~Bishop() override = default;
 
-        [[nodiscard]] std::vector<Position> possibleMoves(const Board &board) const override;
+        [[nodiscard]] std::vector<Position> possibleMoves(const BoardState &state) const override;
     };
 }

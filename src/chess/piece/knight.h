@@ -8,12 +8,12 @@ namespace Chess {
     public:
         Knight() = delete;
 
-        Knight(Color color, Position position)
-            : Piece(color, position, color == Color::White ? L'\u2658' : L'\u265E') {
+        explicit Knight(Color color)
+            : Piece(color, color == Color::White ? L'♘' : L'♞') {
         }
 
         ~Knight() override = default;
 
-        [[nodiscard]] std::vector<Position> possibleMoves(const Board &board) const override;
+        [[nodiscard]] std::vector<Position> possibleMoves(const BoardState &state) const override;
     };
 }

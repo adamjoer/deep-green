@@ -8,17 +8,17 @@ namespace Chess {
     public:
         Pawn() = delete;
 
-        Pawn(Color color, Position position)
-            : Piece(color, position, color == Color::White ? L'\u2659' : L'\u265F') {
+        explicit Pawn(Color color)
+            : Piece(color, color == Color::White ? L'♙' : L'♟') {
         }
 
         ~Pawn() override = default;
 
-        [[nodiscard]] std::vector<Position> possibleMoves(const Board &board) const override;
-
-        void move(const Position &destination) override;
+        [[nodiscard]] std::vector<Position> possibleMoves(const BoardState &state) const override;
 
     private:
-        bool hasMoved = false;
+        // It is detected if the pawn has moved by checking it's still standing
+        // on its start row, since pawns can't move along a row.
+        static const int START_ROW = 1;
     };
 }

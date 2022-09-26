@@ -8,12 +8,12 @@ namespace Chess {
     public:
         Queen() = delete;
 
-        Queen(Color color, Position position)
-            : Piece(color, position, color == Color::White ? L'\u2655' : L'\u265B') {
+        explicit Queen(Color color)
+            : Piece(color, color == Color::White ? L'♕' : L'♛') {
         }
 
         ~Queen() override = default;
 
-        [[nodiscard]] std::vector<Position> possibleMoves(const Board &board) const override;
+        [[nodiscard]] std::vector<Position> possibleMoves(const BoardState &state) const override;
     };
 }

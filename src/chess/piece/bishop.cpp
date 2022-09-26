@@ -1,19 +1,18 @@
 #include "bishop.h"
 
 namespace Chess {
-    std::vector<Position> Bishop::possibleMoves(const Board &board) const {
-        assert(board[this->position.first][this->position.second].get() == this);
+    std::vector<Position> Bishop::possibleMoves(const BoardState &state) const {
 
         std::vector<Position> moves;
 
         // FIXME: Do this so the same for-loop isn't copy-pasted four times
 
         // Right and up
-        for (int x = this->position.first + 1, y = this->position.second + 1;
-             x < BOARD_SIZE && y < BOARD_SIZE; ++x, ++y) {
-            const auto &square = board[x][y];
+        for (int x = state.position.first + 1, y = state.position.second + 1;
+             x < state.board.size() && y < state.board.size(); ++x, ++y) {
+            const auto &square = state.board[x][y];
             if (square) {
-                if (square->color != this->color)
+                if (square.color != this->color)
                     moves.emplace_back(x, y);
                 break;
             }
@@ -22,11 +21,11 @@ namespace Chess {
         }
 
         // Right and down
-        for (int x = this->position.first + 1, y = this->position.second - 1;
-             x < BOARD_SIZE && y >= 0; ++x, --y) {
-            const auto &square = board[x][y];
+        for (int x = state.position.first + 1, y = state.position.second - 1;
+             x < state.board.size() && y >= 0; ++x, --y) {
+            const auto &square = state.board[x][y];
             if (square) {
-                if (square->color != this->color)
+                if (square.color != this->color)
                     moves.emplace_back(x, y);
                 break;
             }
@@ -35,11 +34,11 @@ namespace Chess {
         }
 
         // Left and down
-        for (int x = this->position.first - 1, y = this->position.second - 1;
+        for (int x = state.position.first - 1, y = state.position.second - 1;
              x >= 0 && y >= 0; --x, --y) {
-            const auto &square = board[x][y];
+            const auto &square = state.board[x][y];
             if (square) {
-                if (square->color != this->color)
+                if (square.color != this->color)
                     moves.emplace_back(x, y);
                 break;
             }
@@ -48,11 +47,11 @@ namespace Chess {
         }
 
         // Left and up
-        for (int x = this->position.first - 1, y = this->position.second + 1;
-             x >= 0 && y < BOARD_SIZE; --x, ++y) {
-            const auto &square = board[x][y];
+        for (int x = state.position.first - 1, y = state.position.second + 1;
+             x >= 0 && y < state.board.size(); --x, ++y) {
+            const auto &square = state.board[x][y];
             if (square) {
-                if (square->color != this->color)
+                if (square.color != this->color)
                     moves.emplace_back(x, y);
                 break;
             }

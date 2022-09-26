@@ -3,23 +3,21 @@
 #include <algorithm>
 
 namespace Chess {
-    std::vector<Position> King::possibleMoves(const Board &board) const {
-        assert(board[this->position.first][this->position.second].get() == this);
-
+    std::vector<Position> King::possibleMoves(const BoardState &state) const {
         // TODO: Handle "castling" move
         
         std::vector<Position> moves;
         
-        for (int x = std::max(this->position.first - 1, 0);
-             x <= this->position.first + 1 && x < BOARD_SIZE; ++x) {
+        for (int x = std::max(state.position.first - 1, 0);
+             x <= state.position.first + 1 && x < state.board.size(); ++x) {
 
-            for (int y = std::max(this->position.second - 1, 0);
-                 y <= this->position.second + 1 && y < BOARD_SIZE; ++y) {
-                if (Position(x, y) == this->position)
+            for (int y = std::max(state.position.second - 1, 0);
+                 y <= state.position.second + 1 && y < state.board.size(); ++y) {
+                if (Position(x, y) == state.position)
                     continue;
 
-                const auto &square = board[x][y];
-                if (!square || square->color != this->color)
+                const auto &square = state.board[x][y];
+                if (!square || square.color != this->color)
                     moves.emplace_back(x, y);
             }
         }
