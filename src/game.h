@@ -24,15 +24,20 @@ public:
 
     void reset();
 
-    [[nodiscard]] std::vector<Chess::Position> getPossibleMoves(Chess::Position position) const;
+    [[nodiscard]]
+    std::vector<Chess::Position> getPossibleMoves(Chess::Position position) const;
 
     bool move(const Chess::Position &from, const Chess::Position &to);
 
-    [[nodiscard]] Chess::Color turn() const { return this->currentTurn; }
+    [[nodiscard]]
+    Chess::Color turn() const { return this->currentTurn; }
 
 private slots:
+
     void zoomIn();
+
     void zoomOut();
+
     void about();
 
 private:

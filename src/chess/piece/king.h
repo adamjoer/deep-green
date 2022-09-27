@@ -14,6 +14,7 @@ namespace Chess {
 
         ~King() override = default;
 
-        [[nodiscard]] std::vector<Position> possibleMoves(const BoardState &state) const override;
+        [[nodiscard]]
+        std::vector<Position> possibleMoves(const BoardState &state) const override;
     };
 }

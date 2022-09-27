@@ -20,7 +20,8 @@ namespace Gui {
 
         void addTeamStartingPosition(const Chess::Team &team);
 
-        [[nodiscard]] int getSquarePixelSize() const { return this->squarePixelSize; }
+        [[nodiscard]]
+        int getSquarePixelSize() const { return this->squarePixelSize; }
 
     private:
         int squarePixelSize;
