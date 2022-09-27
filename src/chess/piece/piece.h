@@ -23,14 +23,19 @@ namespace Chess {
     };
 
     struct SquareStatus {
-        Color color;
+        SquareStatus(Color color, bool isEmpty)
+            : color(color),
+              isEmpty(isEmpty) {
+        }
+
+        const Color color;
 
         explicit operator bool() const {
             return isEmpty;
         }
 
     private:
-        bool isEmpty;
+        const bool isEmpty;
     };
 
     struct BoardState {
@@ -57,7 +62,8 @@ namespace Chess {
          * @param state The current state of the board
          * @return Whether this piece can move to 'destination'
          */
-        [[nodiscard]] bool canMoveTo(const Position &destination, const BoardState &state) const {
+        [[nodiscard]]
+        bool canMoveTo(const Position &destination, const BoardState &state) const {
 
             // FIXME: There is most definitely a more efficient way to check this.
             //        This solution is just the quickest and easiest way to implement
@@ -77,7 +83,8 @@ namespace Chess {
          * @param state The current state of the board
          * @return A vector containing all the positions this piece can move to
          */
-        [[nodiscard]] virtual std::vector<Position> possibleMoves(const BoardState &state) const = 0;
+        [[nodiscard]]
+        virtual std::vector<Position> possibleMoves(const BoardState &state) const = 0;
 
         const Color color;
 
