@@ -25,7 +25,8 @@ namespace Gui {
             font.setPixelSize(contentsRect.height());
             painter.setFont(font);
             painter.setPen(QColorConstants::Black);
-            painter.drawText(contentsRect, Qt::AlignCenter, QString(piece->symbol));
+            painter.drawText(contentsRect, Qt::AlignCenter,
+                             QString(QChar(piece->symbol)));
         }
     }
 
