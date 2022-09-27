@@ -16,30 +16,29 @@ namespace Gui {
         layout->setSpacing(0);
         layout->setContentsMargins(0, 0, 0, 0);
 
-        for (int column = 0; column < Chess::Team::SIZE; ++column) {
-            for (int row = 0; row < Chess::Team::SIZE; ++row) {
+        for (int column = 0; column < SIZE; ++column) {
+            for (int row = 0; row < SIZE; ++row) {
                 auto square = this->squares[column][row]
                                   = new Square(this, (column + row) % 2 == 0);
-                layout->addWidget(square, Chess::Team::SIZE - 1 - row, column);
+                layout->addWidget(square, SIZE - 1 - row, column);
             }
         }
         setLayout(layout);
 
-        setFixedSize(Chess::Team::SIZE * this->squarePixelSize,
-                     Chess::Team::SIZE * this->squarePixelSize);
+        setFixedSize(SIZE * this->squarePixelSize, SIZE * this->squarePixelSize);
     }
 
     void Board::addTeamStartingPosition(const Chess::Team &team) {
+        static_assert((Chess::Team::SIZE / 2.0F) == SIZE);
+        static_assert(Chess::Team::QUEEN_COLUMN > 0 && Chess::Team::QUEEN_COLUMN < SIZE);
         assert(team.isFull());
 
         const auto &queen = team.getQueen();
         const auto &officers = team.getOfficers();
         const auto &pawns = team.getPawns();
 
-        int officerRow = (team.getColor() == Chess::Color::White) ? 0 :
-                         Chess::Team::SIZE - 1;
-        int pawnRow = (team.getColor() == Chess::Color::White) ? 1 :
-                      Chess::Team::SIZE - 2;
+        int officerRow = (team.getColor() == Chess::Color::White) ? 0 : SIZE - 1;
+        int pawnRow = (team.getColor() == Chess::Color::White) ? 1 : SIZE - 2;
 
         int i = 0;
         for (const auto &officer: officers) {
@@ -61,7 +60,6 @@ namespace Gui {
 
         this->squarePixelSize += offset;
 
-        setFixedSize(Chess::Team::SIZE * this->squarePixelSize,
-                     Chess::Team::SIZE * this->squarePixelSize);
+        setFixedSize(SIZE * this->squarePixelSize, SIZE * this->squarePixelSize);
     }
 }

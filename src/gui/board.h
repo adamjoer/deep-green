@@ -12,6 +12,8 @@ namespace Gui {
     Q_OBJECT
 
     public:
+        static const int SIZE = 8;
+
         explicit Board(QWidget *parent);
 
         void zoom(int offset);
@@ -23,6 +25,6 @@ namespace Gui {
     private:
         int squarePixelSize;
 
-        std::array<std::array<Square *, Chess::Team::SIZE>, Chess::Team::SIZE> squares{nullptr};
+        std::array<std::array<Square *, SIZE>, SIZE> squares{nullptr};
     };
 }
