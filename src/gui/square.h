@@ -49,8 +49,8 @@ namespace Gui {
         void pressed(Gui::Square &square);
 
     private:
-        static const QRgb LIGHT_COLOR = 0xd6b18b;
-        static const QRgb DARK_COLOR = 0xa57a60;
+        static const QRgb DEFAULT_LIGHT_COLOR = 0xd6b18b;
+        static const QRgb DEFAULT_DARK_COLOR = 0xa57a60;
 
         // FIXME: Find prettier colors
         static const QRgb HIGHLIGHT_COLOR = 0xff0000;
@@ -61,7 +61,7 @@ namespace Gui {
         const int row;
         const int column;
 
-        const QColor color;
+        const QColor defaultColor;
 
         State state = State::Default;
 

@@ -7,7 +7,8 @@ namespace Gui {
         : QWidget(parent),
           row(row),
           column(column),
-          color((column + row) % 2 == 0 ? DARK_COLOR : LIGHT_COLOR) {
+          defaultColor((column + row) % 2 == 0 ? DEFAULT_DARK_COLOR
+                                               : DEFAULT_LIGHT_COLOR) {
     }
 
     void Square::paintEvent(QPaintEvent *event) {
@@ -20,7 +21,7 @@ namespace Gui {
 
         switch (this->state) {
             case State::Default:
-                painter.setBrush(this->color);
+                painter.setBrush(this->defaultColor);
                 break;
             case State::Highlighted:
                 painter.setBrush(QColor(HIGHLIGHT_COLOR));
