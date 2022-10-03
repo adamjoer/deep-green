@@ -41,6 +41,8 @@ private slots:
 
     void zoomOut();
 
+    void clearHighlights();
+
     void about();
 
 private:
@@ -51,6 +53,7 @@ private:
 
     QAction *zoomInAction{nullptr};
     QAction *zoomOutAction{nullptr};
+    QAction *clearHighlightsAction{nullptr};
 
     void createActions();
 

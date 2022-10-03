@@ -61,6 +61,10 @@ void Game::createActions() {
     this->zoomOutAction = viewMenu->addAction("Zoom &Out", this, &Game::zoomOut);
     this->zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
+    this->clearHighlightsAction
+        = viewMenu->addAction("&Clear Highlights", this, &Game::clearHighlights);
+    this->clearHighlightsAction->setShortcut(Qt::ALT | Qt::SHIFT | Qt::Key_X);
+
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
     helpMenu->addAction("&About", this, &Game::about);
@@ -109,6 +113,10 @@ void Game::zoomOut() {
 
     if (this->board->getSquarePixelSize() <= 25)
         this->zoomOutAction->setDisabled(true);
+}
+
+void Game::clearHighlights() {
+    this->board->clearHighlights();
 }
 
 void Game::about() {

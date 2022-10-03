@@ -54,6 +54,14 @@ namespace Gui {
             this->squares[i++][pawnRow]->setPiece(pawn);
     }
 
+    void Board::clearHighlights() {
+        for (auto &row : squares) {
+            for (auto square : row) {
+                square->setState(Square::State::Default);
+            }
+        }
+    }
+
     void Board::setSquarePixelSize(int newSquarePixelSize) {
         if (newSquarePixelSize <= 0 || newSquarePixelSize == this->squarePixelSize)
             return;
