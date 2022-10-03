@@ -1,10 +1,5 @@
 #pragma once
 
-#include <utility>
-#include <array>
-#include <vector>
-#include <memory>
-
 #include <QMainWindow>
 #include <QWidget>
 #include <QLabel>

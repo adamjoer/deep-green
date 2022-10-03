@@ -1,7 +1,5 @@
 #include "game.h"
 
-#include <iostream>
-
 #include <QLayout>
 #include <QMenuBar>
 #include <QStatusBar>
