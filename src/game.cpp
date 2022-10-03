@@ -56,14 +56,16 @@ void Game::createActions() {
 }
 
 void Game::zoomIn() {
-    this->board->zoom(SQUARE_SIZE_ADJUST_OFFSET);
+    this->board->setSquarePixelSize(
+        this->board->getSquarePixelSize() + SQUARE_SIZE_ADJUST_OFFSET);
     setFixedSize(sizeHint());
 
     this->zoomOutAction->setDisabled(false);
 }
 
 void Game::zoomOut() {
-    this->board->zoom(-SQUARE_SIZE_ADJUST_OFFSET);
+    this->board->setSquarePixelSize(
+        this->board->getSquarePixelSize() - SQUARE_SIZE_ADJUST_OFFSET);
     setFixedSize(sizeHint());
 
     if (this->board->getSquarePixelSize() <= 25)

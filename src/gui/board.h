@@ -16,12 +16,12 @@ namespace Gui {
 
         explicit Board(QWidget *parent);
 
-        void zoom(int offset);
-
         void addTeamStartingPosition(const Chess::Team &team);
 
         [[nodiscard]]
         int getSquarePixelSize() const { return this->squarePixelSize; }
+
+        void setSquarePixelSize(int newSquarePixelSize);
 
     private:
         int squarePixelSize;

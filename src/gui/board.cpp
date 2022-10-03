@@ -54,11 +54,11 @@ namespace Gui {
             this->squares[i++][pawnRow]->setPiece(pawn);
     }
 
-    void Board::zoom(int offset) {
-        if (offset == 0)
+    void Board::setSquarePixelSize(int newSquarePixelSize) {
+        if (newSquarePixelSize <= 0 || newSquarePixelSize == this->squarePixelSize)
             return;
 
-        this->squarePixelSize += offset;
+        this->squarePixelSize = newSquarePixelSize;
 
         setFixedSize(SIZE * this->squarePixelSize, SIZE * this->squarePixelSize);
     }
