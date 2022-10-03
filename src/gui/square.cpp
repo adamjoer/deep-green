@@ -5,9 +5,11 @@
 #include <QPainter>
 
 namespace Gui {
-    Square::Square(QWidget *parent, bool isDark)
+    Square::Square(QWidget *parent, int row, int column)
         : QWidget(parent),
-          color(isDark ? DARK_COLOR : LIGHT_COLOR) {
+          row(row),
+          column(column),
+          color((column + row) % 2 == 0 ? DARK_COLOR : LIGHT_COLOR) {
     }
 
     void Square::paintEvent(QPaintEvent *event) {
@@ -32,6 +34,7 @@ namespace Gui {
 
     void Square::mousePressEvent(QMouseEvent *event) {
         // TODO: Notify Game
-        std::cout << "Square pressed!\n";
+        std::cout << "Square pressed! Coordinates: " << (char) ('a' + this->column)
+                  << (this->row + 1) << (this->piece ? " (Full)" : " (Empty)")  << '\n';
     }
 }

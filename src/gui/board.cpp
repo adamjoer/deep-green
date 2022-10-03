@@ -19,7 +19,7 @@ namespace Gui {
         for (int column = 0; column < SIZE; ++column) {
             for (int row = 0; row < SIZE; ++row) {
                 auto square = this->squares[column][row]
-                                  = new Square(this, (column + row) % 2 == 0);
+                                  = new Square(this, row, column);
                 layout->addWidget(square, SIZE - 1 - row, column);
             }
         }

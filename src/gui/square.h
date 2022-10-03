@@ -17,7 +17,7 @@ namespace Gui {
     public:
         static const int DEFAULT_PIXEL_SIZE = 75;
 
-        explicit Square(QWidget *parent, bool isDark);
+        explicit Square(QWidget *parent, int row, int column);
 
         std::shared_ptr<Chess::Piece> getPiece() {
             return this->piece;
@@ -27,11 +27,20 @@ namespace Gui {
             this->piece = newPiece;
         }
 
+        [[nodiscard]]
+        int getRow() const { return this->row; }
+
+        [[nodiscard]]
+        int getColumn() const { return this->column; }
+
     private:
         static const QRgb LIGHT_COLOR = 0xd6b18b;
         static const QRgb DARK_COLOR = 0xa57a60;
 
         std::shared_ptr<Chess::Piece> piece{nullptr};
+
+        const int row;
+        const int column;
 
         const QColor color;
 
