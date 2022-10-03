@@ -81,9 +81,17 @@ void Game::createActions() {
 void Game::squarePressed(Gui::Square &square) {
 
     // TODO: Implement
-    std::cout << "Square pressed! Coordinates: " << (char) ('a' + square.getColumn())
-              << (square.getRow() + 1) << (square.getPiece() ? " (Full)" : " (Empty)")
-              << '\n';
+    switch (square.getState()) {
+        case Gui::Square::State::Default:
+            square.setState(Gui::Square::State::Highlighted);
+            break;
+        case Gui::Square::State::Highlighted:
+            square.setState(Gui::Square::State::PossibleMove);
+            break;
+        case Gui::Square::State::PossibleMove:
+            square.setState(Gui::Square::State::Default);
+            break;
+    }
 }
 
 void Game::zoomIn() {

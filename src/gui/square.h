@@ -15,6 +15,12 @@ namespace Gui {
     Q_OBJECT
 
     public:
+        enum class State {
+            Default,
+            Highlighted,
+            PossibleMove,
+        };
+
         static const int DEFAULT_PIXEL_SIZE = 75;
 
         explicit Square(QWidget *parent, int row, int column);
@@ -33,13 +39,22 @@ namespace Gui {
         [[nodiscard]]
         int getColumn() const { return this->column; }
 
+        [[nodiscard]]
+        State getState() const { return this->state; }
+
+        void setState(State newState);
+
     signals:
 
-        void pressed(Square &square);
+        void pressed(Gui::Square &square);
 
     private:
         static const QRgb LIGHT_COLOR = 0xd6b18b;
         static const QRgb DARK_COLOR = 0xa57a60;
+
+        // FIXME: Find prettier colors
+        static const QRgb HIGHLIGHT_COLOR = 0xff0000;
+        static const QRgb POSSIBLE_MOVE_COLOR = 0x0000ff;
 
         std::shared_ptr<Chess::Piece> piece{nullptr};
 
@@ -47,6 +62,8 @@ namespace Gui {
         const int column;
 
         const QColor color;
+
+        State state = State::Default;
 
         void mousePressEvent(QMouseEvent *event) override;
 

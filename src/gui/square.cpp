@@ -17,7 +17,19 @@ namespace Gui {
 
         QPainter painter(this);
         painter.setPen(Qt::NoPen);
-        painter.setBrush(this->color);
+
+        switch (this->state) {
+            case State::Default:
+                painter.setBrush(this->color);
+                break;
+            case State::Highlighted:
+                painter.setBrush(QColor(HIGHLIGHT_COLOR));
+                break;
+            case State::PossibleMove:
+                painter.setBrush(QColor(POSSIBLE_MOVE_COLOR));
+                break;
+        }
+
         painter.drawRect(contentsRect);
 
         if (this->piece) {
@@ -33,5 +45,14 @@ namespace Gui {
     void Square::mousePressEvent(QMouseEvent *event) {
         // Emit "pressed" signal
         emit pressed(*this);
+    }
+
+    void Square::setState(Gui::Square::State newState) {
+        if (newState == this->state)
+            return;
+
+        this->state = newState;
+
+        update();
     }
 }
