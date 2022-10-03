@@ -30,7 +30,7 @@ namespace Gui {
 
     void Board::addTeamStartingPosition(const Chess::Team &team) {
         static_assert((Chess::Team::SIZE / 2.0F) == SIZE);
-        static_assert(Chess::Team::QUEEN_COLUMN > 0 && Chess::Team::QUEEN_COLUMN < SIZE);
+        static_assert(Chess::Team::QUEEN_COLUMN >= 0 && Chess::Team::QUEEN_COLUMN < SIZE);
         assert(team.isFull());
 
         const auto &queen = team.getQueen();
