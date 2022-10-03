@@ -37,11 +37,11 @@ private slots:
 
     void squarePressed(Gui::Square &square);
 
+    void clearHighlights();
+
     void zoomIn();
 
     void zoomOut();
-
-    void clearHighlights();
 
     void about();
 
@@ -51,9 +51,9 @@ private:
     Gui::Board *board;
     QLabel *turnLabel{nullptr};
 
+    QAction *clearHighlightsAction{nullptr};
     QAction *zoomInAction{nullptr};
     QAction *zoomOutAction{nullptr};
-    QAction *clearHighlightsAction{nullptr};
 
     void createActions();
 

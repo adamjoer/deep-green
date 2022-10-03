@@ -55,15 +55,17 @@ void Game::createActions() {
 
     QMenu *viewMenu = menuBar()->addMenu("&View");
 
+    this->clearHighlightsAction
+        = viewMenu->addAction("&Clear Highlights", this, &Game::clearHighlights);
+    this->clearHighlightsAction->setShortcut(Qt::ALT | Qt::SHIFT | Qt::Key_X);
+
+    viewMenu->addSeparator();
+
     this->zoomInAction = viewMenu->addAction("Zoom &In", this, &Game::zoomIn);
     this->zoomInAction->setShortcut(QKeySequence::ZoomIn);
 
     this->zoomOutAction = viewMenu->addAction("Zoom &Out", this, &Game::zoomOut);
     this->zoomOutAction->setShortcut(QKeySequence::ZoomOut);
-
-    this->clearHighlightsAction
-        = viewMenu->addAction("&Clear Highlights", this, &Game::clearHighlights);
-    this->clearHighlightsAction->setShortcut(Qt::ALT | Qt::SHIFT | Qt::Key_X);
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
@@ -98,6 +100,10 @@ void Game::squarePressed(Gui::Square &square) {
     }
 }
 
+void Game::clearHighlights() {
+    this->board->clearHighlights();
+}
+
 void Game::zoomIn() {
     this->board->setSquarePixelSize(
         this->board->getSquarePixelSize() + SQUARE_SIZE_ADJUST_OFFSET);
@@ -113,10 +119,6 @@ void Game::zoomOut() {
 
     if (this->board->getSquarePixelSize() <= 25)
         this->zoomOutAction->setDisabled(true);
-}
-
-void Game::clearHighlights() {
-    this->board->clearHighlights();
 }
 
 void Game::about() {
