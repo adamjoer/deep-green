@@ -23,6 +23,11 @@ namespace Gui {
 
         void setSquarePixelSize(int newSquarePixelSize);
 
+        [[nodiscard]]
+        const std::array<std::array<Square *, SIZE>, SIZE> &getSquares() const {
+            return this->squares;
+        }
+
     private:
         int squarePixelSize;
 
