@@ -48,7 +48,6 @@ private:
 
     QAction *zoomInAction{nullptr};
     QAction *zoomOutAction{nullptr};
-    QAction *disableBoardAction{nullptr};
 
     void createActions();
 
