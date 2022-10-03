@@ -33,6 +33,10 @@ namespace Gui {
         [[nodiscard]]
         int getColumn() const { return this->column; }
 
+    signals:
+
+        void pressed(Square &square);
+
     private:
         static const QRgb LIGHT_COLOR = 0xd6b18b;
         static const QRgb DARK_COLOR = 0xa57a60;

@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include <iostream>
+
 #include <QLayout>
 #include <QMenuBar>
 #include <QStatusBar>
@@ -21,6 +23,15 @@ Game::Game(QWidget *parent)
 
     board->addTeamStartingPosition(whiteTeam);
     board->addTeamStartingPosition(blackTeam);
+
+    // Connect each of the GUI square's "pressed" signal to this object's
+    // "squarePressed" slot.
+    // See https://doc.qt.io/qt-6/signalsandslots.html
+    for (const auto &row: this->board->getSquares()) {
+        for (const auto square: row) {
+            connect(square, &Gui::Square::pressed, this, &Game::squarePressed);
+        }
+    }
 
     setCentralWidget(this->board);
 
@@ -53,6 +64,26 @@ void Game::createActions() {
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
     helpMenu->addAction("&About", this, &Game::about);
+}
+
+/**
+ * Slot designated to be invoked whenever a square has been pressed with the
+ * mouse in the GUI.
+ *
+ * <p> This function handles highlighting the square and, if there is a chess piece
+ * standing on the square, possible moves for that piece.
+ * If a square has already been highlighted and the user presses a square which
+ * is a possible move, the piece on the highlighted square will be moved to
+ * the pressed square.
+ *
+ * @param square A reference to the GUI square object which was pressed
+ */
+void Game::squarePressed(Gui::Square &square) {
+
+    // TODO: Implement
+    std::cout << "Square pressed! Coordinates: " << (char) ('a' + square.getColumn())
+              << (square.getRow() + 1) << (square.getPiece() ? " (Full)" : " (Empty)")
+              << '\n';
 }
 
 void Game::zoomIn() {

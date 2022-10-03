@@ -1,7 +1,5 @@
 #include "square.h"
 
-#include <iostream>
-
 #include <QPainter>
 
 namespace Gui {
@@ -33,8 +31,7 @@ namespace Gui {
     }
 
     void Square::mousePressEvent(QMouseEvent *event) {
-        // TODO: Notify Game
-        std::cout << "Square pressed! Coordinates: " << (char) ('a' + this->column)
-                  << (this->row + 1) << (this->piece ? " (Full)" : " (Empty)")  << '\n';
+        // Emit "pressed" signal
+        emit pressed(*this);
     }
 }

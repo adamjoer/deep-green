@@ -12,6 +12,7 @@
 
 #include "chess/piece/piece.h"
 #include "chess/team.h"
+#include "gui/square.h"
 #include "gui/board.h"
 
 class Game final : public QMainWindow {
@@ -33,6 +34,8 @@ public:
     Chess::Color turn() const { return this->currentTurn; }
 
 private slots:
+
+    void squarePressed(Gui::Square &square);
 
     void zoomIn();
 
