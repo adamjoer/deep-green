@@ -44,6 +44,9 @@ namespace Gui {
 
         void setState(State newState);
 
+        [[nodiscard]]
+        bool isEmpty() const { return this->piece == nullptr; }
+
     signals:
 
         void pressed(Gui::Square &square);
