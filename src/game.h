@@ -19,11 +19,6 @@ public:
 
     void reset();
 
-    [[nodiscard]]
-    std::vector<Chess::Position> getPossibleMoves(Chess::Position position) const;
-
-    void move(Gui::Square &from, Gui::Square &to);
-
 private slots:
 
     void squarePressed(Gui::Square &square);
@@ -46,16 +41,18 @@ private:
     QAction *zoomInAction{nullptr};
     QAction *zoomOutAction{nullptr};
 
-    void createActions();
-
-    void nextTurn();
-
-    void setTurn(Chess::Color newTurn);
-
     Chess::Team whiteTeam;
     Chess::Team blackTeam;
 
     Chess::Color turn = Chess::Color::White;
 
     Gui::Square *highlightedSquare{nullptr};
+
+    void createActions();
+
+    void move(Gui::Square &from, Gui::Square &to);
+
+    void nextTurn();
+
+    void setTurn(Chess::Color newTurn);
 };

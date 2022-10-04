@@ -159,16 +159,6 @@ void Game::reset() {
 }
 
 /**
- * Get all the positions to which the piece standing at 'position' can move.
- *
- * @param position The position of the piece whose possible moves will be returned
- * @return A vector containing all the positions the piece can move to
- */
-std::vector<Chess::Position> Game::getPossibleMoves(const Chess::Position position) const {
-    return {};
-}
-
-/**
  * Move the piece standing at the 'from' position to the 'to' position.
  * If there is a piece already standing on the 'to' position, that piece
  * is captured, and is therefore removed from the chess board.
