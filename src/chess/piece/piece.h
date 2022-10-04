@@ -18,29 +18,26 @@ namespace Chess {
     using Position = std::pair<int, int>;
 
     enum class Color {
+        Empty,
         White,
         Black,
     };
 
-    struct SquareStatus {
-        SquareStatus(Color color, bool isEmpty)
-            : color(color),
-              isEmpty(isEmpty) {
-        }
-
-        const Color color;
+    struct SquareState {
+        Color color{Color::Empty};
 
         explicit operator bool() const {
-            return isEmpty;
+            return color != Color::Empty;
         }
-
-    private:
-        const bool isEmpty;
     };
 
     struct BoardState {
-        std::array<std::array<SquareStatus, 8>, 8> board;
-        std::pair<int, int> position;
+        explicit BoardState(Position position)
+            : position(std::move(position)) {
+        }
+
+        std::array<std::array<SquareState, 8>, 8> board;
+        const Position position;
     };
 
     class Piece {
