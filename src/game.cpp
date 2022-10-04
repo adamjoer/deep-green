@@ -52,6 +52,11 @@ void Game::createActions() {
     QAction *exitAct = fileMenu->addAction("E&xit", this, &QWidget::close);
     exitAct->setShortcut(Qt::CTRL | Qt::Key_Q);
 
+    QMenu *editMenu = menuBar()->addMenu("&Edit");
+
+    this->restartAction = editMenu->addAction("&Restart Game", this, &Game::restart);
+    this->restartAction->setShortcut(Qt::CTRL | Qt::Key_R);
+
     QMenu *viewMenu = menuBar()->addMenu("&View");
 
     this->clearHighlightsAction
@@ -116,6 +121,23 @@ void Game::squarePressed(Gui::Square &square) {
     this->board->highlightPossibleMoves(possibleMoves);
 }
 
+/**
+ * Restart the game, so all pieces are standing at their starting positions,
+ * and it is white's turn to move.
+ */
+void Game::restart() {
+    setTurn(Chess::Color::White);
+
+    this->highlightedSquare = nullptr;
+    this->board->reset();
+
+    whiteTeam.reset();
+    blackTeam.reset();
+
+    board->addTeamStartingPosition(whiteTeam);
+    board->addTeamStartingPosition(blackTeam);
+}
+
 void Game::clearHighlights() {
     this->board->clearHighlights();
     this->highlightedSquare = nullptr;
@@ -146,16 +168,6 @@ void Game::about() {
                        TO_STRING(CHESS_VERSION_PATCH)
                        "</b></p>"
                        "<p>" TO_STRING(CHESS_DESCRIPTION) "</p>");
-}
-
-/**
- * Reset the game, so all pieces are standing at their starting positions,
- * and it is white's turn to move.
- */
-void Game::reset() {
-    this->turn = Chess::Color::White;
-    whiteTeam.reset();
-    blackTeam.reset();
 }
 
 /**

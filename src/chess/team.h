@@ -29,6 +29,7 @@ namespace Chess {
         ~Team() = default;
 
         void reset() {
+            this->queen.reset();
             this->queen = std::make_shared<Queen>(color);
 
             this->officers.clear();

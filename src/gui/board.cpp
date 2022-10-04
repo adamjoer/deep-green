@@ -62,6 +62,15 @@ namespace Gui {
         origin->setPiece(nullptr);
     }
 
+    void Board::reset() {
+        for (auto &row: squares) {
+            for (auto square: row) {
+                square->setState(Square::State::Default);
+                square->setPiece(nullptr);
+            }
+        }
+    }
+
     void Board::clearHighlights() {
         for (auto &row: squares) {
             for (auto square: row) {

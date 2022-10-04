@@ -17,11 +17,11 @@ public:
 
     ~Game() override = default;
 
-    void reset();
-
 private slots:
 
     void squarePressed(Gui::Square &square);
+
+    void restart();
 
     void clearHighlights();
 
@@ -35,8 +35,9 @@ private:
     const static int SQUARE_SIZE_ADJUST_OFFSET = 5;
 
     Gui::Board *board;
-    QLabel *turnLabel{nullptr};
+    QLabel *turnLabel;
 
+    QAction *restartAction{nullptr};
     QAction *clearHighlightsAction{nullptr};
     QAction *zoomInAction{nullptr};
     QAction *zoomOutAction{nullptr};
