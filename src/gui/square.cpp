@@ -5,8 +5,7 @@
 namespace Gui {
     Square::Square(QWidget *parent, int row, int column)
         : QWidget(parent),
-          row(row),
-          column(column),
+          position(column, row),
           defaultColor((column + row) % 2 == 0 ? DEFAULT_DARK_COLOR
                                                : DEFAULT_LIGHT_COLOR) {
     }

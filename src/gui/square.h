@@ -34,10 +34,7 @@ namespace Gui {
         }
 
         [[nodiscard]]
-        int getRow() const { return this->row; }
-
-        [[nodiscard]]
-        int getColumn() const { return this->column; }
+        Chess::Position getPosition() const { return this->position; }
 
         [[nodiscard]]
         State getState() const { return this->state; }
@@ -61,8 +58,7 @@ namespace Gui {
 
         std::shared_ptr<Chess::Piece> piece{nullptr};
 
-        const int row;
-        const int column;
+        const Chess::Position position;
 
         const QColor defaultColor;
 

@@ -95,7 +95,7 @@ void Game::squarePressed(Gui::Square &square) {
     if (square.isEmpty())
         return;
 
-    Chess::BoardState state({square.getColumn(), square.getRow()});
+    Chess::BoardState state(square.getPosition());
     this->board->getBoardState(state);
 
     const auto possibleMoves = square.getPiece()->possibleMoves(state);
