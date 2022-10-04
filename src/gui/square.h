@@ -29,9 +29,7 @@ namespace Gui {
             return this->piece;
         };
 
-        void setPiece(const std::shared_ptr<Chess::Piece> &newPiece) {
-            this->piece = newPiece;
-        }
+        void setPiece(const std::shared_ptr<Chess::Piece> &newPiece);
 
         [[nodiscard]]
         Chess::Position getPosition() const { return this->position; }

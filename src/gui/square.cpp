@@ -47,6 +47,15 @@ namespace Gui {
         emit pressed(*this);
     }
 
+    void Square::setPiece(const std::shared_ptr<Chess::Piece> &newPiece) {
+        if (newPiece == this->piece)
+            return;
+
+        this->piece = newPiece;
+
+        update();
+    }
+
     void Square::setState(Gui::Square::State newState) {
         if (newState == this->state)
             return;
