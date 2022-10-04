@@ -20,6 +20,10 @@ namespace Gui {
 
         void clearHighlights();
 
+        void getBoardState(Chess::BoardState &state) const;
+
+        void highlightPossibleMoves(const std::vector<Chess::Position> &possibleMoves);
+
         [[nodiscard]]
         int getSquarePixelSize() const { return this->squarePixelSize; }
 

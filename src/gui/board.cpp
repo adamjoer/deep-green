@@ -55,11 +55,29 @@ namespace Gui {
     }
 
     void Board::clearHighlights() {
-        for (auto &row : squares) {
-            for (auto square : row) {
+        for (auto &row: squares) {
+            for (auto square: row) {
                 square->setState(Square::State::Default);
             }
         }
+    }
+
+    void Board::getBoardState(Chess::BoardState &state) const {
+        for (int column = 0; column < SIZE; ++column) {
+            for (int row = 0; row < SIZE; ++row) {
+                const auto &square = this->squares[column][row];
+
+                if (square->isEmpty())
+                    state.board[column][row].color = Chess::Color::Empty;
+                else
+                    state.board[column][row].color = square->getPiece()->color;
+            }
+        }
+    }
+
+    void Board::highlightPossibleMoves(const std::vector<Chess::Position> &possibleMoves) {
+        for (const auto &move: possibleMoves)
+            this->squares[move.first][move.second]->setState(Square::State::PossibleMove);
     }
 
     void Board::setSquarePixelSize(int newSquarePixelSize) {

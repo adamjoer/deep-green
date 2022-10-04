@@ -5,6 +5,7 @@
 #include <QStatusBar>
 #include <QMessageBox>
 
+#include "chess/piece/piece.h"
 #include "config.h"
 
 // See https://stackoverflow.com/a/6852937/18713517
@@ -83,19 +84,22 @@ void Game::createActions() {
  * @param square A reference to the GUI square object which was pressed
  */
 void Game::squarePressed(Gui::Square &square) {
+    if (square.getState() == Gui::Square::State::Highlighted)
+        return;
 
-    // TODO: Implement
-    switch (square.getState()) {
-        case Gui::Square::State::Default:
-            square.setState(Gui::Square::State::Highlighted);
-            break;
-        case Gui::Square::State::Highlighted:
-            square.setState(Gui::Square::State::PossibleMove);
-            break;
-        case Gui::Square::State::PossibleMove:
-            square.setState(Gui::Square::State::Default);
-            break;
-    }
+    // TODO: Implement moving chess pieces
+
+    this->board->clearHighlights();
+    square.setState(Gui::Square::State::Highlighted);
+
+    if (square.isEmpty())
+        return;
+
+    Chess::BoardState state({square.getColumn(), square.getRow()});
+    this->board->getBoardState(state);
+
+    const auto possibleMoves = square.getPiece()->possibleMoves(state);
+    this->board->highlightPossibleMoves(possibleMoves);
 }
 
 void Game::clearHighlights() {
