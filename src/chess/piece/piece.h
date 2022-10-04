@@ -32,12 +32,8 @@ namespace Chess {
     };
 
     struct BoardState {
-        explicit BoardState(Position position)
-            : position(std::move(position)) {
-        }
-
-        std::array<std::array<SquareState, 8>, 8> board;
-        const Position position;
+        const std::array<std::array<SquareState, 8>, 8> &board;
+        const Position &position;
     };
 
     class Piece {

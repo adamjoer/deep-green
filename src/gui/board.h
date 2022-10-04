@@ -24,7 +24,11 @@ namespace Gui {
 
         void clearHighlights();
 
-        void getBoardState(Chess::BoardState &state) const;
+        [[nodiscard]]
+        const std::array<std::array<Chess::SquareState, Board::SIZE>, Board::SIZE>
+        &getBoardRepresentation() const {
+            return this->boardRepresentation;
+        }
 
         void highlightPossibleMoves(const std::vector<Chess::Position> &possibleMoves);
 
@@ -42,5 +46,7 @@ namespace Gui {
         int squarePixelSize;
 
         std::array<std::array<Square *, SIZE>, SIZE> squares{nullptr};
+
+        std::array<std::array<Chess::SquareState, SIZE>, SIZE> boardRepresentation;
     };
 }

@@ -21,6 +21,8 @@ namespace Gui {
                 auto square = this->squares[column][row]
                                   = new Square(this, row, column);
                 layout->addWidget(square, SIZE - 1 - row, column);
+
+                this->boardRepresentation[column][row].color = Chess::Color::Empty;
             }
         }
         setLayout(layout);
@@ -44,29 +46,40 @@ namespace Gui {
         for (const auto &officer: officers) {
             if (i == Chess::Team::QUEEN_COLUMN)
                 i++;
+            this->boardRepresentation[i][officerRow].color = team.getColor();
             this->squares[i++][officerRow]->setPiece(officer);
         }
 
+        this->boardRepresentation[Chess::Team::QUEEN_COLUMN][officerRow].color = team.getColor();
         this->squares[Chess::Team::QUEEN_COLUMN][officerRow]->setPiece(queen);
 
         i = 0;
-        for (const auto &pawn: pawns)
+        for (const auto &pawn: pawns) {
+            this->boardRepresentation[i][pawnRow].color = team.getColor();
             this->squares[i++][pawnRow]->setPiece(pawn);
+        }
     }
 
     void Board::move(const Chess::Position &from, const Chess::Position &to) {
         auto origin = this->squares[from.first][from.second];
         auto destination = this->squares[to.first][to.second];
 
+        this->boardRepresentation[from.first][from.second].color = Chess::Color::Empty;
+        this->boardRepresentation[to.first][to.second].color = origin->getPiece()->color;
+
         destination->setPiece(origin->getPiece());
         origin->setPiece(nullptr);
     }
 
     void Board::reset() {
-        for (auto &row: squares) {
-            for (auto square: row) {
+        for (int column = 0; column < SIZE; ++column) {
+            for (int row = 0; row < SIZE; ++row) {
+                auto square = this->squares[column][row];
+
                 square->setState(Square::State::Default);
                 square->setPiece(nullptr);
+
+                this->boardRepresentation[column][row].color = Chess::Color::Empty;
             }
         }
     }
@@ -75,19 +88,6 @@ namespace Gui {
         for (auto &row: squares) {
             for (auto square: row) {
                 square->setState(Square::State::Default);
-            }
-        }
-    }
-
-    void Board::getBoardState(Chess::BoardState &state) const {
-        for (int column = 0; column < SIZE; ++column) {
-            for (int row = 0; row < SIZE; ++row) {
-                const auto &square = this->squares[column][row];
-
-                if (square->isEmpty())
-                    state.board[column][row].color = Chess::Color::Empty;
-                else
-                    state.board[column][row].color = square->getPiece()->color;
             }
         }
     }

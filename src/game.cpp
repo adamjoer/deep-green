@@ -118,8 +118,10 @@ void Game::squarePressed(Gui::Square &square) {
     if (square.isEmpty())
         return;
 
-    Chess::BoardState state(square.getPosition());
-    this->board->getBoardState(state);
+    Chess::BoardState state{
+        this->board->getBoardRepresentation(),
+        square.getPosition(),
+    };
 
     const auto possibleMoves = square.getPiece()->possibleMoves(state);
     this->board->highlightPossibleMoves(possibleMoves);
