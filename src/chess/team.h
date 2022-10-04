@@ -48,6 +48,21 @@ namespace Chess {
                 this->pawns.push_back(std::make_shared<Pawn>(this->color));
         }
 
+        void capturePiece(const std::shared_ptr<Piece> &piece) {
+            assert(piece != this->queen);
+
+            const auto pawnsSearch = std::find(pawns.begin(), pawns.end(), piece);
+            if (pawnsSearch != pawns.end()) {
+                pawns.erase(pawnsSearch);
+                return;
+            }
+
+            const auto officersSearch = std::find(officers.begin(), officers.end(), piece);
+
+            assert(officersSearch != officers.end());
+            officers.erase(officersSearch);
+        }
+
         [[nodiscard]]
         bool isFull() const {
             return this->queen &&
