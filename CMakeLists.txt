@@ -28,6 +28,12 @@ target_link_libraries(chess
     Qt::Widgets
 )
 
+# Assign executable as a GUI application instead of a console application
+set_target_properties(chess PROPERTIES
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE TRUE
+)
+
 target_include_directories(chess PUBLIC
     "${PROJECT_BINARY_DIR}"
 )
