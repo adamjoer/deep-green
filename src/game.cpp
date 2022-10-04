@@ -95,14 +95,11 @@ void Game::squarePressed(Gui::Square &square) {
     }
 
     if (square.getState() == Gui::Square::State::PossibleMove) {
-
         assert(highlightedSquare != nullptr);
         assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color != turn)
-            return;
-
-        move(*highlightedSquare, square);
+        if (highlightedSquare->getPiece()->color == turn)
+            move(*highlightedSquare, square);
         return;
     }
 
