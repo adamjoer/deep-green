@@ -71,7 +71,7 @@ void Game::createActions() {
     this->zoomOutAction = viewMenu->addAction("Zoom &Out", this, &Game::zoomOut);
     this->zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    QMenu *helpMenu = menuBar()->addMenu("&Help");
 
     helpMenu->addAction("&About", this, &Game::about);
 }
@@ -98,8 +98,15 @@ void Game::squarePressed(Gui::Square &square) {
         assert(highlightedSquare != nullptr);
         assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color == turn)
+        if (highlightedSquare->getPiece()->color == this->turn) {
             move(*highlightedSquare, square);
+
+        } else {
+            statusBar()->showMessage(
+                (this->turn == Chess::Color::White) ? "Black cannot move right now"
+                                                    : "White cannot move right now",
+                2000);
+        }
         return;
     }
 
@@ -133,6 +140,8 @@ void Game::restart() {
 
     board->addTeamStartingPosition(whiteTeam);
     board->addTeamStartingPosition(blackTeam);
+
+    statusBar()->showMessage("Restarted the game", 2000);
 }
 
 void Game::clearHighlights() {
