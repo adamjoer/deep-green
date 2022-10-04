@@ -15,7 +15,7 @@ namespace Chess {
         if (!state.board[state.position.first][state.position.second + yOffset]) {
             moves.emplace_back(state.position.first, state.position.second + yOffset);
 
-            if (state.position.second == START_ROW
+            if (state.position.second == startRow
                 && !state.board[state.position.first][state.position.second + (2 * yOffset)])
                 moves.emplace_back(state.position.first, state.position.second + (2 * yOffset));
         }
