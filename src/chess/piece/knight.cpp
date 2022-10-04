@@ -8,7 +8,7 @@ namespace Chess {
 
         std::vector<Position> moves;
 
-        static const std::array<Position, 8> possibleMoves{
+        const std::array<Position, 8> possibleMoves{
             {
                 {state.position.first + 1, state.position.second + 2},
                 {state.position.first + 2, state.position.second + 1},
