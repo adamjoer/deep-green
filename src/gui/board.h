@@ -18,6 +18,8 @@ namespace Gui {
 
         void addTeamStartingPosition(const Chess::Team &team);
 
+        void move(const Chess::Position &from, const Chess::Position &to);
+
         void clearHighlights();
 
         void getBoardState(Chess::BoardState &state) const;

@@ -84,12 +84,26 @@ void Game::createActions() {
  * @param square A reference to the GUI square object which was pressed
  */
 void Game::squarePressed(Gui::Square &square) {
-    if (square.getState() == Gui::Square::State::Highlighted)
+    if (&square == highlightedSquare) {
+        assert(square.getState() == Gui::Square::State::Highlighted);
         return;
+    }
 
-    // TODO: Implement moving chess pieces
+    if (square.getState() == Gui::Square::State::PossibleMove) {
+
+        assert(highlightedSquare != nullptr);
+        assert(!highlightedSquare->isEmpty());
+
+        if (highlightedSquare->getPiece()->color != currentTurn)
+            return;
+
+        move(*highlightedSquare, square);
+        return;
+    }
 
     this->board->clearHighlights();
+
+    highlightedSquare = &square;
     square.setState(Gui::Square::State::Highlighted);
 
     if (square.isEmpty())
@@ -104,6 +118,7 @@ void Game::squarePressed(Gui::Square &square) {
 
 void Game::clearHighlights() {
     this->board->clearHighlights();
+    this->highlightedSquare = nullptr;
 }
 
 void Game::zoomIn() {
@@ -162,6 +177,28 @@ std::vector<Chess::Position> Game::getPossibleMoves(const Chess::Position positi
  * @param to The position to which the piece will move
  * @return Whether the piece at the 'from' position was moved
  */
-bool Game::move(const Chess::Position &from, const Chess::Position &to) {
-    return false;
+void Game::move(Gui::Square &from, Gui::Square &to) {
+    if (!to.isEmpty()) {
+        const auto &piece = to.getPiece();
+        if (piece->color == Chess::Color::White)
+            whiteTeam.capturePiece(piece);
+        else
+            blackTeam.capturePiece(piece);
+    }
+
+    this->board->move(from.getPosition(), to.getPosition());
+
+    clearHighlights();
+    nextTurn();
+}
+
+void Game::nextTurn() {
+    if (this->currentTurn == Chess::Color::White) {
+        this->currentTurn = Chess::Color::Black;
+        this->turnLabel->setText("It is Black's turn");
+
+    } else {
+        this->currentTurn = Chess::Color::White;
+        this->turnLabel->setText("It is White's turn");
+    }
 }

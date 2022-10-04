@@ -54,6 +54,14 @@ namespace Gui {
             this->squares[i++][pawnRow]->setPiece(pawn);
     }
 
+    void Board::move(const Chess::Position &from, const Chess::Position &to) {
+        auto origin = this->squares[from.first][from.second];
+        auto destination = this->squares[to.first][to.second];
+
+        destination->setPiece(origin->getPiece());
+        origin->setPiece(nullptr);
+    }
+
     void Board::clearHighlights() {
         for (auto &row: squares) {
             for (auto square: row) {

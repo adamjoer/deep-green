@@ -5,7 +5,6 @@
 #include <QLabel>
 #include <QAction>
 
-#include "chess/piece/piece.h"
 #include "chess/team.h"
 #include "gui/square.h"
 #include "gui/board.h"
@@ -23,7 +22,7 @@ public:
     [[nodiscard]]
     std::vector<Chess::Position> getPossibleMoves(Chess::Position position) const;
 
-    bool move(const Chess::Position &from, const Chess::Position &to);
+    void move(Gui::Square &from, Gui::Square &to);
 
     [[nodiscard]]
     Chess::Color turn() const { return this->currentTurn; }
@@ -52,8 +51,12 @@ private:
 
     void createActions();
 
+    void nextTurn();
+
     Chess::Team whiteTeam;
     Chess::Team blackTeam;
 
     Chess::Color currentTurn = Chess::Color::White;
+
+    Gui::Square *highlightedSquare{nullptr};
 };
