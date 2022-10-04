@@ -24,9 +24,6 @@ public:
 
     void move(Gui::Square &from, Gui::Square &to);
 
-    [[nodiscard]]
-    Chess::Color turn() const { return this->currentTurn; }
-
 private slots:
 
     void squarePressed(Gui::Square &square);
@@ -53,10 +50,12 @@ private:
 
     void nextTurn();
 
+    void setTurn(Chess::Color newTurn);
+
     Chess::Team whiteTeam;
     Chess::Team blackTeam;
 
-    Chess::Color currentTurn = Chess::Color::White;
+    Chess::Color turn = Chess::Color::White;
 
     Gui::Square *highlightedSquare{nullptr};
 };

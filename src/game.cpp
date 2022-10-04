@@ -94,7 +94,7 @@ void Game::squarePressed(Gui::Square &square) {
         assert(highlightedSquare != nullptr);
         assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color != currentTurn)
+        if (highlightedSquare->getPiece()->color != turn)
             return;
 
         move(*highlightedSquare, square);
@@ -153,7 +153,7 @@ void Game::about() {
  * and it is white's turn to move.
  */
 void Game::reset() {
-    this->currentTurn = Chess::Color::White;
+    this->turn = Chess::Color::White;
     whiteTeam.reset();
     blackTeam.reset();
 }
@@ -193,12 +193,18 @@ void Game::move(Gui::Square &from, Gui::Square &to) {
 }
 
 void Game::nextTurn() {
-    if (this->currentTurn == Chess::Color::White) {
-        this->currentTurn = Chess::Color::Black;
-        this->turnLabel->setText("It is Black's turn");
+    setTurn((this->turn == Chess::Color::White) ? Chess::Color::Black
+                                                : Chess::Color::White);
+}
 
-    } else {
-        this->currentTurn = Chess::Color::White;
+void Game::setTurn(Chess::Color newTurn) {
+    if (newTurn == this->turn)
+        return;
+
+    this->turn = newTurn;
+
+    if (this->turn == Chess::Color::White)
         this->turnLabel->setText("It is White's turn");
-    }
+    else
+        this->turnLabel->setText("It is Black's turn");
 }
