@@ -185,7 +185,6 @@ void Game::about() {
  *
  * @param from The position where the moving piece is standing
  * @param to The position to which the piece will move
- * @return Whether the piece at the 'from' position was moved
  */
 void Game::move(Gui::Square &from, Gui::Square &to) {
     if (!to.isEmpty()) {
