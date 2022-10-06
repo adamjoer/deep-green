@@ -91,6 +91,7 @@ void Game::createActions() {
 void Game::squarePressed(Gui::Square &square) {
     if (&square == highlightedSquare) {
         assert(square.getState() == Gui::Square::State::Highlighted);
+        clearHighlights();
         return;
     }
 
@@ -110,13 +111,12 @@ void Game::squarePressed(Gui::Square &square) {
         return;
     }
 
-    this->board->clearHighlights();
+    clearHighlights();
+    if (square.isEmpty())
+        return;
 
     highlightedSquare = &square;
     square.setState(Gui::Square::State::Highlighted);
-
-    if (square.isEmpty())
-        return;
 
     Chess::BoardState state{
         this->board->getBoardRepresentation(),
@@ -147,6 +147,9 @@ void Game::restart() {
 }
 
 void Game::clearHighlights() {
+    if (!this->highlightedSquare)
+        return;
+
     this->board->clearHighlights();
     this->highlightedSquare = nullptr;
 }
