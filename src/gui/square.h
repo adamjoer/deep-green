@@ -47,12 +47,12 @@ namespace Gui {
         void pressed(Gui::Square &square);
 
     private:
-        static const QRgb DEFAULT_LIGHT_COLOR = 0xd6b18b;
-        static const QRgb DEFAULT_DARK_COLOR = 0xa57a60;
+        static const QRgb DEFAULT_LIGHT_COLOR = 0xFFD6B18B;
+        static const QRgb DEFAULT_DARK_COLOR = 0xFFA57A60;
 
         // FIXME: Find prettier colors
-        static const QRgb HIGHLIGHT_COLOR = 0xff0000;
-        static const QRgb POSSIBLE_MOVE_COLOR = 0x0000ff;
+        static const QRgb HIGHLIGHT_COLOR = 0xFFFF0000;
+        static const QRgb POSSIBLE_MOVE_COLOR = 0xFF0000FF;
 
         std::shared_ptr<Chess::Piece> piece{nullptr};
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(chess
-    VERSION 0.1.5
+    VERSION 0.1.6
     LANGUAGES CXX
     DESCRIPTION "Chess game with a simple GUI"
 )
