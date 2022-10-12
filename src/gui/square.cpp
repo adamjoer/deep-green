@@ -39,11 +39,11 @@ namespace Gui {
             painter.setFont(font);
             painter.setPen(QColorConstants::Black);
             painter.drawText(contentsRect, Qt::AlignCenter,
-                             QString(QChar(piece->symbol)));
+                             QString(QChar(this->piece->symbol)));
         }
 
         if (this->position.first == 0 || this->position.second == 0) {
-            font.setPixelSize(contentsRect.height() / 4);
+            font.setPixelSize(contentsRect.height() / 3);
             painter.setFont(font);
             painter.setPen(defaultColor.rgb() == DEFAULT_DARK_COLOR ? DEFAULT_LIGHT_COLOR
                                                                     : DEFAULT_DARK_COLOR);
