@@ -18,7 +18,7 @@ Game::Game(QWidget *parent)
       blackTeam(Chess::Color::Black),
       board(new Gui::Board(this)) {
 
-    setWindowTitle("Chess");
+    setWindowTitle(TO_STRING(PROJECT_NAME));
 
     board->addTeamStartingPosition(whiteTeam);
     board->addTeamStartingPosition(blackTeam);
@@ -172,13 +172,13 @@ void Game::zoomOut() {
 }
 
 void Game::about() {
-    QMessageBox::about(this, "About Chess",
-                       "<p><b>Chess v"
-                       TO_STRING(CHESS_VERSION_MAJOR) "."
-                       TO_STRING(CHESS_VERSION_MINOR) "."
-                       TO_STRING(CHESS_VERSION_PATCH)
+    QMessageBox::about(this, "About " TO_STRING(PROJECT_NAME),
+                       "<p><b>" TO_STRING(PROJECT_NAME) " v"
+                       TO_STRING(VERSION_MAJOR) "."
+                       TO_STRING(VERSION_MINOR) "."
+                       TO_STRING(VERSION_PATCH)
                        "</b></p>"
-                       "<p>" TO_STRING(CHESS_DESCRIPTION) "</p>");
+                       "<p>" TO_STRING(DESCRIPTION) "</p>");
 }
 
 /**
