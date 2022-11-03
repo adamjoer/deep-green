@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(chess
+project(DeepGreen
     VERSION 0.1.6
     LANGUAGES CXX
     DESCRIPTION "Chess game with a simple GUI"
@@ -21,20 +21,20 @@ find_package(Qt6 COMPONENTS
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
-add_executable(chess ${SOURCES})
-target_link_libraries(chess
+add_executable(DeepGreen ${SOURCES})
+target_link_libraries(DeepGreen
     Qt::Core
     Qt::Gui
     Qt::Widgets
 )
 
 # Assign executable as a GUI application instead of a console application
-set_target_properties(chess PROPERTIES
+set_target_properties(DeepGreen PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
 
-target_include_directories(chess PUBLIC
+target_include_directories(DeepGreen PUBLIC
     "${PROJECT_BINARY_DIR}"
 )
 

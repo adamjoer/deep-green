@@ -2,8 +2,10 @@
 
 // See https://cmake.org/cmake/help/latest/guide/tutorial/A%20Basic%20Starting%20Point.html#adding-a-version-number-and-configured-header-file
 
-#define CHESS_VERSION_MAJOR @chess_VERSION_MAJOR@
-#define CHESS_VERSION_MINOR @chess_VERSION_MINOR@
-#define CHESS_VERSION_PATCH @chess_VERSION_PATCH@
+#define PROJECT_NAME @PROJECT_NAME@
 
-#define CHESS_DESCRIPTION @chess_DESCRIPTION@
+#define VERSION_MAJOR @DeepGreen_VERSION_MAJOR@
+#define VERSION_MINOR @DeepGreen_VERSION_MINOR@
+#define VERSION_PATCH @DeepGreen_VERSION_PATCH@
+
+#define DESCRIPTION @DeepGreen_DESCRIPTION@
