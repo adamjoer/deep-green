@@ -52,7 +52,7 @@ namespace Chess {
 
         constexpr void clearOccupancyAt(Square square) {
             assert(square != Square::None);
-            this->bits ^= (1ULL << static_cast<int>(square));
+            this->bits &= ~(1ULL << static_cast<int>(square));
         }
 
         void print() const;
