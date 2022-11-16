@@ -1,17 +1,17 @@
-#include "bitBoard.h"
+#include "bitboard.h"
 
 #include <iostream>
 
 namespace Chess {
-    bool BitBoard::isOccupiedAt(Chess::Square square) const {
+    bool Bitboard::isOccupiedAt(Chess::Square square) const {
         return this->bits & (1ULL << static_cast<int>(square));
     }
 
-    void BitBoard::setOccupancyAt(Chess::Square square) {
+    void Bitboard::setOccupancyAt(Chess::Square square) {
         this->bits |= (1ULL << static_cast<int>(square));
     }
 
-    void BitBoard::print() const {
+    void Bitboard::print() const {
 
         std::cout << "Bitboard: " << this->bits << '\n';
 

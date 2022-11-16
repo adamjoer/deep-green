@@ -18,11 +18,11 @@ namespace Chess {
         A8, B8, C8, D8, E8, F8, G8, H8, noSq
     };
 
-    class BitBoard {
+    class Bitboard {
     public:
-        BitBoard() = default;
+        Bitboard() = default;
 
-        explicit BitBoard(uint64_t bits)
+        explicit Bitboard(uint64_t bits)
                 : bits(bits) {
         }
 

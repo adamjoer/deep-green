@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bitBoard.h"
+#include "bitboard.h"
 
 namespace Chess {
 
