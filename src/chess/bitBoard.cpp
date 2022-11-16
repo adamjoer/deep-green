@@ -3,12 +3,17 @@
 #include <iostream>
 
 namespace Chess {
+    // Using a bit-shifted 1 the board (64 bit) is manipulated.
     bool BitBoard::isOccupiedAt(Chess::Square square) const {
         return this->bits & (1ULL << static_cast<int>(square));
     }
 
     void BitBoard::setOccupancyAt(Chess::Square square) {
         this->bits |= (1ULL << static_cast<int>(square));
+    }
+
+    void BitBoard::removeOccupancyAt(Chess::Square square) {
+        this->bits &= ~(1ULL << static_cast<int>(square));
     }
 
     void BitBoard::print() const {

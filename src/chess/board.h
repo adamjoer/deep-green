@@ -18,12 +18,19 @@ namespace Chess {
         Pawn = 5
     };
 
+    enum class Castling {
+        WhiteKing = 1,
+        WhiteQueen = 2,
+        BlackKing = 4,
+        BlackQueen = 8
+    };
+
     class Board {
     private:
         /*
          * Bitboards for current state of the game, indexed by enums (Color and PieceType).
          */
-//         BitBoard bitboards[2][6];
+         BitBoard bitboards[2][6];
     };
 
 }
