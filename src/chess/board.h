@@ -22,6 +22,8 @@ namespace Chess {
 
     class Board {
     public:
+        static Bitboard rookAttacks(Square square, Bitboard occupiedSquares);
+
         static Bitboard bishopAttacks(Square square, Bitboard occupiedSquares);
 
         static void printAttackRays(Direction direction, Square square = Square::None);

@@ -35,6 +35,15 @@ namespace Chess {
         return ray;
     }
 
+    Bitboard Board::rookAttacks(Square square, Bitboard occupiedSquares) {
+        return {
+            slidingAttack(square, Direction::North, occupiedSquares) |
+            slidingAttack(square, Direction::East, occupiedSquares) |
+            slidingAttack(square, Direction::South, occupiedSquares) |
+            slidingAttack(square, Direction::West, occupiedSquares)
+        };
+    }
+
     Bitboard Board::bishopAttacks(Square square, Bitboard occupiedSquares) {
         // See https://rhysre.net/fast-chess-move-generation-with-magic-bitboards.html
 
