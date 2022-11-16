@@ -69,6 +69,49 @@ namespace Chess {
             this->bits &= ~(1ULL << static_cast<int>(square));
         }
 
+        constexpr explicit operator bool() const {
+            return static_cast<bool>(this->bits);
+        }
+
+        [[nodiscard]]
+        constexpr Bitboard operator~() const {
+            return Bitboard(~this->bits);
+        }
+
+        [[nodiscard]]
+        constexpr Bitboard operator&(const Bitboard &other) const {
+            return Bitboard(this->bits & other.bits);
+        }
+
+        [[nodiscard]]
+        constexpr Bitboard operator|(const Bitboard &other) const {
+            return Bitboard(this->bits | other.bits);
+        }
+
+        constexpr Bitboard operator^(const Bitboard &other) const {
+            return Bitboard(this->bits ^ other.bits);
+        }
+
+        constexpr Bitboard &operator&=(const Bitboard &other) {
+            this->bits &= other.bits;
+            return *this;
+        }
+
+        constexpr Bitboard &operator|=(const Bitboard &other) {
+            this->bits |= other.bits;
+            return *this;
+        }
+
+        constexpr Bitboard &operator^=(const Bitboard &other) {
+            this->bits ^= other.bits;
+            return *this;
+        }
+
+        [[nodiscard]]
+        constexpr bool isOverlappingWith(const Bitboard &other) const {
+            return this->bits & other.bits;
+        }
+
         static Square squareToThe(Direction direction, Square square);
 
         friend std::ostream &operator<<(std::ostream &os, const Bitboard &bitboard);
