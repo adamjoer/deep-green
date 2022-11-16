@@ -22,7 +22,7 @@ namespace Chess {
 
     class Board {
     public:
-        Bitboard bishopAttacks(Square square, Bitboard blockers);
+        static Bitboard bishopAttacks(Square square, Bitboard occupiedSquares);
 
         static void printAttackRays(Direction direction, Square square = Square::None);
 
@@ -40,6 +40,12 @@ namespace Chess {
         static std::array<Bitboard, 64> generateAttackRays(Direction direction);
 
         static Bitboard generateAttackRay(Direction direction, Square square);
+
+        static Bitboard slidingAttack(Square square, Direction direction, Bitboard occupiedSquares);
+
+        static Bitboard positiveRayAttack(Square square, Direction direction, Bitboard occupiedSquares);
+
+        static Bitboard negativeRayAttack(Square square, Direction direction, Bitboard occupiedSquares);
 
         static int bitScanForward(Bitboard bitboard);
 

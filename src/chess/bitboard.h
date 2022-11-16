@@ -35,6 +35,8 @@ namespace Chess {
     public:
         Bitboard() = default;
 
+        Bitboard(const Bitboard &other) = default;
+
         constexpr explicit Bitboard(uint64_t bits)
                 : bits(bits) {
         }
@@ -47,6 +49,8 @@ namespace Chess {
         constexpr explicit Bitboard(Args... args) {
             setOccupancyAt(args...);
         }
+
+        ~Bitboard() = default;
 
         [[nodiscard]]
         constexpr bool isOccupiedAt(Square square) const {

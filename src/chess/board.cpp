@@ -35,36 +35,60 @@ namespace Chess {
         return ray;
     }
 
-    Bitboard Board::bishopAttacks(Square square, Bitboard blockers) {
+    Bitboard Board::bishopAttacks(Square square, Bitboard occupiedSquares) {
         // See https://rhysre.net/fast-chess-move-generation-with-magic-bitboards.html
 
-        Bitboard attacks;
+        return {
+            slidingAttack(square, Direction::NorthEast, occupiedSquares) |
+            slidingAttack(square, Direction::SouthEast, occupiedSquares) |
+            slidingAttack(square, Direction::SouthWest, occupiedSquares) |
+            slidingAttack(square, Direction::NorthWest, occupiedSquares)
+        };
+    }
 
-        attacks |= attackRays[static_cast<int>(Direction::NorthEast)][static_cast<int>(square)];
-        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::NorthEast)][static_cast<int>(square)] & blockers) {
-            int blockerIndex = bitScanForward(maskedBlockers);
-            attacks ^= attackRays[static_cast<int>(Direction::NorthEast)][blockerIndex];
+    Bitboard Board::slidingAttack(Square square, Direction direction,
+                                  Bitboard occupiedSquares) {
+        switch (direction) {
+            case Direction::North:
+            case Direction::NorthEast:
+            case Direction::East:
+            case Direction::NorthWest:
+                return positiveRayAttack(square, direction, occupiedSquares);
+
+            case Direction::SouthEast:
+            case Direction::South:
+            case Direction::SouthWest:
+            case Direction::West:
+                return negativeRayAttack(square, direction, occupiedSquares);
+
+            default:
+                assert(false);
+                return {};
+        }
+    }
+
+    Bitboard Board::positiveRayAttack(Square square, Direction direction,
+                                      Bitboard occupiedSquares) {
+        auto attackRay = attackRays[static_cast<int>(direction)][static_cast<int>(square)];
+
+        if (auto blockers = attackRay & occupiedSquares) {
+            auto blockerIndex = bitScanForward(blockers);
+            attackRay ^= attackRays[static_cast<int>(direction)][blockerIndex];
         }
 
-        attacks |= attackRays[static_cast<int>(Direction::SouthEast)][static_cast<int>(square)];
-        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::SouthEast)][static_cast<int>(square)] & blockers) {
-            int blockerIndex = bitScanReverse(maskedBlockers);
-            attacks ^= attackRays[static_cast<int>(Direction::SouthEast)][blockerIndex];
+        return attackRay;
+    }
+
+    Bitboard Board::negativeRayAttack(Square square, Direction direction,
+                                      Bitboard occupiedSquares) {
+        auto attackRay = attackRays[static_cast<int>(direction)][static_cast<int>(square)];
+
+        if (auto blockers = attackRay & occupiedSquares) {
+            auto blockerIndex = bitScanReverse(blockers);
+            attackRay ^= attackRays[static_cast<int>(direction)][blockerIndex];
         }
 
-        attacks |= attackRays[static_cast<int>(Direction::SouthWest)][static_cast<int>(square)];
-        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::SouthWest)][static_cast<int>(square)] & blockers) {
-            int blockerIndex = bitScanReverse(maskedBlockers);
-            attacks ^= attackRays[static_cast<int>(Direction::SouthWest)][blockerIndex];
-        }
-
-        attacks |= attackRays[static_cast<int>(Direction::NorthWest)][static_cast<int>(square)];
-        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::NorthWest)][static_cast<int>(square)] & blockers) {
-            int blockerIndex = bitScanForward(maskedBlockers);
-            attacks ^= attackRays[static_cast<int>(Direction::NorthWest)][blockerIndex];
-        }
-
-        return attacks;
+        return attackRay;
     }
 
     int Board::bitScanForward(Bitboard bitboard) {
