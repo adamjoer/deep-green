@@ -37,6 +37,11 @@ namespace Chess {
         // SW          S          SE
         // Source: https://www.chessprogramming.org/Classical_Approach#Ray_Attacks
         switch (direction) {
+            case Direction::NorthWest:
+                edgeBitboard = aFile | eightRank;
+                offset = 7;
+                break;
+
             case Direction::North:
                 edgeBitboard = eightRank;
                 offset = 8;
@@ -70,11 +75,6 @@ namespace Chess {
             case Direction::West:
                 edgeBitboard = aFile;
                 offset = -1;
-                break;
-
-            case Direction::NorthWest:
-                edgeBitboard = aFile | eightRank;
-                offset = 7;
                 break;
 
             default:

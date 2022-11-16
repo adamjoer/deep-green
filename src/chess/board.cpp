@@ -2,6 +2,7 @@
 
 namespace Chess {
     const std::array<std::array<Bitboard, 64>, 8> Board::attackRays{
+        generateAttackRays(Direction::NorthWest),
         generateAttackRays(Direction::North),
         generateAttackRays(Direction::NorthEast),
         generateAttackRays(Direction::East),
@@ -9,7 +10,6 @@ namespace Chess {
         generateAttackRays(Direction::South),
         generateAttackRays(Direction::SouthWest),
         generateAttackRays(Direction::West),
-        generateAttackRays(Direction::NorthWest),
     };
 
     std::array<Bitboard, 64> Board::generateAttackRays(Direction direction) {
@@ -45,23 +45,21 @@ namespace Chess {
     }
 
     Bitboard Board::bishopAttacks(Square square, Bitboard occupiedSquares) {
-        // See https://rhysre.net/fast-chess-move-generation-with-magic-bitboards.html
-
         return {
+            slidingAttack(square, Direction::NorthWest, occupiedSquares) |
             slidingAttack(square, Direction::NorthEast, occupiedSquares) |
             slidingAttack(square, Direction::SouthEast, occupiedSquares) |
-            slidingAttack(square, Direction::SouthWest, occupiedSquares) |
-            slidingAttack(square, Direction::NorthWest, occupiedSquares)
+            slidingAttack(square, Direction::SouthWest, occupiedSquares)
         };
     }
 
     Bitboard Board::slidingAttack(Square square, Direction direction,
                                   Bitboard occupiedSquares) {
         switch (direction) {
+            case Direction::NorthWest:
             case Direction::North:
             case Direction::NorthEast:
             case Direction::East:
-            case Direction::NorthWest:
                 return positiveRayAttack(square, direction, occupiedSquares);
 
             case Direction::SouthEast:

@@ -21,6 +21,7 @@ namespace Chess {
     std::ostream &operator<<(std::ostream &os, Square square);
 
     enum class Direction {
+        NorthWest,
         North,
         NorthEast,
         East,
@@ -28,7 +29,6 @@ namespace Chess {
         South,
         SouthWest,
         West,
-        NorthWest,
     };
 
     class Bitboard {
