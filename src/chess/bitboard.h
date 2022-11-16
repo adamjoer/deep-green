@@ -37,6 +37,10 @@ namespace Chess {
             this->bits |= (1ULL << static_cast<int>(square));
         }
 
+        constexpr void clearOccupancyAt(Square square) {
+            this->bits ^= (1ULL << static_cast<int>(square));
+        }
+
         void print() const;
 
     private:
