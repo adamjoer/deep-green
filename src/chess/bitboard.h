@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <array>
 #include <cassert>
+#include <iostream>
 
 namespace Chess {
 
@@ -55,12 +56,11 @@ namespace Chess {
             this->bits &= ~(1ULL << static_cast<int>(square));
         }
 
-        void print() const;
-
         static Square squareToThe(Direction direction, Square square);
+
+        friend std::ostream &operator<<(std::ostream &os, const Bitboard &bitboard);
 
     private:
         uint64_t bits{0};
-
     };
 }

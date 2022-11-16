@@ -4,36 +4,28 @@
 
 namespace Chess {
 
-    void Bitboard::print() const {
-
-        std::cout << "Bitboard: " << this->bits << '\n';
-
-        // loop over board ranks
-        for (int rank = 7; rank >= 0; --rank) {
-
-            // loop over board files
-            for (int file = 0; file < 8; ++file) {
-
-                // convert file & rank into square index
-                int square = rank * 8 + file;
-
-                if (!file)
-                    std::cout << ' ' << rank + 1 << '\t';
-
-                std::cout << (isOccupiedAt(static_cast<Square>(square)) ? 1 : 0) << ' ';
-
-            }
-
-            // print new line every rank
-            std::cout << '\n';
-        }
-
-        // print board files
-        std::cout << "\n\ta b c d e f g h\n";
-    }
-
     Square Bitboard::squareToThe(Direction direction, Square square) {
         // TODO
         return Square::None;
+    }
+
+    std::ostream &operator<<(std::ostream &os, const Bitboard &bitboard) {
+        os << "Bitboard: " << bitboard.bits << '\n';
+
+        for (int rank = 7; rank >= 0; --rank) {
+            for (int file = 0; file < 8; ++file) {
+
+                if (file == 0)
+                    os << ' ' << rank + 1 << '\t';
+
+                auto square = Square(rank * 8 + file);
+                os << (bitboard.isOccupiedAt(square) ? '*' : '.') << ' ';
+            }
+
+            os << '\n';
+        }
+        os << "\n\ta b c d e f g h";
+
+        return os;
     }
 }
