@@ -2,6 +2,8 @@
 
 #include "bitboard.h"
 
+#include <array>
+
 namespace Chess {
 
     enum class Color {
@@ -23,7 +25,15 @@ namespace Chess {
         /*
          * Bitboards for current state of the game, indexed by enums (Color and PieceType).
          */
-//         BitBoard bitboards[2][6];
-    };
+        Bitboard bitboards[2][6];
 
+        /*
+         * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
+         */
+        static const std::array<std::array<Bitboard, 64>, 8> attackRays;
+
+        static std::array<Bitboard, 64> generateAttackRays(Direction direction);
+
+        static Bitboard generateAttackRay(Direction direction, Square square);
+    };
 }

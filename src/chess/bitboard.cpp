@@ -30,6 +30,10 @@ namespace Chess {
 
         // print board files
         std::cout << "\n\ta b c d e f g h\n";
+    }
 
+    Square Bitboard::squareToThe(Direction direction, Square square) {
+        // TODO
+        return Square::None;
     }
 }
