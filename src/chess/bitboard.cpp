@@ -3,13 +3,6 @@
 #include <iostream>
 
 namespace Chess {
-    bool Bitboard::isOccupiedAt(Chess::Square square) const {
-        return this->bits & (1ULL << static_cast<int>(square));
-    }
-
-    void Bitboard::setOccupancyAt(Chess::Square square) {
-        this->bits |= (1ULL << static_cast<int>(square));
-    }
 
     void Bitboard::print() const {
 

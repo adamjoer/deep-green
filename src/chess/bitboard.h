@@ -29,9 +29,13 @@ namespace Chess {
 //        explicit BitBoard(std::array<std::array<bool, 8>, 8> array);
 
         [[nodiscard]]
-        bool isOccupiedAt(Square square) const;
+        constexpr bool isOccupiedAt(Square square) const {
+            return this->bits & (1ULL << static_cast<int>(square));
+        }
 
-        void setOccupancyAt(Square square);
+        constexpr void setOccupancyAt(Square square) {
+            this->bits |= (1ULL << static_cast<int>(square));
+        }
 
         void print() const;
 
