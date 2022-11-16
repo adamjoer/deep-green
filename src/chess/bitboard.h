@@ -34,11 +34,18 @@ namespace Chess {
     public:
         Bitboard() = default;
 
-        explicit Bitboard(uint64_t bits)
+        constexpr explicit Bitboard(uint64_t bits)
                 : bits(bits) {
         }
 
-//        explicit BitBoard(std::array<std::array<bool, 8>, 8> array);
+        constexpr explicit Bitboard(Square square) {
+            setOccupancyAt(square);
+        }
+
+        template<typename... Args>
+        constexpr explicit Bitboard(Args... args) {
+            setOccupancyAt(args...);
+        }
 
         [[nodiscard]]
         constexpr bool isOccupiedAt(Square square) const {
@@ -49,6 +56,12 @@ namespace Chess {
         constexpr void setOccupancyAt(Square square) {
             assert(square != Square::None);
             this->bits |= (1ULL << static_cast<int>(square));
+        }
+
+        template<typename... Args>
+        constexpr void setOccupancyAt(Square square, Args... args) {
+            setOccupancyAt(square);
+            setOccupancyAt(args...);
         }
 
         constexpr void clearOccupancyAt(Square square) {
