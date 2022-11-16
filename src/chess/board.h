@@ -21,13 +21,16 @@ namespace Chess {
     };
 
     class Board {
+    public:
+        static void printAttackRays(Direction direction, Square square = Square::None);
+
     private:
-        /*
+        /**
          * Bitboards for current state of the game, indexed by enums (Color and PieceType).
          */
         Bitboard bitboards[2][6];
 
-        /*
+        /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
          */
         static const std::array<std::array<Bitboard, 64>, 8> attackRays;

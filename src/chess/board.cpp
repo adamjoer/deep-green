@@ -34,4 +34,18 @@ namespace Chess {
 
         return ray;
     }
+
+    void Board::printAttackRays(Direction direction, Square square) {
+        if (square != Square::None) {
+            std::cout << square << ":\n"
+                      << attackRays[static_cast<int>(direction)][static_cast<int>(square)]
+                      << '\n';
+        } else {
+            auto bitboards = attackRays[static_cast<int>(direction)];
+            for (int i = 0; i < bitboards.size(); ++i) {
+                std::cout << Square(i) << ":\n"
+                          << bitboards[i] << '\n';
+            }
+        }
+    }
 }
