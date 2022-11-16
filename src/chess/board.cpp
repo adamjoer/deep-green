@@ -35,6 +35,48 @@ namespace Chess {
         return ray;
     }
 
+    Bitboard Board::bishopAttacks(Square square, Bitboard blockers) {
+        // See https://rhysre.net/fast-chess-move-generation-with-magic-bitboards.html
+
+        Bitboard attacks;
+
+        attacks |= attackRays[static_cast<int>(Direction::NorthEast)][static_cast<int>(square)];
+        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::NorthEast)][static_cast<int>(square)] & blockers) {
+            int blockerIndex = bitScanForward(maskedBlockers);
+            attacks ^= attackRays[static_cast<int>(Direction::NorthEast)][blockerIndex];
+        }
+
+        attacks |= attackRays[static_cast<int>(Direction::SouthEast)][static_cast<int>(square)];
+        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::SouthEast)][static_cast<int>(square)] & blockers) {
+            int blockerIndex = bitScanReverse(maskedBlockers);
+            attacks ^= attackRays[static_cast<int>(Direction::SouthEast)][blockerIndex];
+        }
+
+        attacks |= attackRays[static_cast<int>(Direction::SouthWest)][static_cast<int>(square)];
+        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::SouthWest)][static_cast<int>(square)] & blockers) {
+            int blockerIndex = bitScanReverse(maskedBlockers);
+            attacks ^= attackRays[static_cast<int>(Direction::SouthWest)][blockerIndex];
+        }
+
+        attacks |= attackRays[static_cast<int>(Direction::NorthWest)][static_cast<int>(square)];
+        if (auto maskedBlockers = attackRays[static_cast<int>(Direction::NorthWest)][static_cast<int>(square)] & blockers) {
+            int blockerIndex = bitScanForward(maskedBlockers);
+            attacks ^= attackRays[static_cast<int>(Direction::NorthWest)][blockerIndex];
+        }
+
+        return attacks;
+    }
+
+    int Board::bitScanForward(Bitboard bitboard) {
+        // TODO
+        return 0;
+    }
+
+    int Board::bitScanReverse(Bitboard bitboard) {
+        // TODO
+        return 0;
+    }
+
     void Board::printAttackRays(Direction direction, Square square) {
         if (square != Square::None) {
             std::cout << square << ":\n"

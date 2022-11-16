@@ -22,6 +22,8 @@ namespace Chess {
 
     class Board {
     public:
+        Bitboard bishopAttacks(Square square, Bitboard blockers);
+
         static void printAttackRays(Direction direction, Square square = Square::None);
 
     private:
@@ -38,5 +40,9 @@ namespace Chess {
         static std::array<Bitboard, 64> generateAttackRays(Direction direction);
 
         static Bitboard generateAttackRay(Direction direction, Square square);
+
+        static int bitScanForward(Bitboard bitboard);
+
+        static int bitScanReverse(Bitboard bitboard);
     };
 }
