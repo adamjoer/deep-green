@@ -1,6 +1,11 @@
 #include "board.h"
 
 namespace Chess {
+    static constexpr Bitboard twoRank{Square::A2, Square::B2, Square::C2, Square::D2,
+                                      Square::E2, Square::F2, Square::G2, Square::H2};
+    static constexpr Bitboard sevenRank{Square::A7, Square::B7, Square::C7, Square::D7,
+                                        Square::E7, Square::F7, Square::G7, Square::H7};
+
     const std::array<std::array<Bitboard, 64>, 8> Board::attackRayMasks{
             generateAttackRayMasks(Direction::NorthWest),
             generateAttackRayMasks(Direction::North),
@@ -15,6 +20,8 @@ namespace Chess {
     const std::array<Bitboard, 64> Board::knightAttackMasks = generateKnightAttackMasks();
 
     const std::array<Bitboard, 64> Board::kingAttackMasks = generateKingAttackMasks();
+
+    const std::array<std::array<Bitboard, 64>, 2> Board::pawnAttackMasks = generatePawnAttackMasks();
 
     std::array<Bitboard, 64> Board::generateAttackRayMasks(Direction direction) {
         std::array<Bitboard, 64> ray;
@@ -39,7 +46,7 @@ namespace Chess {
         return ray;
     }
 
-     std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
+    std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
         std::array<Bitboard, 64> rookAttacks;
 
         for (int i = 0; i < rookAttacks.size(); ++i) {
@@ -116,6 +123,42 @@ namespace Chess {
         return attackMask;
     }
 
+    std::array<std::array<Bitboard, 64>, 2> Board::generatePawnAttackMasks() {
+        std::array<std::array<Bitboard, 64>, 2> attackMasks;
+
+        for (int i = 0; i < attackMasks.size(); ++i) {
+            for (int j = 0; j < attackMasks[i].size(); ++j) {
+                attackMasks[i][j] = generatePawnAttackMask(Square(j), Color(i));
+            }
+        }
+
+        return attackMasks;
+    }
+
+    Bitboard Board::generatePawnAttackMask(Square square, Color color) {
+        Direction attackDirection;
+        switch (color) {
+            case Color::Black:
+                attackDirection = Direction::South;
+                break;
+            case Color::White:
+                attackDirection = Direction::North;
+                break;
+        }
+
+        Bitboard attack;
+
+        auto attackSquare = Bitboard::squareToThe(attackDirection, square);
+        if (attackSquare != Square::None)
+            attack.setOccupancyAt(attackSquare);
+
+        auto startRank = (color == Color::White) ? twoRank : sevenRank;
+        if (startRank.isOccupiedAt(square))
+            attack.setOccupancyAt(Bitboard::squareToThe(attackDirection, attackSquare));
+
+        return attack;
+    }
+
     Bitboard Board::rookAttacks(Square square, Bitboard occupiedSquares) {
         return {
                 slidingAttack(square, Direction::North, occupiedSquares) |
@@ -140,6 +183,49 @@ namespace Chess {
 
     Bitboard Board::kingAttacks(Square square) {
         return kingAttackMasks[static_cast<int>(square)];
+    }
+
+    Bitboard Board::pawnAttacks(Square square, Bitboard occupiedSquares, Color color) {
+        Direction attackDirection;
+        Bitboard startRank;
+        Square captureEast;
+        Square captureWest;
+
+        switch (color) {
+            case Color::Black:
+                attackDirection = Direction::South;
+                startRank = sevenRank;
+                captureEast = Bitboard::squareToThe(Direction::SouthEast, square);
+                captureWest = Bitboard::squareToThe(Direction::SouthWest, square);
+                break;
+
+            case Color::White:
+                attackDirection = Direction::North;
+                startRank = twoRank;
+                captureEast = Bitboard::squareToThe(Direction::NorthEast, square);
+                captureWest = Bitboard::squareToThe(Direction::NorthWest, square);
+                break;
+        }
+
+        Bitboard attacks;
+
+        auto attackMask = pawnAttackMasks[static_cast<int>(color)][static_cast<int>(square)];
+        if (attackMask.isOverlappingWith(occupiedSquares)) {
+            if (startRank.isOccupiedAt(square) && !occupiedSquares.isOccupiedAt(
+                    Bitboard::squareToThe(attackDirection, square)))
+                attacks.setOccupancyAt(Bitboard::squareToThe(attackDirection, square));
+
+        } else {
+            attacks |= attackMask;
+        }
+
+        if (occupiedSquares.isOccupiedAt(captureEast))
+            attacks.setOccupancyAt(captureEast);
+
+        if (occupiedSquares.isOccupiedAt(captureWest))
+            attacks.setOccupancyAt(captureWest);
+
+        return attacks;
     }
 
     Bitboard Board::slidingAttack(Square square, Direction direction,

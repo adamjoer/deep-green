@@ -30,6 +30,10 @@ namespace Chess {
 
         static Bitboard kingAttacks(Square square);
 
+        static Bitboard queenAttacks(Square square, Bitboard occupiedSquares);
+
+        static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
+
         static void printAttackRays(Direction direction, Square square = Square::None);
 
     private:
@@ -47,6 +51,8 @@ namespace Chess {
 
         static const std::array<Bitboard, 64> kingAttackMasks;
 
+        static const std::array<std::array<Bitboard, 64>, 2> pawnAttackMasks;
+
         static std::array<Bitboard, 64> generateAttackRayMasks(Direction direction);
 
         static Bitboard generateAttackRayMask(Direction direction, Square square);
@@ -58,6 +64,10 @@ namespace Chess {
         static std::array<Bitboard, 64> generateKingAttackMasks();
 
         static Bitboard generateKingAttackMask(Square square);
+
+        static std::array<std::array<Bitboard, 64>, 2> generatePawnAttackMasks();
+
+        static Bitboard generatePawnAttackMask(Square square, Color color);
 
         static Bitboard slidingAttack(Square square, Direction direction, Bitboard occupiedSquares);
 
