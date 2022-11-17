@@ -79,7 +79,7 @@ namespace Chess {
         auto attackRay = attackRays[static_cast<int>(direction)][static_cast<int>(square)];
 
         if (auto blockers = attackRay & occupiedSquares) {
-            auto blockerIndex = bitScanForward(blockers);
+            auto blockerIndex = blockers.bitScanForward();
             attackRay ^= attackRays[static_cast<int>(direction)][blockerIndex];
         }
 
@@ -91,21 +91,11 @@ namespace Chess {
         auto attackRay = attackRays[static_cast<int>(direction)][static_cast<int>(square)];
 
         if (auto blockers = attackRay & occupiedSquares) {
-            auto blockerIndex = bitScanReverse(blockers);
+            auto blockerIndex = blockers.bitScanReverse();
             attackRay ^= attackRays[static_cast<int>(direction)][blockerIndex];
         }
 
         return attackRay;
-    }
-
-    int Board::bitScanForward(Bitboard bitboard) {
-        // TODO
-        return 0;
-    }
-
-    int Board::bitScanReverse(Bitboard bitboard) {
-        // TODO
-        return 0;
     }
 
     void Board::printAttackRays(Direction direction, Square square) {

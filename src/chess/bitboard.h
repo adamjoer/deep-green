@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <iostream>
+#include <bit>
 
 namespace Chess {
 
@@ -115,6 +116,18 @@ namespace Chess {
         [[nodiscard]]
         constexpr bool isOverlappingWith(const Bitboard &other) const {
             return this->bits & other.bits;
+        }
+
+        [[nodiscard]]
+        constexpr int bitScanForward() const {
+            assert(this->bits != 0);
+            return std::countr_zero(this->bits);
+        }
+
+        [[nodiscard]]
+        constexpr int bitScanReverse() const {
+            assert(this->bits != 0);
+            return 63 - std::countl_zero(this->bits);
         }
 
         static Square squareToThe(Direction direction, Square square);
