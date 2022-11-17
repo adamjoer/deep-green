@@ -30,6 +30,7 @@ namespace Chess {
     class Board {
     public:
         explicit Board(std::string &fen);
+
         Bitboard bitboards[2][6];
         uint8_t castlingRights;
         Color playerTurn;
