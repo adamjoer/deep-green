@@ -1,27 +1,27 @@
 #include "board.h"
 
 namespace Chess {
-    const std::array<std::array<Bitboard, 64>, 8> Board::attackRays{
-        generateAttackRays(Direction::NorthWest),
-        generateAttackRays(Direction::North),
-        generateAttackRays(Direction::NorthEast),
-        generateAttackRays(Direction::East),
-        generateAttackRays(Direction::SouthEast),
-        generateAttackRays(Direction::South),
-        generateAttackRays(Direction::SouthWest),
-        generateAttackRays(Direction::West),
+    const std::array<std::array<Bitboard, 64>, 8> Board::attackRayMasks{
+            generateAttackRayMasks(Direction::NorthWest),
+            generateAttackRayMasks(Direction::North),
+            generateAttackRayMasks(Direction::NorthEast),
+            generateAttackRayMasks(Direction::East),
+            generateAttackRayMasks(Direction::SouthEast),
+            generateAttackRayMasks(Direction::South),
+            generateAttackRayMasks(Direction::SouthWest),
+            generateAttackRayMasks(Direction::West),
     };
 
-    std::array<Bitboard, 64> Board::generateAttackRays(Direction direction) {
+    std::array<Bitboard, 64> Board::generateAttackRayMasks(Direction direction) {
         std::array<Bitboard, 64> ray;
 
         for (int i = 0; i < ray.size(); i++)
-            ray[i] = generateAttackRay(direction, Square(i));
+            ray[i] = generateAttackRayMask(direction, Square(i));
 
         return ray;
     }
 
-    Bitboard Board::generateAttackRay(Direction direction, Square square) {
+    Bitboard Board::generateAttackRayMask(Direction direction, Square square) {
         Bitboard ray;
 
         while (true) {
@@ -76,11 +76,11 @@ namespace Chess {
 
     Bitboard Board::positiveRayAttack(Square square, Direction direction,
                                       Bitboard occupiedSquares) {
-        auto attackRay = attackRays[static_cast<int>(direction)][static_cast<int>(square)];
+        auto attackRay = attackRayMasks[static_cast<int>(direction)][static_cast<int>(square)];
 
         if (auto blockers = attackRay & occupiedSquares) {
             auto blockerIndex = blockers.bitScanForward();
-            attackRay ^= attackRays[static_cast<int>(direction)][blockerIndex];
+            attackRay ^= attackRayMasks[static_cast<int>(direction)][blockerIndex];
         }
 
         return attackRay;
@@ -88,11 +88,11 @@ namespace Chess {
 
     Bitboard Board::negativeRayAttack(Square square, Direction direction,
                                       Bitboard occupiedSquares) {
-        auto attackRay = attackRays[static_cast<int>(direction)][static_cast<int>(square)];
+        auto attackRay = attackRayMasks[static_cast<int>(direction)][static_cast<int>(square)];
 
         if (auto blockers = attackRay & occupiedSquares) {
             auto blockerIndex = blockers.bitScanReverse();
-            attackRay ^= attackRays[static_cast<int>(direction)][blockerIndex];
+            attackRay ^= attackRayMasks[static_cast<int>(direction)][blockerIndex];
         }
 
         return attackRay;
@@ -101,10 +101,10 @@ namespace Chess {
     void Board::printAttackRays(Direction direction, Square square) {
         if (square != Square::None) {
             std::cout << square << ":\n"
-                      << attackRays[static_cast<int>(direction)][static_cast<int>(square)]
+                      << attackRayMasks[static_cast<int>(direction)][static_cast<int>(square)]
                       << '\n';
         } else {
-            auto bitboards = attackRays[static_cast<int>(direction)];
+            auto bitboards = attackRayMasks[static_cast<int>(direction)];
             for (int i = 0; i < bitboards.size(); ++i) {
                 std::cout << Square(i) << ":\n"
                           << bitboards[i] << '\n';

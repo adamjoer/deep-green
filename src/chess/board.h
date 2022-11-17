@@ -37,11 +37,11 @@ namespace Chess {
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
          */
-        static const std::array<std::array<Bitboard, 64>, 8> attackRays;
+        static const std::array<std::array<Bitboard, 64>, 8> attackRayMasks;
 
-        static std::array<Bitboard, 64> generateAttackRays(Direction direction);
+        static std::array<Bitboard, 64> generateAttackRayMasks(Direction direction);
 
-        static Bitboard generateAttackRay(Direction direction, Square square);
+        static Bitboard generateAttackRayMask(Direction direction, Square square);
 
         static Bitboard slidingAttack(Square square, Direction direction, Bitboard occupiedSquares);
 
