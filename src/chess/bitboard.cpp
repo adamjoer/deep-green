@@ -102,7 +102,7 @@ namespace Chess {
 
             os << '\n';
         }
-        os << "\n\ta b c d e f g h";
+        os << "\n\ta b c d e f g h\n";
 
         return os;
     }

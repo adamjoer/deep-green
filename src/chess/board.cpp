@@ -54,18 +54,70 @@ namespace Chess {
         for (int rank = 7; rank > -1; --rank) {
             for (int file = 0; file < 8; ++file) {
                 if (std::isupper(*itr)) { // White piece
-                    this->bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
+                    bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
                             static_cast<Square>(rank * 8 + file));
                 } else if (std::islower(*itr)) { // Black piece
-                    this->bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
+                    bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
                             static_cast<Square>(rank * 8 + file));
                 } else if (std::isdigit(*itr)) { // Empty squares
-                    file += *itr - '0' - 1;
+                    file += *itr - '1';
                 }
                 itr++;
             }
+            itr++;
         }
-        // TODO: Create board variables for turn, castling, en passant
+
+        // Set player turn
+        *itr == 'w' ? playerTurn = Color::White : playerTurn = Color::Black;
+        itr += 2;
+
+        // Set castling bits
+        castlingRights = 0;
+        if (*itr == 'K') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::WhiteKing);
+            itr++;
+        }
+        if (*itr == 'Q') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::WhiteQueen);
+            itr++;
+        }
+        if (*itr == 'k') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::BlackKing);
+            itr++;
+        }
+        if (*itr == 'q') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::BlackQueen);
+            itr++;
+        }
+        itr++;
+        // En passant parsing.
+        if (*itr == '-') {
+            enPassant = None;
+            itr += 2;
+        } else {
+            int file = *itr - 'a'; // Zero indexed file number
+            itr++;
+            int rank = *itr - '1'; // Zero indexed rank number
+            enPassant = static_cast<Square>(rank * 8 + file);
+            itr += 2;
+        }
+
+        if (*itr == '0') {
+            fiftyMoveCounter = 0;
+            itr += 2;
+        } else {
+            fiftyMoveCounter = *itr - '0';
+            itr++;
+            if (*itr != ' ') {
+                fiftyMoveCounter = fiftyMoveCounter * 10 + *itr - '0';
+                itr++;
+            }
+        }
+        fullMoveCounter = 0;
+        while (itr != fen.end()) {
+            fullMoveCounter = fullMoveCounter * 10 + *itr - '0';
+            itr++;
+        }
     }
 
     Bitboard Board::generateAttackRayMask(Direction direction, Square square) {

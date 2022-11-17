@@ -20,10 +20,22 @@ namespace Chess {
         Pawn,
     };
 
+    enum class castlingBits {
+        WhiteKing = 1,
+        WhiteQueen = 2,
+        BlackKing = 4,
+        BlackQueen = 8,
+    };
+
     class Board {
     public:
         explicit Board(std::string &fen);
         Bitboard bitboards[2][6];
+        uint8_t castlingRights;
+        Color playerTurn;
+        Square enPassant;
+        uint8_t fiftyMoveCounter;
+        uint16_t fullMoveCounter;
 
         static Bitboard rookAttacks(Square square, Bitboard occupiedSquares);
 
