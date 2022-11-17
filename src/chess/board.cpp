@@ -14,6 +14,8 @@ namespace Chess {
 
     const std::array<Bitboard, 64> Board::knightAttackMasks = generateKnightAttackMasks();
 
+    const std::array<Bitboard, 64> Board::kingAttackMasks = generateKingAttackMasks();
+
     std::array<Bitboard, 64> Board::generateAttackRayMasks(Direction direction) {
         std::array<Bitboard, 64> ray;
 
@@ -93,6 +95,27 @@ namespace Chess {
         return attack;
     }
 
+    std::array<Bitboard, 64> Board::generateKingAttackMasks() {
+        std::array<Bitboard, 64> attacks;
+
+        for (int i = 0; i < attacks.size(); ++i) {
+            attacks[i] = generateKingAttackMask(Square(i));
+        }
+
+        return attacks;
+    }
+
+    Bitboard Board::generateKingAttackMask(Chess::Square square) {
+        Bitboard attackMask;
+
+        for (int i = 0; i < 8; i++) {
+            auto attackSquare = Bitboard::squareToThe(Direction(i), square);
+            if (attackSquare != Square::None)
+                attackMask.setOccupancyAt(attackSquare);
+        }
+        return attackMask;
+    }
+
     Bitboard Board::rookAttacks(Square square, Bitboard occupiedSquares) {
         return {
                 slidingAttack(square, Direction::North, occupiedSquares) |
@@ -111,8 +134,12 @@ namespace Chess {
         };
     }
 
-    Bitboard Board::knightAttacks(Square square, Bitboard occupiedSquares) {
-        return knightAttackMasks[static_cast<int>(square)] & ~occupiedSquares;
+    Bitboard Board::knightAttacks(Square square) {
+        return knightAttackMasks[static_cast<int>(square)];
+    }
+
+    Bitboard Board::kingAttacks(Square square) {
+        return kingAttackMasks[static_cast<int>(square)];
     }
 
     Bitboard Board::slidingAttack(Square square, Direction direction,
