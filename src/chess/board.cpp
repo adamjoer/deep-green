@@ -185,6 +185,13 @@ namespace Chess {
         return kingAttackMasks[static_cast<int>(square)];
     }
 
+    Bitboard Board::queenAttacks(Square square, Bitboard occupiedSquares) {
+        return {
+                rookAttacks(square, occupiedSquares) |
+                bishopAttacks(square, occupiedSquares)
+        };
+    }
+
     Bitboard Board::pawnAttacks(Square square, Bitboard occupiedSquares, Color color) {
         Direction attackDirection;
         Bitboard startRank;

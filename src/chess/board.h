@@ -6,12 +6,12 @@
 
 namespace Chess {
 
-    enum class Color: char {
+    enum class Color {
         White,
         Black,
     };
 
-    enum class PieceType: int {
+    enum class PieceType {
         King,
         Queen,
         Rook,
@@ -69,10 +69,13 @@ namespace Chess {
 
         static Bitboard generatePawnAttackMask(Square square, Color color);
 
-        static Bitboard slidingAttack(Square square, Direction direction, Bitboard occupiedSquares);
+        static Bitboard slidingAttack(Square square, Direction direction,
+                                      Bitboard occupiedSquares);
 
-        static Bitboard positiveRayAttack(Square square, Direction direction, Bitboard occupiedSquares);
+        static Bitboard positiveRayAttack(Square square, Direction direction,
+                                          Bitboard occupiedSquares);
 
-        static Bitboard negativeRayAttack(Square square, Direction direction, Bitboard occupiedSquares);
+        static Bitboard negativeRayAttack(Square square, Direction direction,
+                                          Bitboard occupiedSquares);
     };
 }
