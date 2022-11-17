@@ -32,6 +32,42 @@ namespace Chess {
         return ray;
     }
 
+    // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+    Board::Board(std::string &fen) {
+        auto itr = fen.begin();
+        auto charToPiece = [&](char c) -> PieceType {
+            switch (toupper(c)) {
+                case 'K':
+                    return PieceType::King;
+                case 'Q':
+                    return PieceType::Queen;
+                case 'R':
+                    return PieceType::Rook;
+                case 'B':
+                    return PieceType::Bishop;
+                case 'N':
+                    return PieceType::Knight;
+                default:
+                    return PieceType::Pawn;
+            }
+        };
+        for (int rank = 7; rank > -1; --rank) {
+            for (int file = 0; file < 8; ++file) {
+                if (std::isupper(*itr)) { // White piece
+                    this->bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
+                            static_cast<Square>(rank * 8 + file));
+                } else if (std::islower(*itr)) { // Black piece
+                    this->bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
+                            static_cast<Square>(rank * 8 + file));
+                } else if (std::isdigit(*itr)) { // Empty squares
+                    file += *itr - '0' - 1;
+                }
+                itr++;
+            }
+        }
+        // TODO: Create board variables for turn, castling, en passant
+    }
+
     Bitboard Board::generateAttackRayMask(Direction direction, Square square) {
         Bitboard ray;
 
@@ -46,7 +82,7 @@ namespace Chess {
         return ray;
     }
 
-     std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
+    std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
         std::array<Bitboard, 64> rookAttacks;
 
         for (int i = 0; i < rookAttacks.size(); ++i) {

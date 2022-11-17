@@ -22,6 +22,9 @@ namespace Chess {
 
     class Board {
     public:
+        explicit Board(std::string &fen);
+        Bitboard bitboards[2][6];
+
         static Bitboard rookAttacks(Square square, Bitboard occupiedSquares);
 
         static Bitboard bishopAttacks(Square square, Bitboard occupiedSquares);
@@ -40,7 +43,6 @@ namespace Chess {
         /**
          * Bitboards for current state of the game, indexed by enums (Color and PieceType).
          */
-        Bitboard bitboards[2][6];
 
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
