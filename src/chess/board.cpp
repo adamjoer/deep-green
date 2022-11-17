@@ -12,6 +12,8 @@ namespace Chess {
             generateAttackRayMasks(Direction::West),
     };
 
+    const std::array<Bitboard, 64> Board::knightAttackMasks = generateKnightAttackMasks();
+
     std::array<Bitboard, 64> Board::generateAttackRayMasks(Direction direction) {
         std::array<Bitboard, 64> ray;
 
@@ -35,22 +37,82 @@ namespace Chess {
         return ray;
     }
 
+     std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
+        std::array<Bitboard, 64> rookAttacks;
+
+        for (int i = 0; i < rookAttacks.size(); ++i) {
+            rookAttacks[i] = generateKnightAttackMask(Square(i));
+        }
+
+        return rookAttacks;
+    }
+
+    Bitboard Board::generateKnightAttackMask(Square square) {
+        Bitboard attack;
+
+        auto generateKnightAttack = [&](auto square, auto direction) {
+            square = Bitboard::squareToThe(direction, square);
+            if (square == Square::None)
+                return;
+
+            Square left;
+            Square right;
+            switch (direction) {
+                case Direction::North:
+                    left = Bitboard::squareToThe(Direction::NorthWest, square);
+                    right = Bitboard::squareToThe(Direction::NorthEast, square);
+                    break;
+                case Direction::East:
+                    left = Bitboard::squareToThe(Direction::NorthEast, square);
+                    right = Bitboard::squareToThe(Direction::SouthEast, square);
+                    break;
+                case Direction::South:
+                    left = Bitboard::squareToThe(Direction::SouthWest, square);
+                    right = Bitboard::squareToThe(Direction::SouthEast, square);
+                    break;
+                case Direction::West:
+                    left = Bitboard::squareToThe(Direction::SouthWest, square);
+                    right = Bitboard::squareToThe(Direction::NorthWest, square);
+                    break;
+                default:
+                    left = right = Square::None;
+                    break;
+            }
+
+            if (left != Square::None)
+                attack.setOccupancyAt(left);
+            if (right != Square::None)
+                attack.setOccupancyAt(right);
+        };
+
+        generateKnightAttack(square, Direction::North);
+        generateKnightAttack(square, Direction::East);
+        generateKnightAttack(square, Direction::South);
+        generateKnightAttack(square, Direction::West);
+
+        return attack;
+    }
+
     Bitboard Board::rookAttacks(Square square, Bitboard occupiedSquares) {
         return {
-            slidingAttack(square, Direction::North, occupiedSquares) |
-            slidingAttack(square, Direction::East, occupiedSquares) |
-            slidingAttack(square, Direction::South, occupiedSquares) |
-            slidingAttack(square, Direction::West, occupiedSquares)
+                slidingAttack(square, Direction::North, occupiedSquares) |
+                slidingAttack(square, Direction::East, occupiedSquares) |
+                slidingAttack(square, Direction::South, occupiedSquares) |
+                slidingAttack(square, Direction::West, occupiedSquares)
         };
     }
 
     Bitboard Board::bishopAttacks(Square square, Bitboard occupiedSquares) {
         return {
-            slidingAttack(square, Direction::NorthWest, occupiedSquares) |
-            slidingAttack(square, Direction::NorthEast, occupiedSquares) |
-            slidingAttack(square, Direction::SouthEast, occupiedSquares) |
-            slidingAttack(square, Direction::SouthWest, occupiedSquares)
+                slidingAttack(square, Direction::NorthWest, occupiedSquares) |
+                slidingAttack(square, Direction::NorthEast, occupiedSquares) |
+                slidingAttack(square, Direction::SouthEast, occupiedSquares) |
+                slidingAttack(square, Direction::SouthWest, occupiedSquares)
         };
+    }
+
+    Bitboard Board::knightAttacks(Square square, Bitboard occupiedSquares) {
+        return knightAttackMasks[static_cast<int>(square)] & ~occupiedSquares;
     }
 
     Bitboard Board::slidingAttack(Square square, Direction direction,
