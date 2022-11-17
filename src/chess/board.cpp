@@ -46,7 +46,7 @@ namespace Chess {
         return ray;
     }
 
-    std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
+     std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
         std::array<Bitboard, 64> rookAttacks;
 
         for (int i = 0; i < rookAttacks.size(); ++i) {
