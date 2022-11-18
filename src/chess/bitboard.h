@@ -33,6 +33,16 @@ namespace Chess {
 
     std::ostream &operator<<(std::ostream &os, Square square);
 
+    enum class PieceType {
+        King,
+        Queen,
+        Rook,
+        Bishop,
+        Knight,
+        Pawn,
+    };
+    std::ostream &operator<<(std::ostream &os, PieceType piece);
+
     enum class Direction {
         NorthWest,
         North,

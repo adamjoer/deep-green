@@ -312,6 +312,99 @@ namespace Chess {
         return attack;
     }
 
+    std::vector<Move> Board::pseudoLegalMoves() const {
+        std::vector<Move> moves;
+
+        for (int pieceIndex = 0; pieceIndex < 6; ++pieceIndex)
+            pseudoLegalMoves(PieceType(pieceIndex), moves);
+
+        return moves;
+    }
+
+    void Board::pseudoLegalMoves(PieceType piece, std::vector<Move> &moves) const {
+        Bitboard bitboard = this->bitboards[static_cast<int>(this->playerTurn)][static_cast<int>(piece)];
+
+        const auto ourSquares = teamOccupiedSquares(playerTurn);
+        const auto enemySquares = teamOccupiedSquares(oppositeTeam(playerTurn));
+        const auto occupiedSquares = ourSquares | enemySquares;
+
+        for (int i = 0; i < 64; ++i) {
+            auto from = Square(i);
+            if (!bitboard.isOccupiedAt(from))
+                continue;
+
+            Bitboard attacks;
+            switch (piece) {
+                case PieceType::King:
+                    attacks = kingAttacks(from);
+                    break;
+                case PieceType::Queen:
+                    attacks = queenAttacks(from, occupiedSquares);
+                    break;
+                case PieceType::Rook:
+                    attacks = rookAttacks(from, occupiedSquares);
+                    break;
+                case PieceType::Bishop:
+                    attacks = bishopAttacks(from, occupiedSquares);
+                    break;
+                case PieceType::Knight:
+                    attacks = knightAttacks(from);
+                    break;
+                case PieceType::Pawn:
+                    attacks = pawnAttacks(from, occupiedSquares, this->playerTurn);
+                    break;
+            }
+
+            if (!attacks)
+                continue;
+
+            attacks &= ~ourSquares;
+
+            for (int j = 0; j < 64; ++j) {
+                auto to = Square(j);
+                if (!attacks.isOccupiedAt(to))
+                    continue;
+
+                moves.emplace_back(from, to, enemySquares.isOccupiedAt(to)
+                                             ? std::make_optional(pieceAt(to))
+                                             : std::nullopt);
+            }
+        }
+    }
+
+    Bitboard Board::teamOccupiedSquares(Color color) const {
+        Bitboard occupiedSquares;
+
+        auto team = this->bitboards[static_cast<int>(color)];
+        for (auto bitboard: team)
+            occupiedSquares |= bitboard;
+
+        return occupiedSquares;
+    }
+
+    PieceType Board::pieceAt(Chess::Square square) const {
+        for (auto team : this->bitboards) {
+            for (int i = 0; i < team.size(); ++i) {
+                if (team[i].isOccupiedAt(square))
+                    return PieceType(i);
+            }
+        }
+
+        assert(false);
+        return PieceType::Pawn;
+    }
+
+    PieceType Board::pieceAt(Chess::Square square, Color color) const {
+        auto team = this->bitboards[static_cast<int>(color)];
+        for (int i = 0; i < team.size(); ++i) {
+            if (team[i].isOccupiedAt(square))
+                return PieceType(i);
+        }
+
+        assert(false);
+        return PieceType::Pawn;
+    }
+
     Bitboard Board::rookAttacks(Square square, Bitboard occupiedSquares) {
         return {
                 slidingAttack(square, Direction::North, occupiedSquares) |
@@ -357,18 +450,18 @@ namespace Chess {
         Square captureWest;
 
         switch (color) {
-            case Color::Black:
-                attackDirection = Direction::South;
-                startRank = sevenRank;
-                captureEast = Bitboard::squareToThe(Direction::SouthEast, square);
-                captureWest = Bitboard::squareToThe(Direction::SouthWest, square);
-                break;
-
             case Color::White:
                 attackDirection = Direction::North;
                 startRank = twoRank;
                 captureEast = Bitboard::squareToThe(Direction::NorthEast, square);
                 captureWest = Bitboard::squareToThe(Direction::NorthWest, square);
+                break;
+
+            case Color::Black:
+                attackDirection = Direction::South;
+                startRank = sevenRank;
+                captureEast = Bitboard::squareToThe(Direction::SouthEast, square);
+                captureWest = Bitboard::squareToThe(Direction::SouthWest, square);
                 break;
         }
 
@@ -376,18 +469,19 @@ namespace Chess {
 
         auto attackMask = pawnAttackMasks[static_cast<int>(color)][static_cast<int>(square)];
         if (attackMask.isOverlappingWith(occupiedSquares)) {
-            if (startRank.isOccupiedAt(square) && !occupiedSquares.isOccupiedAt(
-                    Bitboard::squareToThe(attackDirection, square)))
-                attacks.setOccupancyAt(Bitboard::squareToThe(attackDirection, square));
+
+            auto nextSquare = Bitboard::squareToThe(attackDirection, square);
+            if (startRank.isOccupiedAt(square) && !occupiedSquares.isOccupiedAt(nextSquare))
+                attacks.setOccupancyAt(nextSquare);
 
         } else {
-            attacks |= attackMask;
+            attacks = attackMask;
         }
 
-        if (occupiedSquares.isOccupiedAt(captureEast))
+        if (captureEast != Square::None && occupiedSquares.isOccupiedAt(captureEast))
             attacks.setOccupancyAt(captureEast);
 
-        if (occupiedSquares.isOccupiedAt(captureWest))
+        if (captureWest != Square::None && occupiedSquares.isOccupiedAt(captureWest))
             attacks.setOccupancyAt(captureWest);
 
         return attacks;
@@ -436,19 +530,5 @@ namespace Chess {
         }
 
         return attackRay;
-    }
-
-    void Board::printAttackRays(Direction direction, Square square) {
-        if (square != Square::None) {
-            std::cout << square << ":\n"
-                      << attackRayMasks[static_cast<int>(direction)][static_cast<int>(square)]
-                      << '\n';
-        } else {
-            auto bitboards = attackRayMasks[static_cast<int>(direction)];
-            for (int i = 0; i < bitboards.size(); ++i) {
-                std::cout << Square(i) << ":\n"
-                          << bitboards[i] << '\n';
-            }
-        }
     }
 }

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "bitboard.h"
+#include "move.h"
 
 #include <array>
+#include <vector>
 
 namespace Chess {
 
@@ -10,15 +12,9 @@ namespace Chess {
         White,
         Black,
     };
-
-    enum class PieceType {
-        King,
-        Queen,
-        Rook,
-        Bishop,
-        Knight,
-        Pawn,
-    };
+    constexpr Color oppositeTeam(Color color) {
+        return color == Color::White ? Color::Black : Color::White;
+    }
 
     enum class castlingBits {
         WhiteKing = 1,
@@ -31,6 +27,31 @@ namespace Chess {
     public:
         explicit Board(std::string &fen);
 
+        [[nodiscard]]
+        std::vector<Move> pseudoLegalMoves() const;
+
+        void pseudoLegalMoves(PieceType piece, std::vector<Move> &moves) const;
+
+        [[nodiscard]]
+        Bitboard teamOccupiedSquares(Color color) const;
+
+        [[nodiscard]]
+        PieceType pieceAt(Square square) const;
+
+        [[nodiscard]]
+        PieceType pieceAt(Square square, Color color) const;
+
+    private:
+        /**
+         * Bitboards for current state of the game, indexed by enums (Color and PieceType).
+         */
+        std::array<std::array<Bitboard, 6>, 2> bitboards;
+
+        /**
+         * The color of the team whose playerTurn to move it currently is
+         */
+        Color playerTurn{Color::White};
+
         static Bitboard rookAttacks(Square square, Bitboard occupiedSquares);
 
         static Bitboard bishopAttacks(Square square, Bitboard occupiedSquares);
@@ -42,6 +63,7 @@ namespace Chess {
         static Bitboard queenAttacks(Square square, Bitboard occupiedSquares);
 
         static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
+
 
         static void printAttackRays(Direction direction, Square square = Square::None);
 
@@ -67,10 +89,19 @@ namespace Chess {
          */
         static const std::array<std::array<Bitboard, 64>, 8> attackRayMasks;
 
+        /**
+         * Bitboards with attack masks for knight pieces, indexed by the Square enum
+         */
         static const std::array<Bitboard, 64> knightAttackMasks;
 
+        /**
+         * Bitboards with attack masks for king pieces,indexed by the Square enum
+         */
         static const std::array<Bitboard, 64> kingAttackMasks;
 
+        /**
+         * Bitboards with attack masks for king pieces,indexed by the Color enum then the Square enum
+         */
         static const std::array<std::array<Bitboard, 64>, 2> pawnAttackMasks;
 
         static std::array<Bitboard, 64> generateAttackRayMasks(Direction direction);

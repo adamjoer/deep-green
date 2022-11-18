@@ -126,4 +126,17 @@ namespace Chess {
 
         return os << names[static_cast<int>(square)];
     }
+
+    std::ostream &operator<<(std::ostream &os, PieceType piece) {
+        static const char *const names[6]{
+                "King",
+                "Queen",
+                "Rook",
+                "Bishop",
+                "Knight",
+                "Pawn",
+        };
+
+        return os << names[static_cast<int>(piece)];
+    }
 }
