@@ -121,7 +121,7 @@ namespace Chess {
         }
     }
 
-    // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+
     std::string Board::generateFen() {
         std::string result;
         Bitboard fullBoard;
@@ -177,18 +177,6 @@ namespace Chess {
         } else {
             result += squareToString[static_cast<int>(enPassant)] + ' ';
         }
-
-        auto appendNumber = [&](unsigned int num) -> void {
-            std::string numString;
-            unsigned int temp = num;
-            int mostSignificant = 1;
-            while (temp / mostSignificant > 10)
-                mostSignificant *= 10;
-            while (mostSignificant > 0) {
-                numString += std::to_string(temp / mostSignificant + '0');
-
-            }
-        };
 
         result += std::to_string(fiftyMoveCounter) + ' ' + std::to_string(fullMoveCounter);
 
