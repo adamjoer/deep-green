@@ -159,6 +159,99 @@ namespace Chess {
         return attack;
     }
 
+    std::vector<Move> Board::pseudoLegalMoves() const {
+        std::vector<Move> moves;
+
+        for (int pieceIndex = 0; pieceIndex < 6; ++pieceIndex)
+            pseudoLegalMoves(PieceType(pieceIndex), moves);
+
+        return moves;
+    }
+
+    void Board::pseudoLegalMoves(PieceType piece, std::vector<Move> &moves) const {
+        Bitboard bitboard = this->bitboards[static_cast<int>(this->playerTurn)][static_cast<int>(piece)];
+
+        const auto ourSquares = teamOccupiedSquares(playerTurn);
+        const auto enemySquares = teamOccupiedSquares(oppositeTeam(playerTurn));
+        const auto occupiedSquares = ourSquares | enemySquares;
+
+        for (int i = 0; i < 64; ++i) {
+            auto from = Square(i);
+            if (!bitboard.isOccupiedAt(from))
+                continue;
+
+            Bitboard attacks;
+            switch (piece) {
+                case PieceType::King:
+                    attacks = kingAttacks(from);
+                    break;
+                case PieceType::Queen:
+                    attacks = queenAttacks(from, occupiedSquares);
+                    break;
+                case PieceType::Rook:
+                    attacks = rookAttacks(from, occupiedSquares);
+                    break;
+                case PieceType::Bishop:
+                    attacks = bishopAttacks(from, occupiedSquares);
+                    break;
+                case PieceType::Knight:
+                    attacks = knightAttacks(from);
+                    break;
+                case PieceType::Pawn:
+                    attacks = pawnAttacks(from, occupiedSquares, this->playerTurn);
+                    break;
+            }
+
+            if (!attacks)
+                continue;
+
+            attacks &= ~ourSquares;
+
+            for (int j = 0; j < 64; ++j) {
+                auto to = Square(j);
+                if (!attacks.isOccupiedAt(to))
+                    continue;
+
+                moves.emplace_back(from, to, enemySquares.isOccupiedAt(to)
+                                             ? std::make_optional(pieceAt(to))
+                                             : std::nullopt);
+            }
+        }
+    }
+
+    Bitboard Board::teamOccupiedSquares(Color color) const {
+        Bitboard occupiedSquares;
+
+        auto team = this->bitboards[static_cast<int>(color)];
+        for (auto bitboard: team)
+            occupiedSquares |= bitboard;
+
+        return occupiedSquares;
+    }
+
+    PieceType Board::pieceAt(Chess::Square square) const {
+        for (auto team : this->bitboards) {
+            for (int i = 0; i < team.size(); ++i) {
+                if (team[i].isOccupiedAt(square))
+                    return PieceType(i);
+            }
+        }
+
+        assert(false);
+        return PieceType::Pawn;
+    }
+
+    PieceType Board::pieceAt(Chess::Square square, Color color) const {
+        auto team = this->bitboards[static_cast<int>(color)];
+        for (int i = 0; i < team.size(); ++i) {
+            if (team[i].isOccupiedAt(square))
+                return PieceType(i);
+        }
+
+        assert(false);
+        return PieceType::Pawn;
+    }
+
     Bitboard Board::rookAttacks(Square square, Bitboard occupiedSquares) {
         return {
                 slidingAttack(square, Direction::North, occupiedSquares) |
