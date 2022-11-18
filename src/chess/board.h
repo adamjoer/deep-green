@@ -34,8 +34,6 @@ namespace Chess {
 
         static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
 
-        static void printAttackRays(Direction direction, Square square = Square::None);
-
     private:
         /**
          * Bitboards for current state of the game, indexed by enums (Color and PieceType).
