@@ -46,7 +46,7 @@ namespace Chess {
         return ray;
     }
 
-     std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
+    std::array<Bitboard, 64> Board::generateKnightAttackMasks() {
         std::array<Bitboard, 64> rookAttacks;
 
         for (int i = 0; i < rookAttacks.size(); ++i) {
@@ -199,18 +199,18 @@ namespace Chess {
         Square captureWest;
 
         switch (color) {
-            case Color::Black:
-                attackDirection = Direction::South;
-                startRank = sevenRank;
-                captureEast = Bitboard::squareToThe(Direction::SouthEast, square);
-                captureWest = Bitboard::squareToThe(Direction::SouthWest, square);
-                break;
-
             case Color::White:
                 attackDirection = Direction::North;
                 startRank = twoRank;
                 captureEast = Bitboard::squareToThe(Direction::NorthEast, square);
                 captureWest = Bitboard::squareToThe(Direction::NorthWest, square);
+                break;
+
+            case Color::Black:
+                attackDirection = Direction::South;
+                startRank = sevenRank;
+                captureEast = Bitboard::squareToThe(Direction::SouthEast, square);
+                captureWest = Bitboard::squareToThe(Direction::SouthWest, square);
                 break;
         }
 
@@ -218,18 +218,19 @@ namespace Chess {
 
         auto attackMask = pawnAttackMasks[static_cast<int>(color)][static_cast<int>(square)];
         if (attackMask.isOverlappingWith(occupiedSquares)) {
-            if (startRank.isOccupiedAt(square) && !occupiedSquares.isOccupiedAt(
-                    Bitboard::squareToThe(attackDirection, square)))
-                attacks.setOccupancyAt(Bitboard::squareToThe(attackDirection, square));
+
+            auto nextSquare = Bitboard::squareToThe(attackDirection, square);
+            if (startRank.isOccupiedAt(square) && !occupiedSquares.isOccupiedAt(nextSquare))
+                attacks.setOccupancyAt(nextSquare);
 
         } else {
-            attacks |= attackMask;
+            attacks = attackMask;
         }
 
-        if (occupiedSquares.isOccupiedAt(captureEast))
+        if (captureEast != Square::None && occupiedSquares.isOccupiedAt(captureEast))
             attacks.setOccupancyAt(captureEast);
 
-        if (occupiedSquares.isOccupiedAt(captureWest))
+        if (captureWest != Square::None && occupiedSquares.isOccupiedAt(captureWest))
             attacks.setOccupancyAt(captureWest);
 
         return attacks;
