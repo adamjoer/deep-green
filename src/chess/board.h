@@ -12,6 +12,7 @@ namespace Chess {
         White,
         Black,
     };
+
     constexpr Color oppositeTeam(Color color) {
         return color == Color::White ? Color::Black : Color::White;
     }
@@ -48,6 +49,14 @@ namespace Chess {
         std::array<std::array<Bitboard, 6>, 2> bitboards;
 
         /**
+         * Variables pertaining to current game state.
+         */
+        uint8_t castlingRights{};
+        Square enPassant{};
+        int halfMoveCounter{};
+        int fullMoveCounter{};
+
+        /**
          * The color of the team whose playerTurn to move it currently is
          */
         Color playerTurn{Color::White};
@@ -64,26 +73,9 @@ namespace Chess {
 
         static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
 
-
-        static void printAttackRays(Direction direction, Square square = Square::None);
-
         std::string generateFen();
 
     private:
-        /**
-         * Bitboards for current state of the game, indexed by enums (Color and PieceType).
-         */
-        Bitboard bitboards[2][6];
-
-        /**
-         * Variables pertaining to current game state.
-         */
-        uint8_t castlingRights;
-        Color playerTurn;
-        Square enPassant;
-        int halfMoveCounter;
-        int fullMoveCounter;
-
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
          */

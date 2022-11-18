@@ -99,7 +99,7 @@ namespace Chess {
             int file = *itr - 'a'; // Zero indexed file number
             itr++;
             int rank = *itr - '1'; // Zero indexed rank number
-            enPassant = static_cast<Square>(rank * 8 + file);
+            enPassant = Square(rank * 8 + file);
             itr += 2;
         }
 
@@ -134,7 +134,7 @@ namespace Chess {
         for (int rank = 7; rank > -1; --rank) {
             for (int file = 0; file < 8; ++file) {
 
-                Square square = static_cast<Square>(rank * 8 + file);
+                auto square = static_cast<Square>(rank * 8 + file);
                 if (fullBoard.isOccupiedAt(square))
                     for (int i = 0; i < 12; ++i) {
                         if (bitboards[i / 6][i % 6].isOccupiedAt(square)) {
