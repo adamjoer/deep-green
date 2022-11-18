@@ -59,8 +59,8 @@ namespace Chess {
         uint8_t castlingRights;
         Color playerTurn;
         Square enPassant;
-        unsigned int fiftyMoveCounter;
-        unsigned int fullMoveCounter;
+        int halfMoveCounter;
+        int fullMoveCounter;
 
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)

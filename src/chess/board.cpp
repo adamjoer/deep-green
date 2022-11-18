@@ -1,3 +1,4 @@
+#include <sstream>
 #include "board.h"
 
 namespace Chess {
@@ -34,7 +35,7 @@ namespace Chess {
 
     Board::Board(std::string &fen) {
         auto itr = fen.begin();
-        auto charToPiece = [&](char c) -> PieceType {
+        auto charToPiece = [](char c) -> PieceType {
             switch (toupper(c)) {
                 case 'K':
                     return PieceType::King;
@@ -54,10 +55,10 @@ namespace Chess {
             for (int file = 0; file < 8; ++file) {
                 if (std::isupper(*itr)) { // White piece
                     bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
-                            static_cast<Square>(rank * 8 + file));
+                            Square(rank * 8 + file));
                 } else if (std::islower(*itr)) { // Black piece
                     bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
-                            static_cast<Square>(rank * 8 + file));
+                            Square(rank * 8 + file));
                 } else if (std::isdigit(*itr)) { // Empty squares
                     file += *itr - '1';
                 }
@@ -103,13 +104,13 @@ namespace Chess {
         }
 
         if (*itr == '0') {
-            fiftyMoveCounter = 0;
+            halfMoveCounter = 0;
             itr++;
         } else {
-            fiftyMoveCounter = *itr - '0';
+            halfMoveCounter = *itr - '0';
             itr++;
             if (*itr != ' ') {
-                fiftyMoveCounter = fiftyMoveCounter * 10 + *itr - '0';
+                halfMoveCounter = halfMoveCounter * 10 + *itr - '0';
                 itr++;
             }
         }
@@ -123,7 +124,7 @@ namespace Chess {
 
 
     std::string Board::generateFen() {
-        std::string result;
+        std::ostringstream result;
         Bitboard fullBoard;
         char pieces[] = "KQRBNPkqrbnp";
         for (auto &bitboard: bitboards)
@@ -137,7 +138,7 @@ namespace Chess {
                 if (fullBoard.isOccupiedAt(square))
                     for (int i = 0; i < 12; ++i) {
                         if (bitboards[i / 6][i % 6].isOccupiedAt(square)) {
-                            result += pieces[i];
+                            result << pieces[i];
                             break;
                         }
                     }
@@ -147,40 +148,41 @@ namespace Chess {
                     while (!fullBoard.isOccupiedAt(square) and file < 8) {
                         ++blankSpaceCounter;
                         ++file;
-                        square = static_cast<Square>(rank * 8 + file);
+                        square = Square(rank * 8 + file);
                     }
-                    result += blankSpaceCounter;
+                    result << blankSpaceCounter;
                     --file; // Fixes increment error
                 }
             }
             if (rank > 0)
-                result += '/';
+                result << '/';
             else
-                result += ' ';
+                result << ' ';
         }
 
-        playerTurn == Color::White ? result += "w " : result += "b ";
+        result << (playerTurn == Color::White ? "w " : "b ");
+
 
         if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteKing))
-            result += "K";
+            result << "K";
         if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteQueen))
-            result += "Q";
+            result << "Q";
         if (castlingRights & static_cast<uint8_t>(castlingBits::BlackKing))
-            result += "k";
+            result << "k";
         if (castlingRights & static_cast<uint8_t>(castlingBits::BlackQueen))
-            result += "q";
+            result << "q";
         if (castlingRights)
-            result += ' ';
+            result << ' ';
 
         if (enPassant == None) {
-            result += "- ";
+            result << "- ";
         } else {
-            result += squareToString[static_cast<int>(enPassant)] + ' ';
+            result << squareToString[static_cast<int>(enPassant)] + ' ';
         }
 
-        result += std::to_string(fiftyMoveCounter) + ' ' + std::to_string(fullMoveCounter);
+        result << halfMoveCounter << ' ' << fullMoveCounter;
 
-        return result;
+        return result.str();
     }
 
     Bitboard Board::generateAttackRayMask(Direction direction, Square square) {
