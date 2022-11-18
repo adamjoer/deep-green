@@ -31,13 +31,6 @@ namespace Chess {
     public:
         explicit Board(std::string &fen);
 
-        Bitboard bitboards[2][6];
-        uint8_t castlingRights;
-        Color playerTurn;
-        Square enPassant;
-        uint8_t fiftyMoveCounter;
-        uint16_t fullMoveCounter;
-
         static Bitboard rookAttacks(Square square, Bitboard occupiedSquares);
 
         static Bitboard bishopAttacks(Square square, Bitboard occupiedSquares);
@@ -52,10 +45,22 @@ namespace Chess {
 
         static void printAttackRays(Direction direction, Square square = Square::None);
 
+        std::string generateFen();
+
     private:
         /**
          * Bitboards for current state of the game, indexed by enums (Color and PieceType).
          */
+        Bitboard bitboards[2][6];
+
+        /**
+         * Variables pertaining to current game state.
+         */
+        uint8_t castlingRights;
+        Color playerTurn;
+        Square enPassant;
+        unsigned int fiftyMoveCounter;
+        unsigned int fullMoveCounter;
 
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)

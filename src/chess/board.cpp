@@ -32,7 +32,6 @@ namespace Chess {
         return ray;
     }
 
-    // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
     Board::Board(std::string &fen) {
         auto itr = fen.begin();
         auto charToPiece = [&](char c) -> PieceType {
@@ -89,7 +88,8 @@ namespace Chess {
             castlingRights |= static_cast<uint8_t>(castlingBits::BlackQueen);
             itr++;
         }
-        itr++;
+        if (castlingRights)
+            itr++;
         // En passant parsing.
         if (*itr == '-') {
             enPassant = None;
@@ -104,7 +104,7 @@ namespace Chess {
 
         if (*itr == '0') {
             fiftyMoveCounter = 0;
-            itr += 2;
+            itr++;
         } else {
             fiftyMoveCounter = *itr - '0';
             itr++;
@@ -113,11 +113,86 @@ namespace Chess {
                 itr++;
             }
         }
+        itr++;
         fullMoveCounter = 0;
         while (itr != fen.end()) {
             fullMoveCounter = fullMoveCounter * 10 + *itr - '0';
             itr++;
         }
+    }
+
+    // rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+    std::string Board::generateFen() {
+        std::string result;
+        Bitboard fullBoard;
+        char pieces[] = "KQRBNPkqrbnp";
+        for (auto &bitboard: bitboards)
+            for (auto bb: bitboard)
+                fullBoard |= bb;
+
+        for (int rank = 7; rank > -1; --rank) {
+            for (int file = 0; file < 8; ++file) {
+
+                Square square = static_cast<Square>(rank * 8 + file);
+                if (fullBoard.isOccupiedAt(square))
+                    for (int i = 0; i < 12; ++i) {
+                        if (bitboards[i / 6][i % 6].isOccupiedAt(square)) {
+                            result += pieces[i];
+                            break;
+                        }
+                    }
+
+                else {
+                    char blankSpaceCounter{'0'};
+                    while (!fullBoard.isOccupiedAt(square) and file < 8) {
+                        ++blankSpaceCounter;
+                        ++file;
+                        square = static_cast<Square>(rank * 8 + file);
+                    }
+                    result += blankSpaceCounter;
+                    --file; // Fixes increment error
+                }
+            }
+            if (rank > 0)
+                result += '/';
+            else
+                result += ' ';
+        }
+
+        playerTurn == Color::White ? result += "w " : result += "b ";
+
+        if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteKing))
+            result += "K";
+        if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteQueen))
+            result += "Q";
+        if (castlingRights & static_cast<uint8_t>(castlingBits::BlackKing))
+            result += "k";
+        if (castlingRights & static_cast<uint8_t>(castlingBits::BlackQueen))
+            result += "q";
+        if (castlingRights)
+            result += ' ';
+
+        if (enPassant == None) {
+            result += "- ";
+        } else {
+            result += squareToString[static_cast<int>(enPassant)] + ' ';
+        }
+
+        auto appendNumber = [&](unsigned int num) -> void {
+            std::string numString;
+            unsigned int temp = num;
+            int mostSignificant = 1;
+            while (temp / mostSignificant > 10)
+                mostSignificant *= 10;
+            while (mostSignificant > 0) {
+                numString += std::to_string(temp / mostSignificant + '0');
+
+            }
+        };
+
+        result += std::to_string(fiftyMoveCounter) + ' ' + std::to_string(fullMoveCounter);
+
+        return result;
     }
 
     Bitboard Board::generateAttackRayMask(Direction direction, Square square) {
@@ -270,6 +345,11 @@ namespace Chess {
     }
 
     Bitboard Board::kingAttacks(Square square) {
+        // TODO: Add castling moves, if castling bits are 1. Use playerTurn variable to switch.
+        // TODO: All other attack methods need to check if square is threatened by BRQ, then check possible pin.
+        // TODO: King may not move into check or stay in check. Suggestion: Check all legal moves generated and
+        //  see whether the move makes king non-threatened. This is also an alternative to pin checks, and provides
+        //  a clear end condition - if no move exists after this check, then it's checkmate and opposing player wins.
         return kingAttackMasks[static_cast<int>(square)];
     }
 
