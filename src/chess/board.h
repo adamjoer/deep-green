@@ -8,7 +8,7 @@
 
 namespace Chess {
 
-    enum class Color {
+    enum class Color : int {
         White,
         Black,
     };

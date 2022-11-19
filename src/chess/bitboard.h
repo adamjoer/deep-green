@@ -8,7 +8,7 @@
 
 namespace Chess {
 
-    enum Square {
+    enum class Square : int {
         None = -1,
         A1, B1, C1, D1, E1, F1, G1, H1,
         A2, B2, C2, D2, E2, F2, G2, H2,
@@ -21,7 +21,7 @@ namespace Chess {
     };
     std::ostream &operator<<(std::ostream &os, Square square);
 
-    enum class PieceType {
+    enum class PieceType : int {
         King,
         Queen,
         Rook,
@@ -31,7 +31,7 @@ namespace Chess {
     };
     std::ostream &operator<<(std::ostream &os, PieceType piece);
 
-    enum class Direction {
+    enum class Direction : int {
         NorthWest,
         North,
         NorthEast,
