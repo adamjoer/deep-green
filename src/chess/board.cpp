@@ -1,5 +1,6 @@
-#include <sstream>
 #include "board.h"
+
+#include <sstream>
 
 namespace Chess {
     static constexpr Bitboard twoRank{Square::A2, Square::B2, Square::C2, Square::D2,
@@ -52,156 +53,6 @@ namespace Chess {
             ray[i] = generateAttackRayMask(direction, Square(i));
 
         return ray;
-    }
-
-    Board::Board(std::string &fen) {
-        auto itr = fen.begin();
-        auto charToPiece = [](char c) -> PieceType {
-            switch (toupper(c)) {
-                case 'K':
-                    return PieceType::King;
-                case 'Q':
-                    return PieceType::Queen;
-                case 'R':
-                    return PieceType::Rook;
-                case 'B':
-                    return PieceType::Bishop;
-                case 'N':
-                    return PieceType::Knight;
-                default:
-                    return PieceType::Pawn;
-            }
-        };
-        for (int rank = 7; rank > -1; --rank) {
-            for (int file = 0; file < 8; ++file) {
-                if (std::isupper(*itr)) { // White piece
-                    bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
-                            Square(rank * 8 + file));
-                } else if (std::islower(*itr)) { // Black piece
-                    bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
-                            Square(rank * 8 + file));
-                } else if (std::isdigit(*itr)) { // Empty squares
-                    file += *itr - '1';
-                }
-                itr++;
-            }
-            itr++;
-        }
-
-        // Set player turn
-        *itr == 'w' ? playerTurn = Color::White : playerTurn = Color::Black;
-        itr += 2;
-
-        // Set castling bits
-        castlingRights = 0;
-        if (*itr == 'K') {
-            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::WhiteKing);
-            itr++;
-        }
-        if (*itr == 'Q') {
-            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::WhiteQueen);
-            itr++;
-        }
-        if (*itr == 'k') {
-            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::BlackKing);
-            itr++;
-        }
-        if (*itr == 'q') {
-            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::BlackQueen);
-            itr++;
-        }
-        if (castlingRights)
-            itr++;
-        // En passant parsing.
-        if (*itr == '-') {
-            enPassant = Square::None;
-            itr += 2;
-        } else {
-            int file = *itr - 'a'; // Zero indexed file number
-            itr++;
-            int rank = *itr - '1'; // Zero indexed rank number
-            enPassant = Square(rank * 8 + file);
-            itr += 2;
-        }
-
-        if (*itr == '0') {
-            halfMoveCounter = 0;
-            itr++;
-        } else {
-            halfMoveCounter = *itr - '0';
-            itr++;
-            if (*itr != ' ') {
-                halfMoveCounter = halfMoveCounter * 10 + *itr - '0';
-                itr++;
-            }
-        }
-        itr++;
-        fullMoveCounter = 0;
-        while (itr != fen.end()) {
-            fullMoveCounter = fullMoveCounter * 10 + *itr - '0';
-            itr++;
-        }
-    }
-
-    std::string Board::generateFen() const {
-        std::ostringstream result;
-        Bitboard fullBoard;
-        char pieces[] = "KQRBNPkqrbnp";
-        for (auto &bitboard: bitboards)
-            for (auto bb: bitboard)
-                fullBoard |= bb;
-
-        for (int rank = 7; rank > -1; --rank) {
-            for (int file = 0; file < 8; ++file) {
-
-                auto square = static_cast<Square>(rank * 8 + file);
-                if (fullBoard.isOccupiedAt(square))
-                    for (int i = 0; i < 12; ++i) {
-                        if (bitboards[i / 6][i % 6].isOccupiedAt(square)) {
-                            result << pieces[i];
-                            break;
-                        }
-                    }
-
-                else {
-                    char blankSpaceCounter{'0'};
-                    while (!fullBoard.isOccupiedAt(square) and file < 8) {
-                        ++blankSpaceCounter;
-                        ++file;
-                        square = Square(rank * 8 + file);
-                    }
-                    result << blankSpaceCounter;
-                    --file; // Fixes increment error
-                }
-            }
-            if (rank > 0)
-                result << '/';
-            else
-                result << ' ';
-        }
-
-        result << (playerTurn == Color::White ? "w " : "b ");
-
-        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteKing))
-            result << 'K';
-        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteQueen))
-            result << 'Q';
-        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackKing))
-            result << 'k';
-        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackQueen))
-            result << 'q';
-        if (castlingRights)
-            result << ' ';
-
-        if (enPassant == Square::None) {
-            result << "- ";
-        } else {
-            result << enPassant << ' ';
-        }
-
-        result << halfMoveCounter << ' ' << fullMoveCounter;
-
-        return result.str();
     }
 
     Bitboard Board::generateAttackRayMask(Direction direction, Square square) {
@@ -335,9 +186,171 @@ namespace Chess {
         reset();
     }
 
+    Board::Board(const std::string &fen) {
+        parseFen(fen);
+    }
+
     void Board::reset() {
         this->bitboards = startingPosition;
         this->playerTurn = Color::White;
+    }
+
+    void Board::parseFen(const std::string &fen) {
+        auto charToPiece = [](char c) -> PieceType {
+            switch (toupper(c)) {
+                case 'K':
+                    return PieceType::King;
+                case 'Q':
+                    return PieceType::Queen;
+                case 'R':
+                    return PieceType::Rook;
+                case 'B':
+                    return PieceType::Bishop;
+                case 'N':
+                    return PieceType::Knight;
+                default:
+                    return PieceType::Pawn;
+            }
+        };
+
+        auto itr = fen.begin();
+
+        for (int rank = 7; rank >= 0; --rank) {
+            for (int file = 0; file < 8; ++file) {
+                if (std::isupper(*itr)) { // White piece
+                    bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(Square(rank * 8 + file));
+
+                } else if (std::islower(*itr)) { // Black piece
+                    bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(Square(rank * 8 + file));
+
+                } else if (std::isdigit(*itr)) { // Empty squares
+                    file += *itr - '1';
+                }
+                itr++;
+            }
+            itr++;
+        }
+
+        // Set player turn
+        playerTurn = (*itr == 'w') ? Color::White : Color::Black;
+        itr += 2;
+
+        // Set castling bits
+        castlingRights = 0;
+        if (*itr == 'K') {
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::WhiteKing);
+            itr++;
+        }
+        if (*itr == 'Q') {
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::WhiteQueen);
+            itr++;
+        }
+        if (*itr == 'k') {
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::BlackKing);
+            itr++;
+        }
+        if (*itr == 'q') {
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::BlackQueen);
+            itr++;
+        }
+        if (castlingRights)
+            itr++;
+
+        // En passant parsing.
+        if (*itr == '-') {
+            enPassant = Square::None;
+            itr += 2;
+
+        } else {
+            int file = *itr - 'a'; // Zero indexed file number
+            itr++;
+            int rank = *itr - '1'; // Zero indexed rank number
+            enPassant = Square(rank * 8 + file);
+            itr += 2;
+        }
+
+        if (*itr == '0') {
+            halfMoveCounter = 0;
+            itr++;
+
+        } else {
+            halfMoveCounter = *itr - '0';
+            itr++;
+            if (*itr != ' ') {
+                halfMoveCounter = halfMoveCounter * 10 + *itr - '0';
+                itr++;
+            }
+        }
+
+        itr++;
+        fullMoveCounter = 0;
+        while (itr != fen.end()) {
+            fullMoveCounter = fullMoveCounter * 10 + *itr - '0';
+            itr++;
+        }
+    }
+
+    std::string Board::generateFen() const {
+        std::ostringstream result;
+
+        Bitboard fullBoard;
+        for (auto &bitboard: bitboards)
+            for (auto bb: bitboard)
+                fullBoard |= bb;
+
+        static const char *const pieces = "KQRBNPkqrbnp";
+
+        for (int rank = 7; rank > -1; --rank) {
+            for (int file = 0; file < 8; ++file) {
+
+                auto square = static_cast<Square>(rank * 8 + file);
+                if (fullBoard.isOccupiedAt(square))
+                    for (int i = 0; i < 12; ++i) {
+                        if (bitboards[i / 6][i % 6].isOccupiedAt(square)) {
+                            result << pieces[i];
+                            break;
+                        }
+                    }
+
+                else {
+                    char blankSpaceCounter{'0'};
+                    while (!fullBoard.isOccupiedAt(square) and file < 8) {
+                        ++blankSpaceCounter;
+                        ++file;
+                        square = Square(rank * 8 + file);
+                    }
+                    result << blankSpaceCounter;
+                    --file; // Fixes increment error
+                }
+            }
+            if (rank > 0)
+                result << '/';
+            else
+                result << ' ';
+        }
+
+        result << (playerTurn == Color::White ? "w " : "b ");
+
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteKing))
+            result << 'K';
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteQueen))
+            result << 'Q';
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackKing))
+            result << 'k';
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackQueen))
+            result << 'q';
+        if (castlingRights)
+            result << ' ';
+
+        if (enPassant == Square::None) {
+            result << "- ";
+        } else {
+            result << enPassant << ' ';
+        }
+
+        result << halfMoveCounter << ' ' << fullMoveCounter;
+
+        return result.str();
     }
 
     std::vector<Move> Board::pseudoLegalMoves() const {

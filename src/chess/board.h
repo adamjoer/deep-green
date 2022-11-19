@@ -26,13 +26,18 @@ namespace Chess {
 
     class Board {
     public:
-        explicit Board(std::string &fen);
+        explicit Board(const std::string &fen);
 
         Board();
 
         void reset();
 
         void clear();
+
+        void parseFen(const std::string &fen);
+
+        [[nodiscard]]
+        std::string generateFen() const;
 
         [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
@@ -46,9 +51,6 @@ namespace Chess {
         std::vector<Move> pseudoLegalMoves(Square square) const;
 
         void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
-
-        [[nodiscard]]
-        std::string generateFen() const;
 
         [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;
