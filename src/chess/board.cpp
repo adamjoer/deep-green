@@ -1,3 +1,4 @@
+#include <sstream>
 #include "board.h"
 
 namespace Chess {
@@ -51,6 +52,158 @@ namespace Chess {
             ray[i] = generateAttackRayMask(direction, Square(i));
 
         return ray;
+    }
+
+    Board::Board(std::string &fen) {
+        auto itr = fen.begin();
+        auto charToPiece = [](char c) -> PieceType {
+            switch (toupper(c)) {
+                case 'K':
+                    return PieceType::King;
+                case 'Q':
+                    return PieceType::Queen;
+                case 'R':
+                    return PieceType::Rook;
+                case 'B':
+                    return PieceType::Bishop;
+                case 'N':
+                    return PieceType::Knight;
+                default:
+                    return PieceType::Pawn;
+            }
+        };
+        for (int rank = 7; rank > -1; --rank) {
+            for (int file = 0; file < 8; ++file) {
+                if (std::isupper(*itr)) { // White piece
+                    bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
+                            Square(rank * 8 + file));
+                } else if (std::islower(*itr)) { // Black piece
+                    bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(
+                            Square(rank * 8 + file));
+                } else if (std::isdigit(*itr)) { // Empty squares
+                    file += *itr - '1';
+                }
+                itr++;
+            }
+            itr++;
+        }
+
+        // Set player turn
+        *itr == 'w' ? playerTurn = Color::White : playerTurn = Color::Black;
+        itr += 2;
+
+        // Set castling bits
+        castlingRights = 0;
+        if (*itr == 'K') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::WhiteKing);
+            itr++;
+        }
+        if (*itr == 'Q') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::WhiteQueen);
+            itr++;
+        }
+        if (*itr == 'k') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::BlackKing);
+            itr++;
+        }
+        if (*itr == 'q') {
+            castlingRights |= static_cast<uint8_t>(castlingBits::BlackQueen);
+            itr++;
+        }
+        if (castlingRights)
+            itr++;
+        // En passant parsing.
+        if (*itr == '-') {
+            enPassant = None;
+            itr += 2;
+        } else {
+            int file = *itr - 'a'; // Zero indexed file number
+            itr++;
+            int rank = *itr - '1'; // Zero indexed rank number
+            enPassant = Square(rank * 8 + file);
+            itr += 2;
+        }
+
+        if (*itr == '0') {
+            halfMoveCounter = 0;
+            itr++;
+        } else {
+            halfMoveCounter = *itr - '0';
+            itr++;
+            if (*itr != ' ') {
+                halfMoveCounter = halfMoveCounter * 10 + *itr - '0';
+                itr++;
+            }
+        }
+        itr++;
+        fullMoveCounter = 0;
+        while (itr != fen.end()) {
+            fullMoveCounter = fullMoveCounter * 10 + *itr - '0';
+            itr++;
+        }
+    }
+
+
+    std::string Board::generateFen() {
+        std::ostringstream result;
+        Bitboard fullBoard;
+        char pieces[] = "KQRBNPkqrbnp";
+        for (auto &bitboard: bitboards)
+            for (auto bb: bitboard)
+                fullBoard |= bb;
+
+        for (int rank = 7; rank > -1; --rank) {
+            for (int file = 0; file < 8; ++file) {
+
+                auto square = static_cast<Square>(rank * 8 + file);
+                if (fullBoard.isOccupiedAt(square))
+                    for (int i = 0; i < 12; ++i) {
+                        if (bitboards[i / 6][i % 6].isOccupiedAt(square)) {
+                            result << pieces[i];
+                            break;
+                        }
+                    }
+
+                else {
+                    char blankSpaceCounter{'0'};
+                    while (!fullBoard.isOccupiedAt(square) and file < 8) {
+                        ++blankSpaceCounter;
+                        ++file;
+                        square = Square(rank * 8 + file);
+                    }
+                    result << blankSpaceCounter;
+                    --file; // Fixes increment error
+                }
+            }
+            if (rank > 0)
+                result << '/';
+            else
+                result << ' ';
+        }
+
+        result << (playerTurn == Color::White ? "w " : "b ");
+
+
+        if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteKing))
+            result << "K";
+        if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteQueen))
+            result << "Q";
+        if (castlingRights & static_cast<uint8_t>(castlingBits::BlackKing))
+            result << "k";
+        if (castlingRights & static_cast<uint8_t>(castlingBits::BlackQueen))
+            result << "q";
+        if (castlingRights)
+            result << ' ';
+
+        if (enPassant == None) {
+            result << "- ";
+        } else {
+            result << squareToString[static_cast<int>(enPassant)] + ' ';
+        }
+
+        result << halfMoveCounter << ' ' << fullMoveCounter;
+
+        return result.str();
     }
 
     Bitboard Board::generateAttackRayMask(Direction direction, Square square) {
@@ -323,6 +476,11 @@ namespace Chess {
     }
 
     Bitboard Board::kingAttacks(Square square) {
+        // TODO: Add castling moves, if castling bits are 1. Use playerTurn variable to switch.
+        // TODO: All other attack methods need to check if square is threatened by BRQ, then check possible pin.
+        // TODO: King may not move into check or stay in check. Suggestion: Check all legal moves generated and
+        //  see whether the move makes king non-threatened. This is also an alternative to pin checks, and provides
+        //  a clear end condition - if no move exists after this check, then it's checkmate and opposing player wins.
         return kingAttackMasks[static_cast<int>(square)];
     }
 
