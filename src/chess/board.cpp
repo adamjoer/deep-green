@@ -328,10 +328,10 @@ namespace Chess {
         Bitboard attacks;
 
         auto attackMask = pawnAttackMasks[static_cast<int>(color)][static_cast<int>(square)];
-        if (attackMask.isOverlappingWith(occupiedSquares)) {
+        if (attackMask.isOverlappingWith(occupiedSquares) && startRank.isOccupiedAt(square)) {
 
             auto nextSquare = Bitboard::squareToThe(attackDirection, square);
-            if (startRank.isOccupiedAt(square) && !occupiedSquares.isOccupiedAt(nextSquare))
+            if (!occupiedSquares.isOccupiedAt(nextSquare))
                 attacks.setOccupancyAt(nextSquare);
 
         } else {
