@@ -143,8 +143,7 @@ namespace Chess {
         }
     }
 
-
-    std::string Board::generateFen() {
+    std::string Board::generateFen() const {
         std::ostringstream result;
         Bitboard fullBoard;
         char pieces[] = "KQRBNPkqrbnp";

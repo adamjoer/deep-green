@@ -48,6 +48,9 @@ namespace Chess {
         void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
 
         [[nodiscard]]
+        std::string generateFen() const;
+
+        [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;
 
         [[nodiscard]]
@@ -87,9 +90,6 @@ namespace Chess {
 
         static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
 
-        std::string generateFen();
-
-    private:
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
          */
