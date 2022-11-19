@@ -8,7 +8,7 @@
 
 namespace Chess {
 
-    enum class Color {
+    enum class Color : int {
         White,
         Black,
     };
@@ -28,19 +28,33 @@ namespace Chess {
     public:
         explicit Board(std::string &fen);
 
+        Board();
+
+        void reset();
+
+        void clear();
+
         [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
 
+        [[nodiscard]]
+        std::vector<Move> pseudoLegalMoves(PieceType piece) const;
+
         void pseudoLegalMoves(PieceType piece, std::vector<Move> &moves) const;
+
+        [[nodiscard]]
+        std::vector<Move> pseudoLegalMoves(Square square) const;
+
+        void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
 
         [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;
 
         [[nodiscard]]
-        PieceType pieceAt(Square square) const;
+        constexpr PieceType pieceAt(Square square) const;
 
         [[nodiscard]]
-        PieceType pieceAt(Square square, Color color) const;
+        constexpr PieceType pieceAt(Square square, Color color) const;
 
     private:
         /**
