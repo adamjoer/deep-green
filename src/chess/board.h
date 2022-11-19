@@ -21,7 +21,15 @@ namespace Chess {
         [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
 
+        [[nodiscard]]
+        std::vector<Move> pseudoLegalMoves(PieceType piece) const;
+
         void pseudoLegalMoves(PieceType piece, std::vector<Move> &moves) const;
+
+        [[nodiscard]]
+        std::vector<Move> pseudoLegalMoves(Square square) const;
+
+        void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
 
         [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;

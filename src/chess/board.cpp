@@ -168,54 +168,72 @@ namespace Chess {
         return moves;
     }
 
+    std::vector<Move> Board::pseudoLegalMoves(PieceType piece) const {
+        std::vector<Move> moves;
+        pseudoLegalMoves(piece, moves);
+        return moves;
+    }
+
     void Board::pseudoLegalMoves(PieceType piece, std::vector<Move> &moves) const {
         Bitboard bitboard = this->bitboards[static_cast<int>(this->playerTurn)][static_cast<int>(piece)];
-
-        const auto ourSquares = teamOccupiedSquares(playerTurn);
-        const auto enemySquares = teamOccupiedSquares(oppositeTeam(playerTurn));
-        const auto occupiedSquares = ourSquares | enemySquares;
 
         for (int i = 0; i < 64; ++i) {
             auto from = Square(i);
             if (!bitboard.isOccupiedAt(from))
                 continue;
 
-            Bitboard attacks;
-            switch (piece) {
-                case PieceType::King:
-                    attacks = kingAttacks(from);
-                    break;
-                case PieceType::Queen:
-                    attacks = queenAttacks(from, occupiedSquares);
-                    break;
-                case PieceType::Rook:
-                    attacks = rookAttacks(from, occupiedSquares);
-                    break;
-                case PieceType::Bishop:
-                    attacks = bishopAttacks(from, occupiedSquares);
-                    break;
-                case PieceType::Knight:
-                    attacks = knightAttacks(from);
-                    break;
-                case PieceType::Pawn:
-                    attacks = pawnAttacks(from, occupiedSquares, this->playerTurn);
-                    break;
-            }
+            pseudoLegalMoves(from, moves);
+        }
+    }
 
-            if (!attacks)
+    std::vector<Move> Board::pseudoLegalMoves(Chess::Square square) const {
+        std::vector<Move> moves;
+        pseudoLegalMoves(square, moves);
+        return moves;
+    }
+
+    void Board::pseudoLegalMoves(Square square, std::vector<Move> &moves) const {
+        const auto ourSquares = teamOccupiedSquares(playerTurn);
+        const auto enemySquares = teamOccupiedSquares(oppositeTeam(playerTurn));
+        const auto occupiedSquares = ourSquares | enemySquares;
+
+        const auto piece = pieceAt(square);
+
+        Bitboard attacks;
+        switch (piece) {
+            case PieceType::King:
+                attacks = kingAttacks(square);
+                break;
+            case PieceType::Queen:
+                attacks = queenAttacks(square, occupiedSquares);
+                break;
+            case PieceType::Rook:
+                attacks = rookAttacks(square, occupiedSquares);
+                break;
+            case PieceType::Bishop:
+                attacks = bishopAttacks(square, occupiedSquares);
+                break;
+            case PieceType::Knight:
+                attacks = knightAttacks(square);
+                break;
+            case PieceType::Pawn:
+                attacks = pawnAttacks(square, occupiedSquares, this->playerTurn);
+                break;
+        }
+
+        if (!attacks)
+            return;
+
+        attacks &= ~ourSquares;
+
+        for (int j = 0; j < 64; ++j) {
+            auto to = Square(j);
+            if (!attacks.isOccupiedAt(to))
                 continue;
 
-            attacks &= ~ourSquares;
-
-            for (int j = 0; j < 64; ++j) {
-                auto to = Square(j);
-                if (!attacks.isOccupiedAt(to))
-                    continue;
-
-                moves.emplace_back(from, to, enemySquares.isOccupiedAt(to)
-                                             ? std::make_optional(pieceAt(to))
-                                             : std::nullopt);
-            }
+            moves.emplace_back(square, to, enemySquares.isOccupiedAt(to)
+                                           ? std::make_optional(pieceAt(to))
+                                           : std::nullopt);
         }
     }
 
