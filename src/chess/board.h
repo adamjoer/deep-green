@@ -17,11 +17,11 @@ namespace Chess {
         return color == Color::White ? Color::Black : Color::White;
     }
 
-    enum class castlingBits {
-        WhiteKing = 1,
-        WhiteQueen = 2,
-        BlackKing = 4,
-        BlackQueen = 8,
+    enum class CastlingRightFlag : uint8_t {
+        WhiteKing = 0x01,
+        WhiteQueen = 0x02,
+        BlackKing = 0x04,
+        BlackQueen = 0x08,
     };
 
     class Board {
@@ -66,12 +66,12 @@ namespace Chess {
          * Variables pertaining to current game state.
          */
         uint8_t castlingRights{};
-        Square enPassant{};
-        int halfMoveCounter{};
-        int fullMoveCounter{};
+        Square enPassant{Square::None};
+        int halfMoveCounter{0};
+        int fullMoveCounter{0};
 
         /**
-         * The color of the team whose playerTurn to move it currently is
+         * The color of the team whose turn to move it currently is
          */
         Color playerTurn{Color::White};
 

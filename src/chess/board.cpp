@@ -95,26 +95,26 @@ namespace Chess {
         // Set castling bits
         castlingRights = 0;
         if (*itr == 'K') {
-            castlingRights |= static_cast<uint8_t>(castlingBits::WhiteKing);
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::WhiteKing);
             itr++;
         }
         if (*itr == 'Q') {
-            castlingRights |= static_cast<uint8_t>(castlingBits::WhiteQueen);
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::WhiteQueen);
             itr++;
         }
         if (*itr == 'k') {
-            castlingRights |= static_cast<uint8_t>(castlingBits::BlackKing);
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::BlackKing);
             itr++;
         }
         if (*itr == 'q') {
-            castlingRights |= static_cast<uint8_t>(castlingBits::BlackQueen);
+            castlingRights |= static_cast<uint8_t>(CastlingRightFlag::BlackQueen);
             itr++;
         }
         if (castlingRights)
             itr++;
         // En passant parsing.
         if (*itr == '-') {
-            enPassant = None;
+            enPassant = Square::None;
             itr += 2;
         } else {
             int file = *itr - 'a'; // Zero indexed file number
@@ -183,22 +183,21 @@ namespace Chess {
 
         result << (playerTurn == Color::White ? "w " : "b ");
 
-
-        if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteKing))
-            result << "K";
-        if (castlingRights & static_cast<uint8_t>(castlingBits::WhiteQueen))
-            result << "Q";
-        if (castlingRights & static_cast<uint8_t>(castlingBits::BlackKing))
-            result << "k";
-        if (castlingRights & static_cast<uint8_t>(castlingBits::BlackQueen))
-            result << "q";
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteKing))
+            result << 'K';
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteQueen))
+            result << 'Q';
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackKing))
+            result << 'k';
+        if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackQueen))
+            result << 'q';
         if (castlingRights)
             result << ' ';
 
-        if (enPassant == None) {
+        if (enPassant == Square::None) {
             result << "- ";
         } else {
-            result << squareToString[static_cast<int>(enPassant)] + ' ';
+            result << enPassant << ' ';
         }
 
         result << halfMoveCounter << ' ' << fullMoveCounter;
