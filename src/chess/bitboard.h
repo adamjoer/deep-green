@@ -44,9 +44,9 @@ namespace Chess {
 
     class Bitboard {
     public:
-        Bitboard() = default;
+        constexpr Bitboard() = default;
 
-        Bitboard(const Bitboard &other) = default;
+        constexpr Bitboard(const Bitboard &other) = default;
 
         constexpr explicit Bitboard(uint64_t bits)
                 : bits(bits) {

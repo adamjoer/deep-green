@@ -6,6 +6,27 @@ namespace Chess {
     static constexpr Bitboard sevenRank{Square::A7, Square::B7, Square::C7, Square::D7,
                                         Square::E7, Square::F7, Square::G7, Square::H7};
 
+    static constexpr std::array<std::array<Bitboard, 6>, 2> startingPosition{
+            {
+                    {
+                            Bitboard(Square::E1),
+                            Bitboard(Square::D1),
+                            Bitboard(Square::A1, Square::H1),
+                            Bitboard(Square::C1, Square::F1),
+                            Bitboard(Square::B1, Square::G1),
+                            twoRank,
+                    },
+                    {
+                            Bitboard(Square::E8),
+                            Bitboard(Square::D8),
+                            Bitboard(Square::A8, Square::H8),
+                            Bitboard(Square::C8, Square::F8),
+                            Bitboard(Square::B8, Square::G8),
+                            sevenRank,
+                    },
+            }
+    };
+
     const std::array<std::array<Bitboard, 64>, 8> Board::attackRayMasks{
             generateAttackRayMasks(Direction::NorthWest),
             generateAttackRayMasks(Direction::North),
@@ -157,6 +178,15 @@ namespace Chess {
             attack.setOccupancyAt(Bitboard::squareToThe(attackDirection, attackSquare));
 
         return attack;
+    }
+
+    Board::Board() {
+        reset();
+    }
+
+    void Board::reset() {
+        this->bitboards = startingPosition;
+        this->playerTurn = Color::White;
     }
 
     std::vector<Move> Board::pseudoLegalMoves() const {

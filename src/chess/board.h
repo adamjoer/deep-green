@@ -18,6 +18,12 @@ namespace Chess {
 
     class Board {
     public:
+        Board();
+
+        void reset();
+
+        void clear();
+
         [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
 
