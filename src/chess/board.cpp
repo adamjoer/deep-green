@@ -247,8 +247,8 @@ namespace Chess {
         return occupiedSquares;
     }
 
-    PieceType Board::pieceAt(Chess::Square square) const {
-        for (auto team : this->bitboards) {
+    constexpr PieceType Board::pieceAt(Chess::Square square) const {
+        for (auto team: this->bitboards) {
             for (int i = 0; i < team.size(); ++i) {
                 if (team[i].isOccupiedAt(square))
                     return PieceType(i);
@@ -259,7 +259,7 @@ namespace Chess {
         return PieceType::Pawn;
     }
 
-    PieceType Board::pieceAt(Chess::Square square, Color color) const {
+    constexpr PieceType Board::pieceAt(Chess::Square square, Color color) const {
         auto team = this->bitboards[static_cast<int>(color)];
         for (int i = 0; i < team.size(); ++i) {
             if (team[i].isOccupiedAt(square))

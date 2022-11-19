@@ -35,10 +35,10 @@ namespace Chess {
         Bitboard teamOccupiedSquares(Color color) const;
 
         [[nodiscard]]
-        PieceType pieceAt(Square square) const;
+        constexpr PieceType pieceAt(Square square) const;
 
         [[nodiscard]]
-        PieceType pieceAt(Square square, Color color) const;
+        constexpr PieceType pieceAt(Square square, Color color) const;
 
     private:
         /**
