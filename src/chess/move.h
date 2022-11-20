@@ -28,6 +28,16 @@ namespace Chess {
         const Square to;
         const std::optional<PieceType> dropPiece{std::nullopt};
 
+        bool operator==(const Move &rhs) const {
+            return from == rhs.from &&
+                   to == rhs.to &&
+                   dropPiece == rhs.dropPiece;
+        }
+
+        bool operator!=(const Move &rhs) const {
+            return !(rhs == *this);
+        }
+
         friend std::ostream &operator<<(std::ostream &os, const Move &move) {
             os << move.from << "-->" << move.to;
             if (move.dropPiece)

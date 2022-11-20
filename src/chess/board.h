@@ -5,6 +5,7 @@
 
 #include <array>
 #include <vector>
+#include <ostream>
 
 namespace Chess {
 
@@ -13,26 +14,40 @@ namespace Chess {
         Black,
     };
 
+    std::ostream &operator<<(std::ostream &os, Color color);
+
     constexpr Color oppositeTeam(Color color) {
         return color == Color::White ? Color::Black : Color::White;
     }
 
-    enum class castlingBits {
-        WhiteKing = 1,
-        WhiteQueen = 2,
-        BlackKing = 4,
-        BlackQueen = 8,
+    enum class CastlingRightFlag : uint8_t {
+        WhiteKing = 0x01,
+        WhiteQueen = 0x02,
+        BlackKing = 0x04,
+        BlackQueen = 0x08,
     };
 
     class Board {
     public:
-        explicit Board(std::string &fen);
+        explicit Board(const std::string &fen);
 
         Board();
 
         void reset();
 
         void clear();
+
+        void performMove(Move move);
+
+        void undoMove(Move move);
+
+        [[nodiscard]]
+        Color turnToMove() const;
+
+        void parseFen(const std::string &fen);
+
+        [[nodiscard]]
+        std::string generateFen() const;
 
         [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
@@ -48,6 +63,9 @@ namespace Chess {
         void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
 
         [[nodiscard]]
+        bool isMovePseudoLegal(Move move) const;
+
+        [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;
 
         [[nodiscard]]
@@ -55,6 +73,8 @@ namespace Chess {
 
         [[nodiscard]]
         constexpr PieceType pieceAt(Square square, Color color) const;
+
+        friend std::ostream &operator<<(std::ostream &os, const Board &board);
 
     private:
         /**
@@ -66,14 +86,18 @@ namespace Chess {
          * Variables pertaining to current game state.
          */
         uint8_t castlingRights{};
-        Square enPassant{};
-        int halfMoveCounter{};
-        int fullMoveCounter{};
+        Square enPassant{Square::None};
+        int halfMoveCounter{0};
+        int fullMoveCounter{0};
 
         /**
-         * The color of the team whose playerTurn to move it currently is
+         * The color of the team whose turn to move it currently is
          */
         Color playerTurn{Color::White};
+
+        PieceType removePieceAt(Square square);
+
+        PieceType removePieceAt(Square square, Color color);
 
         static Bitboard rookAttacks(Square square, Bitboard occupiedSquares);
 
@@ -87,9 +111,6 @@ namespace Chess {
 
         static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
 
-        std::string generateFen();
-
-    private:
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
          */
