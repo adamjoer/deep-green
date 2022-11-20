@@ -49,9 +49,5 @@ private:
 
     void createActions();
 
-    void performMove(Gui::Square &from, Gui::Square &to);
-
-    void nextTurn();
-
     void setTurn(Chess::Color newTurn);
 };

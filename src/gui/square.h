@@ -50,6 +50,11 @@ namespace Gui {
         void setPiece(std::optional<Piece> newPiece);
 
         [[nodiscard]]
+        Chess::Square getPosition() const {
+            return Chess::Square(this->rank * 8 + file);
+        }
+
+        [[nodiscard]]
         State getState() const { return this->state; }
 
         void setState(State newState);
