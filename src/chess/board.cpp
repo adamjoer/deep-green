@@ -110,11 +110,12 @@ namespace Chess {
             castlingRights |= static_cast<uint8_t>(castlingBits::BlackQueen);
             itr++;
         }
-        if (castlingRights)
+        if (!castlingRights)
             itr++;
+        itr++;
         // En passant parsing.
         if (*itr == '-') {
-            enPassant = None;
+            enPassant = Square::None;
             itr += 2;
         } else {
             int file = *itr - 'a'; // Zero indexed file number
@@ -192,10 +193,11 @@ namespace Chess {
             result << "k";
         if (castlingRights & static_cast<uint8_t>(castlingBits::BlackQueen))
             result << "q";
-        if (castlingRights)
-            result << ' ';
+        if (!castlingRights)
+            result << '-';
+        result << ' ';
 
-        if (enPassant == None) {
+        if (enPassant == Square::None) {
             result << "- ";
         } else {
             result << squareToString[static_cast<int>(enPassant)] + ' ';
