@@ -42,25 +42,24 @@ namespace Gui {
     }
 
     void Board::set(const Chess::Board &chessBoard) {
-        // FIXME: This could probably be done with a single for-loop instead of three
+        const auto whiteOccupiedSquares = chessBoard.teamOccupiedSquares(Chess::Color::White);
+        const auto blackOccupiedSquares = chessBoard.teamOccupiedSquares(Chess::Color::Black);
 
-        for (auto square : squares)
-            square->setPiece(std::nullopt);
+        for (int i = 0; i < 64; ++i) {
+            const auto square = Chess::Square(i);
 
-        auto setTeam = [&](Chess::Color color) -> void {
-            auto teamSquares = chessBoard.teamOccupiedSquares(color);
-            for (int i = 0; i < 64; ++i) {
-                auto square = Chess::Square(i);
+            if (whiteOccupiedSquares.isOccupiedAt(square)) {
+                auto type = chessBoard.pieceAt(square, Chess::Color::White);
+                this->squares[i]->setPiece(std::make_optional(Piece(type, Chess::Color::White)));
 
-                if (teamSquares.isOccupiedAt(square)) {
-                    auto type = chessBoard.pieceAt(square, color);
-                    this->squares[i]->setPiece(std::make_optional(Piece(type, color)));
-                }
+            } else if (blackOccupiedSquares.isOccupiedAt(square)) {
+                auto type = chessBoard.pieceAt(square, Chess::Color::Black);
+                this->squares[i]->setPiece(std::make_optional(Piece(type, Chess::Color::Black)));
+
+            } else {
+                squares[i]->setPiece(std::nullopt);
             }
-        };
-
-        setTeam(Chess::Color::White);
-        setTeam(Chess::Color::Black);
+        }
     }
 
     void Board::clearHighlights() {
