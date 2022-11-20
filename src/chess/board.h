@@ -146,12 +146,6 @@ namespace Chess {
         static Bitboard slidingAttack(Square square, Direction direction,
                                       Bitboard occupiedSquares);
 
-        static Bitboard positiveRayAttack(Square square, Direction direction,
-                                          Bitboard occupiedSquares);
-
-        static Bitboard negativeRayAttack(Square square, Direction direction,
-                                          Bitboard occupiedSquares);
-
         static std::array<Bitboard, 64> generateAttackRayMasks(Direction direction);
 
         static Bitboard generateAttackRayMask(Direction direction, Square square);

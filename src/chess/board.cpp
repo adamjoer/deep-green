@@ -497,43 +497,31 @@ namespace Chess {
 
     Bitboard Board::slidingAttack(Square square, Direction direction,
                                   Bitboard occupiedSquares) {
-        switch (direction) {
-            case Direction::NorthWest:
-            case Direction::North:
-            case Direction::NorthEast:
-            case Direction::East:
-                return positiveRayAttack(square, direction, occupiedSquares);
-
-            case Direction::SouthEast:
-            case Direction::South:
-            case Direction::SouthWest:
-            case Direction::West:
-                return negativeRayAttack(square, direction, occupiedSquares);
-
-            default:
-                assert(false);
-                return {};
-        }
-    }
-
-    Bitboard Board::positiveRayAttack(Square square, Direction direction,
-                                      Bitboard occupiedSquares) {
         auto attackRay = attackRayMasks[static_cast<int>(direction)][static_cast<int>(square)];
 
         if (auto blockers = attackRay & occupiedSquares) {
-            auto blockerIndex = blockers.bitScanForward();
-            attackRay ^= attackRayMasks[static_cast<int>(direction)][blockerIndex];
-        }
 
-        return attackRay;
-    }
+            int blockerIndex;
+            switch (direction) {
+                case Direction::NorthWest:
+                case Direction::North:
+                case Direction::NorthEast:
+                case Direction::East:
+                    blockerIndex = blockers.bitScanForward();
+                    break;
 
-    Bitboard Board::negativeRayAttack(Square square, Direction direction,
-                                      Bitboard occupiedSquares) {
-        auto attackRay = attackRayMasks[static_cast<int>(direction)][static_cast<int>(square)];
+                case Direction::SouthEast:
+                case Direction::South:
+                case Direction::SouthWest:
+                case Direction::West:
+                    blockerIndex = blockers.bitScanReverse();
+                    break;
 
-        if (auto blockers = attackRay & occupiedSquares) {
-            auto blockerIndex = blockers.bitScanReverse();
+                default:
+                    assert(false);
+                    return {};
+            }
+
             attackRay ^= attackRayMasks[static_cast<int>(direction)][blockerIndex];
         }
 
