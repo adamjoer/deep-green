@@ -663,4 +663,40 @@ namespace Chess {
 
         return attackRay;
     }
+
+    std::ostream &operator<<(std::ostream &os, Color color) {
+        static const char *const names[2]{"White", "Black"};
+        return os << names[static_cast<int>(color)];
+    }
+
+    std::ostream &operator<<(std::ostream &os, const Board &board) {
+        auto printTeam = [&](const Color color) {
+            os << color << ":\n";
+            const auto team = board.bitboards[static_cast<int>(color)];
+            for (int i = 0; i < team.size(); ++i) {
+                os << PieceType(i) << ":\n"
+                   << team[i] << '\n';
+            }
+        };
+
+        printTeam(Color::White);
+        printTeam(Color::Black);
+
+        os << "Turn:\t\t" << board.playerTurn << '\n';
+        os << "Half moves:\t" << board.halfMoveCounter << '\n';
+        os << "Full moves:\t" << board.fullMoveCounter << '\n';
+        os << "En passant:\t" << board.enPassant << '\n';
+        os << "Castling:\t";
+        if (board.castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteKing))
+            os << 'K';
+        if (board.castlingRights & static_cast<uint8_t>(CastlingRightFlag::WhiteQueen))
+            os << 'Q';
+        if (board.castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackKing))
+            os << 'k';
+        if (board.castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackQueen))
+            os << 'q';
+        os << '\n';
+
+        return os;
+    }
 }

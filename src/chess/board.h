@@ -5,6 +5,7 @@
 
 #include <array>
 #include <vector>
+#include <ostream>
 
 namespace Chess {
 
@@ -12,6 +13,8 @@ namespace Chess {
         White,
         Black,
     };
+
+    std::ostream &operator<<(std::ostream &os, Color color);
 
     constexpr Color oppositeTeam(Color color) {
         return color == Color::White ? Color::Black : Color::White;
@@ -70,6 +73,8 @@ namespace Chess {
 
         [[nodiscard]]
         constexpr PieceType pieceAt(Square square, Color color) const;
+
+        friend std::ostream &operator<<(std::ostream &os, const Board &board);
 
     private:
         /**
