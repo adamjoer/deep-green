@@ -3,11 +3,12 @@
 #include <QPainter>
 
 namespace Gui {
-    Square::Square(QWidget *parent, int row, int column)
+    Square::Square(QWidget *parent, int rank, int file)
             : QWidget(parent),
-              position(column, row),
-              defaultColor((column + row) % 2 == 0 ? DEFAULT_DARK_COLOR
-                                                   : DEFAULT_LIGHT_COLOR) {
+              rank(rank),
+              file(file),
+              defaultColor((file + rank) % 2 == 0 ? DEFAULT_DARK_COLOR
+                                                  : DEFAULT_LIGHT_COLOR) {
     }
 
     void Square::paintEvent(QPaintEvent *event) {
@@ -39,10 +40,10 @@ namespace Gui {
             painter.setFont(font);
             painter.setPen(QColorConstants::Black);
             painter.drawText(contentsRect, Qt::AlignCenter,
-                             QString(QChar(this->piece->symbol)));
+                             QString(QChar(this->piece->symbol())));
         }
 
-        if (this->position.first == 0 || this->position.second == 0) {
+        if (this->file == 0 || this->rank == 0) {
             font.setPixelSize(contentsRect.height() / 3);
             painter.setFont(font);
             painter.setPen(defaultColor.rgb() == DEFAULT_DARK_COLOR ? DEFAULT_LIGHT_COLOR
@@ -50,14 +51,14 @@ namespace Gui {
 
             contentsRect -= {2, 0, 2, 0};
 
-            if (this->position.first == 0) {
+            if (this->file == 0) {
                 painter.drawText(contentsRect, Qt::AlignLeft | Qt::AlignTop,
-                                 QString(QChar('1' + this->position.second)));
+                                 QString(QChar('1' + this->rank)));
             }
 
-            if (this->position.second == 0) {
+            if (this->rank == 0) {
                 painter.drawText(contentsRect, Qt::AlignRight | Qt::AlignBottom,
-                                 QString(QChar('a' + this->position.first)));
+                                 QString(QChar('a' + this->file)));
             }
         }
     }
@@ -67,7 +68,7 @@ namespace Gui {
         emit pressed(*this);
     }
 
-    void Square::setPiece(const std::shared_ptr<Chess::Piece> &newPiece) {
+    void Square::setPiece(std::optional<Piece> newPiece) {
         if (newPiece == this->piece)
             return;
 
@@ -83,5 +84,27 @@ namespace Gui {
         this->state = newState;
 
         update();
+    }
+
+    bool Piece::operator==(const Piece &rhs) const {
+        return type == rhs.type &&
+               color == rhs.color;
+    }
+
+    bool Piece::operator!=(const Piece &rhs) const {
+        return !(rhs == *this);
+    }
+
+    wchar_t Piece::symbol() const {
+        static const wchar_t symbols[2][6]{
+                {L'♔', L'♕', L'♖', L'♗', L'♘', L'♙'},
+                {L'♚', L'♛', L'♜', L'♝', L'♞', L'♟'},
+        };
+
+        return symbols[static_cast<int>(this->color)][static_cast<int>(this->type)];
+    }
+
+    std::wostream &operator<<(std::wostream &os, const Piece &piece) {
+        return os << piece.symbol();
     }
 }

@@ -5,9 +5,9 @@
 #include <QLabel>
 #include <QAction>
 
-#include "chess/team.h"
-#include "gui/square.h"
+#include "chess/board.h"
 #include "gui/board.h"
+#include "gui/square.h"
 
 class Game final : public QMainWindow {
 Q_OBJECT
@@ -21,7 +21,7 @@ private slots:
 
     void squarePressed(Gui::Square &square);
 
-    void restart();
+    void reset();
 
     void clearHighlights();
 
@@ -32,26 +32,24 @@ private slots:
     void about();
 
 private:
-    const static int SQUARE_SIZE_ADJUST_OFFSET = 5;
+    const static int SQUARE_SIZE_ADJUST_OFFSET = 40;
 
-    Gui::Board *board;
+    Chess::Board chessBoard;
+
+    Gui::Board *guiBoard;
+
     QLabel *turnLabel;
 
-    QAction *restartAction{nullptr};
+    QAction *resetAction{nullptr};
     QAction *clearHighlightsAction{nullptr};
     QAction *zoomInAction{nullptr};
     QAction *zoomOutAction{nullptr};
-
-    Chess::Team whiteTeam;
-    Chess::Team blackTeam;
-
-    Chess::Color turn = Chess::Color::White;
 
     Gui::Square *highlightedSquare{nullptr};
 
     void createActions();
 
-    void move(Gui::Square &from, Gui::Square &to);
+    void performMove(Gui::Square &from, Gui::Square &to);
 
     void nextTurn();
 
