@@ -143,6 +143,15 @@ namespace Chess {
          */
         static const std::array<std::array<Bitboard, 64>, 2> pawnAttackMasks;
 
+        static Bitboard slidingAttack(Square square, Direction direction,
+                                      Bitboard occupiedSquares);
+
+        static Bitboard positiveRayAttack(Square square, Direction direction,
+                                          Bitboard occupiedSquares);
+
+        static Bitboard negativeRayAttack(Square square, Direction direction,
+                                          Bitboard occupiedSquares);
+
         static std::array<Bitboard, 64> generateAttackRayMasks(Direction direction);
 
         static Bitboard generateAttackRayMask(Direction direction, Square square);
@@ -158,14 +167,5 @@ namespace Chess {
         static std::array<std::array<Bitboard, 64>, 2> generatePawnAttackMasks();
 
         static Bitboard generatePawnAttackMask(Square square, Color color);
-
-        static Bitboard slidingAttack(Square square, Direction direction,
-                                      Bitboard occupiedSquares);
-
-        static Bitboard positiveRayAttack(Square square, Direction direction,
-                                          Bitboard occupiedSquares);
-
-        static Bitboard negativeRayAttack(Square square, Direction direction,
-                                          Bitboard occupiedSquares);
     };
 }
