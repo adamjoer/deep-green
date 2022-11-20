@@ -288,9 +288,9 @@ namespace Chess {
             castlingRights |= static_cast<uint8_t>(CastlingRightFlag::BlackQueen);
             itr++;
         }
-        if (castlingRights)
+        if (!castlingRights)
             itr++;
-
+        itr++;
         // En passant parsing.
         if (*itr == '-') {
             enPassant = Square::None;
@@ -374,8 +374,9 @@ namespace Chess {
             result << 'k';
         if (castlingRights & static_cast<uint8_t>(CastlingRightFlag::BlackQueen))
             result << 'q';
-        if (castlingRights)
-            result << ' ';
+        if (!castlingRights)
+            result << '-';
+        result << ' ';
 
         if (enPassant == Square::None) {
             result << "- ";
