@@ -76,10 +76,10 @@ namespace Chess {
         Bitboard teamOccupiedSquares(Color color) const;
 
         [[nodiscard]]
-        constexpr PieceType pieceAt(Square square) const;
+        PieceType pieceAt(Square square) const;
 
         [[nodiscard]]
-        constexpr PieceType pieceAt(Square square, Color color) const;
+        PieceType pieceAt(Square square, Color color) const;
 
         friend std::ostream &operator<<(std::ostream &os, const Board &board);
 

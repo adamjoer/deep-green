@@ -213,6 +213,7 @@ namespace Chess {
 
         // TODO: Set "en passant" square if relevant
 
+        // TODO: Reset halfMoveCounter if capture or pawn performMove.
         ++this->halfMoveCounter;
         if (this->playerTurn == Color::Black)
             ++this->fullMoveCounter;
@@ -486,7 +487,7 @@ namespace Chess {
         return occupiedSquares;
     }
 
-    constexpr PieceType Board::pieceAt(Chess::Square square) const {
+    PieceType Board::pieceAt(Chess::Square square) const {
         for (auto team: this->bitboards) {
             for (int i = 0; i < team.size(); ++i) {
                 if (team[i].isOccupiedAt(square))
@@ -498,7 +499,7 @@ namespace Chess {
         return PieceType::Pawn;
     }
 
-    constexpr PieceType Board::pieceAt(Chess::Square square, Color color) const {
+    PieceType Board::pieceAt(Chess::Square square, Color color) const {
         auto team = this->bitboards[static_cast<int>(color)];
         for (int i = 0; i < team.size(); ++i) {
             if (team[i].isOccupiedAt(square))
