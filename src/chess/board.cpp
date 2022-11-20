@@ -195,6 +195,41 @@ namespace Chess {
         this->playerTurn = Color::White;
     }
 
+    void Board::performMove(Move move) {
+        assert(isMovePseudoLegal(move));
+
+        // TODO: Check for "en passant" square
+
+        auto &team = this->bitboards[static_cast<int>(this->playerTurn)];
+
+        auto piece = removePieceAt(move.from, this->playerTurn);
+        team[static_cast<int>(piece)].setOccupancyAt(move.to);
+
+        if (move.dropPiece) {
+            auto &enemyTeam
+                    = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
+            enemyTeam[static_cast<int>(*move.dropPiece)].clearOccupancyAt(move.to);
+        }
+
+        // TODO: Set "en passant" square if relevant
+
+        ++this->halfMoveCounter;
+        if (this->playerTurn == Color::Black)
+            ++this->fullMoveCounter;
+
+        this->enPassant = Square::None;
+
+        this->playerTurn = oppositeTeam(playerTurn);
+    }
+
+    void Board::undoMove(Move move) {
+        // TODO
+    }
+
+    Color Board::turnToMove() const {
+        return this->playerTurn;
+    }
+
     void Board::parseFen(const std::string &fen) {
         auto charToPiece = [](char c) -> PieceType {
             switch (toupper(c)) {
@@ -431,6 +466,15 @@ namespace Chess {
         }
     }
 
+    bool Board::isMovePseudoLegal(Move move) const {
+        if (move.from == Square::None || move.to == Square::None)
+            return false;
+
+        const auto legalMoves = pseudoLegalMoves(move.from);
+        return std::find(legalMoves.begin(), legalMoves.end(), move)
+               != legalMoves.end();
+    }
+
     Bitboard Board::teamOccupiedSquares(Color color) const {
         Bitboard occupiedSquares;
 
@@ -458,6 +502,35 @@ namespace Chess {
         for (int i = 0; i < team.size(); ++i) {
             if (team[i].isOccupiedAt(square))
                 return PieceType(i);
+        }
+
+        assert(false);
+        return PieceType::Pawn;
+    }
+
+    PieceType Board::removePieceAt(Square square) {
+        for (auto &team: this->bitboards) {
+            for (int i = 0; i < team.size(); ++i) {
+                auto &bitboard = team[i];
+                if (bitboard.isOccupiedAt(square)) {
+                    bitboard.clearOccupancyAt(square);
+                    return PieceType(i);
+                }
+            }
+        }
+
+        assert(false);
+        return PieceType::Pawn;
+    }
+
+    PieceType Board::removePieceAt(Square square, Color color) {
+        auto &team = this->bitboards[static_cast<int>(color)];
+        for (int i = 0; i < team.size(); ++i) {
+            auto &bitboard = team[i];
+            if (bitboard.isOccupiedAt(square)) {
+                bitboard.clearOccupancyAt(square);
+                return PieceType(i);
+            }
         }
 
         assert(false);

@@ -34,6 +34,13 @@ namespace Chess {
 
         void clear();
 
+        void performMove(Move move);
+
+        void undoMove(Move move);
+
+        [[nodiscard]]
+        Color turnToMove() const;
+
         void parseFen(const std::string &fen);
 
         [[nodiscard]]
@@ -51,6 +58,9 @@ namespace Chess {
         std::vector<Move> pseudoLegalMoves(Square square) const;
 
         void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
+
+        [[nodiscard]]
+        bool isMovePseudoLegal(Move move) const;
 
         [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;
@@ -79,6 +89,10 @@ namespace Chess {
          * The color of the team whose turn to move it currently is
          */
         Color playerTurn{Color::White};
+
+        PieceType removePieceAt(Square square);
+
+        PieceType removePieceAt(Square square, Color color);
 
         static Bitboard rookAttacks(Square square, Bitboard occupiedSquares);
 
