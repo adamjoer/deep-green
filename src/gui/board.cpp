@@ -42,7 +42,25 @@ namespace Gui {
     }
 
     void Board::set(const Chess::Board &chessBoard) {
-        // TODO
+        // FIXME: This could probably be done with a single for-loop instead of three
+
+        for (auto square : squares)
+            square->setPiece(std::nullopt);
+
+        auto setTeam = [&](Chess::Color color) -> void {
+            auto teamSquares = chessBoard.teamOccupiedSquares(color);
+            for (int i = 0; i < 64; ++i) {
+                auto square = Chess::Square(i);
+
+                if (teamSquares.isOccupiedAt(square)) {
+                    auto type = chessBoard.pieceAt(square, color);
+                    this->squares[i]->setPiece(std::make_optional(Piece(type, color)));
+                }
+            }
+        };
+
+        setTeam(Chess::Color::White);
+        setTeam(Chess::Color::Black);
     }
 
     void Board::clearHighlights() {
