@@ -424,8 +424,18 @@ namespace Chess {
     }
 
     void Board::pseudoLegalMoves(Square square, std::vector<Move> &moves) const {
-        const auto ourSquares = teamOccupiedSquares(playerTurn);
-        const auto enemySquares = teamOccupiedSquares(oppositeTeam(playerTurn));
+        pseudoLegalMoves(square, this->playerTurn, moves);
+    }
+
+    std::vector<Move> Board::pseudoLegalMoves(Square square, Color color) const {
+        std::vector<Move> moves;
+        pseudoLegalMoves(square, color, moves);
+        return moves;
+    }
+
+    void Board::pseudoLegalMoves(Square square, Color color, std::vector<Move> &moves) const {
+        const auto ourSquares = teamOccupiedSquares(color);
+        const auto enemySquares = teamOccupiedSquares(oppositeTeam(color));
         const auto occupiedSquares = ourSquares | enemySquares;
 
         const auto piece = pieceAt(square);
@@ -448,7 +458,7 @@ namespace Chess {
                 attacks = knightAttacks(square);
                 break;
             case PieceType::Pawn:
-                attacks = pawnAttacks(square, occupiedSquares, this->playerTurn);
+                attacks = pawnAttacks(square, occupiedSquares, color);
                 break;
         }
 

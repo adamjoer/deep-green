@@ -70,6 +70,11 @@ namespace Chess {
         void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
 
         [[nodiscard]]
+        std::vector<Move> pseudoLegalMoves(Square square, Color color) const;
+
+        void pseudoLegalMoves(Square square, Color color, std::vector<Move> &moves) const;
+
+        [[nodiscard]]
         bool isMovePseudoLegal(Move move) const;
 
         [[nodiscard]]
