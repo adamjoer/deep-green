@@ -21,6 +21,8 @@ private slots:
 
     void squarePressed(Gui::Square &square);
 
+    void inputFen();
+
     void reset();
 
     void clearHighlights();
@@ -40,6 +42,7 @@ private:
 
     QLabel *turnLabel;
 
+    QAction *inputFenAction{nullptr};
     QAction *resetAction{nullptr};
     QAction *clearHighlightsAction{nullptr};
     QAction *zoomInAction{nullptr};

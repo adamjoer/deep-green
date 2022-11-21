@@ -4,6 +4,7 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include "config.h"
 
@@ -46,6 +47,11 @@ void Game::createActions() {
     exitAct->setShortcut(Qt::CTRL | Qt::Key_Q);
 
     QMenu *editMenu = menuBar()->addMenu("&Edit");
+
+    this->inputFenAction = editMenu->addAction("&Input FEN", this, &Game::inputFen);
+    this->inputFenAction->setShortcut(Qt::CTRL | Qt::Key_F);
+
+    editMenu->addSeparator();
 
     this->resetAction = editMenu->addAction("&Reset Game", this, &Game::reset);
     this->resetAction->setShortcut(Qt::CTRL | Qt::Key_R);
@@ -117,6 +123,28 @@ void Game::squarePressed(Gui::Square &square) {
 
     const auto moves = chessBoard.pseudoLegalMoves(square.getPosition(), square.getPiece()->color);
     guiBoard->highlightPossibleMoves(moves);
+}
+
+void Game::inputFen() {
+    bool ok;
+    const auto input = QInputDialog::getText(this, "Input FEN", "FEN string:",
+                                             QLineEdit::Normal, {}, &ok, {},
+                                             Qt::ImhNoAutoUppercase | Qt::ImhNoPredictiveText);
+    if (!ok)
+        return;
+
+    const auto inputStd = input.toStdString();
+    if (!Chess::Board::isValidFen(inputStd)) {
+        // FIXME: Notify user in a bit more elegant way?
+        statusBar()->showMessage("Invalid FEN", 2000);
+        return;
+    }
+
+    chessBoard.parseFen(inputStd);
+
+    clearHighlights();
+    this->guiBoard->set(this->chessBoard);
+    setTurn(chessBoard.turnToMove());
 }
 
 /**
