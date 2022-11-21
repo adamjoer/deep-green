@@ -51,6 +51,9 @@ void Game::createActions() {
     this->inputFenAction = editMenu->addAction("&Input FEN", this, &Game::inputFen);
     this->inputFenAction->setShortcut(Qt::CTRL | Qt::Key_F);
 
+    this->outputFenAction = editMenu->addAction("&Output FEN", this, &Game::outputFen);
+    this->outputFenAction->setShortcut(Qt::CTRL | Qt::Key_O);
+
     editMenu->addSeparator();
 
     this->resetAction = editMenu->addAction("&Reset Game", this, &Game::reset);
@@ -145,6 +148,14 @@ void Game::inputFen() {
     clearHighlights();
     this->guiBoard->set(this->chessBoard);
     setTurn(chessBoard.turnToMove());
+}
+
+void Game::outputFen() {
+    QMessageBox messageBox(this);
+    messageBox.setWindowTitle("Output FEN");
+    messageBox.setText(QString(this->chessBoard.generateFen().c_str()));
+    messageBox.setTextInteractionFlags(Qt::TextSelectableByMouse);
+    messageBox.exec();
 }
 
 /**
