@@ -476,14 +476,13 @@ namespace Chess {
         Bitboard attacks;
 
         auto attackMask = pawnAttackMasks[static_cast<int>(color)][static_cast<int>(square)];
-        if (attackMask.isOverlappingWith(occupiedSquares) && startRank.isOccupiedAt(square)) {
+        if (!attackMask.isOverlappingWith(occupiedSquares)) {
+            attacks = attackMask;
 
-            auto nextSquare = Bitboard::squareToThe(attackDirection, square);
+        } else if (startRank.isOccupiedAt(square)) {
+            const auto nextSquare = Bitboard::squareToThe(attackDirection, square);
             if (!occupiedSquares.isOccupiedAt(nextSquare))
                 attacks.setOccupancyAt(nextSquare);
-
-        } else {
-            attacks = attackMask;
         }
 
         if (captureEast != Square::None && occupiedSquares.isOccupiedAt(captureEast))
