@@ -124,12 +124,11 @@ void Game::squarePressed(Gui::Square &square) {
  * and it is white's turn to move.
  */
 void Game::reset() {
-    setTurn(Chess::Color::White);
+    this->chessBoard.reset();
 
     clearHighlights();
-
-    this->chessBoard.reset();
     this->guiBoard->set(this->chessBoard);
+    setTurn(chessBoard.turnToMove());
 
     statusBar()->showMessage("Game reset", 2000);
 }
