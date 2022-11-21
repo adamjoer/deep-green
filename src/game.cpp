@@ -5,7 +5,6 @@
 #include <QStatusBar>
 #include <QMessageBox>
 
-#include "chess/piece/piece.h"
 #include "config.h"
 
 // See https://stackoverflow.com/a/6852937/18713517
@@ -13,31 +12,25 @@
 #define TO_STRING(x) QUOTE(x)
 
 Game::Game(QWidget *parent)
-    : QMainWindow(parent),
-      whiteTeam(Chess::Color::White),
-      blackTeam(Chess::Color::Black),
-      board(new Gui::Board(this)) {
+        : QMainWindow(parent),
+          guiBoard(new Gui::Board(this, chessBoard)) {
 
     setWindowTitle(TO_STRING(PROJECT_NAME));
-
-    board->addTeamStartingPosition(whiteTeam);
-    board->addTeamStartingPosition(blackTeam);
 
     // Connect each of the GUI square's "pressed" signal to this object's
     // "squarePressed" slot.
     // See https://doc.qt.io/qt-6/signalsandslots.html
-    for (const auto &row: this->board->getSquares()) {
-        for (const auto square: row) {
-            connect(square, &Gui::Square::pressed, this, &Game::squarePressed);
-        }
+    for (const auto square: this->guiBoard->getSquares()) {
+        connect(square, &Gui::Square::pressed, this, &Game::squarePressed);
     }
 
-    setCentralWidget(this->board);
+    setCentralWidget(this->guiBoard);
 
     createActions();
 
-    this->turnLabel = new QLabel("It is White's turn");
+    this->turnLabel = new QLabel();
     statusBar()->addPermanentWidget(this->turnLabel);
+    setTurn(this->chessBoard.turnToMove());
 
     statusBar()->setSizeGripEnabled(false);
 
@@ -54,13 +47,13 @@ void Game::createActions() {
 
     QMenu *editMenu = menuBar()->addMenu("&Edit");
 
-    this->restartAction = editMenu->addAction("&Restart Game", this, &Game::restart);
-    this->restartAction->setShortcut(Qt::CTRL | Qt::Key_R);
+    this->resetAction = editMenu->addAction("&Reset Game", this, &Game::reset);
+    this->resetAction->setShortcut(Qt::CTRL | Qt::Key_R);
 
     QMenu *viewMenu = menuBar()->addMenu("&View");
 
     this->clearHighlightsAction
-        = viewMenu->addAction("&Clear Highlights", this, &Game::clearHighlights);
+            = viewMenu->addAction("&Clear Highlights", this, &Game::clearHighlights);
     this->clearHighlightsAction->setShortcut(Qt::ALT | Qt::SHIFT | Qt::Key_X);
 
     viewMenu->addSeparator();
@@ -99,14 +92,18 @@ void Game::squarePressed(Gui::Square &square) {
         assert(highlightedSquare != nullptr);
         assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color == this->turn) {
-            move(*highlightedSquare, square);
+        if (highlightedSquare->getPiece()->color == this->chessBoard.turnToMove()) {
+            chessBoard.performMove(Chess::Move(highlightedSquare->getPosition(), square.getPosition(),
+                                               square.isEmpty() ? std::nullopt
+                                                                : std::make_optional(square.getPiece()->type)));
+            guiBoard->performMove(highlightedSquare->getPosition(), square.getPosition());
+
+            clearHighlights();
+
+            setTurn(this->chessBoard.turnToMove());
 
         } else {
-            statusBar()->showMessage(
-                (this->turn == Chess::Color::White) ? "Black cannot move right now"
-                                                    : "White cannot move right now",
-                2000);
+            statusBar()->showMessage("It is not this team's turn to move right now", 2000);
         }
         return;
     }
@@ -118,56 +115,47 @@ void Game::squarePressed(Gui::Square &square) {
     highlightedSquare = &square;
     square.setState(Gui::Square::State::Highlighted);
 
-    Chess::BoardState state{
-        this->board->getBoardRepresentation(),
-        square.getPosition(),
-    };
-
-    const auto possibleMoves = square.getPiece()->possibleMoves(state);
-    this->board->highlightPossibleMoves(possibleMoves);
+    const auto moves = chessBoard.pseudoLegalMoves(square.getPosition(), square.getPiece()->color);
+    guiBoard->highlightPossibleMoves(moves);
 }
 
 /**
  * Restart the game, so all pieces are standing at their starting positions,
  * and it is white's turn to move.
  */
-void Game::restart() {
+void Game::reset() {
     setTurn(Chess::Color::White);
 
     this->highlightedSquare = nullptr;
-    this->board->reset();
 
-    whiteTeam.reset();
-    blackTeam.reset();
+    this->chessBoard.reset();
+    this->guiBoard->set(this->chessBoard);
 
-    board->addTeamStartingPosition(whiteTeam);
-    board->addTeamStartingPosition(blackTeam);
-
-    statusBar()->showMessage("Restarted the game", 2000);
+    statusBar()->showMessage("Game reset", 2000);
 }
 
 void Game::clearHighlights() {
     if (!this->highlightedSquare)
         return;
 
-    this->board->clearHighlights();
+    this->guiBoard->clearHighlights();
     this->highlightedSquare = nullptr;
 }
 
 void Game::zoomIn() {
-    this->board->setSquarePixelSize(
-        this->board->getSquarePixelSize() + SQUARE_SIZE_ADJUST_OFFSET);
+    this->guiBoard->setPixelSize(
+            this->guiBoard->getPixelSize() + SQUARE_SIZE_ADJUST_OFFSET);
     setFixedSize(sizeHint());
 
     this->zoomOutAction->setDisabled(false);
 }
 
 void Game::zoomOut() {
-    this->board->setSquarePixelSize(
-        this->board->getSquarePixelSize() - SQUARE_SIZE_ADJUST_OFFSET);
+    this->guiBoard->setPixelSize(
+            this->guiBoard->getPixelSize() - SQUARE_SIZE_ADJUST_OFFSET);
     setFixedSize(sizeHint());
 
-    if (this->board->getSquarePixelSize() <= 25)
+    if (this->guiBoard->getPixelSize() <= 200)
         this->zoomOutAction->setDisabled(true);
 }
 
@@ -181,42 +169,9 @@ void Game::about() {
                        "<p>" TO_STRING(DESCRIPTION) "</p>");
 }
 
-/**
- * Move the piece standing at the 'from' position to the 'to' position.
- * If there is a piece already standing on the 'to' position, that piece
- * is captured, and is therefore removed from the chess board.
- *
- * @param from The position where the moving piece is standing
- * @param to The position to which the piece will move
- */
-void Game::move(Gui::Square &from, Gui::Square &to) {
-    if (!to.isEmpty()) {
-        const auto &piece = to.getPiece();
-        if (piece->color == Chess::Color::White)
-            whiteTeam.capturePiece(piece);
-        else
-            blackTeam.capturePiece(piece);
-    }
-
-    this->board->move(from.getPosition(), to.getPosition());
-
-    clearHighlights();
-    nextTurn();
-}
-
-void Game::nextTurn() {
-    setTurn((this->turn == Chess::Color::White) ? Chess::Color::Black
-                                                : Chess::Color::White);
-}
-
 void Game::setTurn(Chess::Color newTurn) {
-    if (newTurn == this->turn)
-        return;
-
-    this->turn = newTurn;
-
-    if (this->turn == Chess::Color::White)
-        this->turnLabel->setText("It is White's turn");
+    if (newTurn == Chess::Color::White)
+        this->turnLabel->setText("It is White's turn to move");
     else
-        this->turnLabel->setText("It is Black's turn");
+        this->turnLabel->setText("It is Black's turn to move");
 }

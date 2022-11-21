@@ -70,16 +70,21 @@ namespace Chess {
         void pseudoLegalMoves(Square square, std::vector<Move> &moves) const;
 
         [[nodiscard]]
+        std::vector<Move> pseudoLegalMoves(Square square, Color color) const;
+
+        void pseudoLegalMoves(Square square, Color color, std::vector<Move> &moves) const;
+
+        [[nodiscard]]
         bool isMovePseudoLegal(Move move) const;
 
         [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;
 
         [[nodiscard]]
-        constexpr PieceType pieceAt(Square square) const;
+        PieceType pieceAt(Square square) const;
 
         [[nodiscard]]
-        constexpr PieceType pieceAt(Square square, Color color) const;
+        PieceType pieceAt(Square square, Color color) const;
 
         friend std::ostream &operator<<(std::ostream &os, const Board &board);
 
@@ -138,6 +143,9 @@ namespace Chess {
          */
         static const std::array<std::array<Bitboard, 64>, 2> pawnAttackMasks;
 
+        static Bitboard slidingAttack(Square square, Direction direction,
+                                      Bitboard occupiedSquares);
+
         static std::array<Bitboard, 64> generateAttackRayMasks(Direction direction);
 
         static Bitboard generateAttackRayMask(Direction direction, Square square);
@@ -153,14 +161,5 @@ namespace Chess {
         static std::array<std::array<Bitboard, 64>, 2> generatePawnAttackMasks();
 
         static Bitboard generatePawnAttackMask(Square square, Color color);
-
-        static Bitboard slidingAttack(Square square, Direction direction,
-                                      Bitboard occupiedSquares);
-
-        static Bitboard positiveRayAttack(Square square, Direction direction,
-                                          Bitboard occupiedSquares);
-
-        static Bitboard negativeRayAttack(Square square, Direction direction,
-                                          Bitboard occupiedSquares);
     };
 }

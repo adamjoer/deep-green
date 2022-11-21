@@ -1,10 +1,8 @@
 #pragma once
 
 #include <QWidget>
-#include <QLabel>
 
 #include "square.h"
-#include "../chess/team.h"
 
 namespace Gui {
 
@@ -12,41 +10,35 @@ namespace Gui {
     Q_OBJECT
 
     public:
-        static const int SIZE = 8;
-
         explicit Board(QWidget *parent);
 
-        void addTeamStartingPosition(const Chess::Team &team);
+        explicit Board(QWidget *parent, const Chess::Board &chessBoard);
 
-        void move(const Chess::Position &from, const Chess::Position &to);
+        void performMove(Chess::Square from, Chess::Square to);
 
-        void reset();
+        void set(const Chess::Board &chessBoard);
 
         void clearHighlights();
 
-        [[nodiscard]]
-        const std::array<std::array<Chess::SquareState, Board::SIZE>, Board::SIZE>
-        &getBoardRepresentation() const {
-            return this->boardRepresentation;
-        }
-
-        void highlightPossibleMoves(const std::vector<Chess::Position> &possibleMoves);
+        void highlightPossibleMoves(const std::vector<Chess::Move> &possibleMoves);
 
         [[nodiscard]]
-        int getSquarePixelSize() const { return this->squarePixelSize; }
+        int getPixelSize() const { return this->pixelSize; }
 
-        void setSquarePixelSize(int newSquarePixelSize);
+        void setPixelSize(int newPixelSize);
 
         [[nodiscard]]
-        const std::array<std::array<Square *, SIZE>, SIZE> &getSquares() const {
+        const std::array<Square *, 64> &getSquares() const {
             return this->squares;
         }
 
     private:
-        int squarePixelSize;
+        static constexpr int DEFAULT_PIXEL_SIZE = 600;
 
-        std::array<std::array<Square *, SIZE>, SIZE> squares{nullptr};
+        int pixelSize{DEFAULT_PIXEL_SIZE};
 
-        std::array<std::array<Chess::SquareState, SIZE>, SIZE> boardRepresentation;
+        std::array<Square *, 64> squares{nullptr};
+
+        void createLayout();
     };
 }

@@ -1,108 +1,84 @@
 #include "board.h"
 
-#include <cassert>
-
 #include <QGridLayout>
-
-#include "square.h"
 
 namespace Gui {
 
-    Board::Board(QWidget *parent)
-        : QWidget(parent),
-          squarePixelSize(Square::DEFAULT_PIXEL_SIZE) {
+    Board::Board(QWidget *parent, const Chess::Board &chessBoard)
+            : QWidget(parent) {
+        createLayout();
+        set(chessBoard);
+    }
 
+    Board::Board(QWidget *parent)
+            : QWidget(parent) {
+        createLayout();
+    }
+
+    void Board::createLayout() {
         auto *layout = new QGridLayout;
         layout->setSpacing(0);
         layout->setContentsMargins(0, 0, 0, 0);
+        layout->setOriginCorner(Qt::Corner::BottomLeftCorner);
 
-        for (int column = 0; column < SIZE; ++column) {
-            for (int row = 0; row < SIZE; ++row) {
-                auto square = this->squares[column][row]
-                                  = new Square(this, row, column);
-                layout->addWidget(square, SIZE - 1 - row, column);
-
-                this->boardRepresentation[column][row].color = Chess::Color::Empty;
+        for (int rank = 0; rank < 8; ++rank) {
+            for (int file = 0; file < 8; ++file) {
+                auto square = this->squares[rank * 8 + file]
+                                      = new Square(this, rank, file);
+                layout->addWidget(square, rank, file);
             }
         }
         setLayout(layout);
 
-        setFixedSize(SIZE * this->squarePixelSize, SIZE * this->squarePixelSize);
+        setFixedSize(this->pixelSize, this->pixelSize);
     }
 
-    void Board::addTeamStartingPosition(const Chess::Team &team) {
-        static_assert((Chess::Team::SIZE / 2.0F) == SIZE);
-        static_assert(Chess::Team::QUEEN_COLUMN >= 0 && Chess::Team::QUEEN_COLUMN < SIZE);
-        assert(team.isFull());
-
-        const auto &queen = team.getQueen();
-        const auto &officers = team.getOfficers();
-        const auto &pawns = team.getPawns();
-
-        int officerRow = (team.getColor() == Chess::Color::White) ? 0 : SIZE - 1;
-        int pawnRow = (team.getColor() == Chess::Color::White) ? 1 : SIZE - 2;
-
-        int i = 0;
-        for (const auto &officer: officers) {
-            if (i == Chess::Team::QUEEN_COLUMN)
-                i++;
-            this->boardRepresentation[i][officerRow].color = team.getColor();
-            this->squares[i++][officerRow]->setPiece(officer);
-        }
-
-        this->boardRepresentation[Chess::Team::QUEEN_COLUMN][officerRow].color = team.getColor();
-        this->squares[Chess::Team::QUEEN_COLUMN][officerRow]->setPiece(queen);
-
-        i = 0;
-        for (const auto &pawn: pawns) {
-            this->boardRepresentation[i][pawnRow].color = team.getColor();
-            this->squares[i++][pawnRow]->setPiece(pawn);
-        }
-    }
-
-    void Board::move(const Chess::Position &from, const Chess::Position &to) {
-        auto origin = this->squares[from.first][from.second];
-        auto destination = this->squares[to.first][to.second];
-
-        this->boardRepresentation[from.first][from.second].color = Chess::Color::Empty;
-        this->boardRepresentation[to.first][to.second].color = origin->getPiece()->color;
+    void Board::performMove(Chess::Square from, Chess::Square to) {
+        auto origin = this->squares[static_cast<int>(from)];
+        auto destination = this->squares[static_cast<int>(to)];
 
         destination->setPiece(origin->getPiece());
-        origin->setPiece(nullptr);
+        origin->setPiece(std::nullopt);
     }
 
-    void Board::reset() {
-        for (int column = 0; column < SIZE; ++column) {
-            for (int row = 0; row < SIZE; ++row) {
-                auto square = this->squares[column][row];
+    void Board::set(const Chess::Board &chessBoard) {
+        const auto whiteOccupiedSquares = chessBoard.teamOccupiedSquares(Chess::Color::White);
+        const auto blackOccupiedSquares = chessBoard.teamOccupiedSquares(Chess::Color::Black);
 
-                square->setState(Square::State::Default);
-                square->setPiece(nullptr);
+        for (int i = 0; i < 64; ++i) {
+            const auto square = Chess::Square(i);
 
-                this->boardRepresentation[column][row].color = Chess::Color::Empty;
+            if (whiteOccupiedSquares.isOccupiedAt(square)) {
+                auto type = chessBoard.pieceAt(square, Chess::Color::White);
+                this->squares[i]->setPiece(std::make_optional(Piece(type, Chess::Color::White)));
+
+            } else if (blackOccupiedSquares.isOccupiedAt(square)) {
+                auto type = chessBoard.pieceAt(square, Chess::Color::Black);
+                this->squares[i]->setPiece(std::make_optional(Piece(type, Chess::Color::Black)));
+
+            } else {
+                squares[i]->setPiece(std::nullopt);
             }
         }
     }
 
     void Board::clearHighlights() {
-        for (auto &row: squares) {
-            for (auto square: row) {
-                square->setState(Square::State::Default);
-            }
+        for (auto square: squares) {
+            square->setState(Square::State::Default);
         }
     }
 
-    void Board::highlightPossibleMoves(const std::vector<Chess::Position> &possibleMoves) {
-        for (const auto &move: possibleMoves)
-            this->squares[move.first][move.second]->setState(Square::State::PossibleMove);
+    void Board::highlightPossibleMoves(const std::vector<Chess::Move> &possibleMoves) {
+        for (const auto move: possibleMoves)
+            this->squares[static_cast<int>(move.to)]->setState(Square::State::PossibleMove);
     }
 
-    void Board::setSquarePixelSize(int newSquarePixelSize) {
-        if (newSquarePixelSize <= 0 || newSquarePixelSize == this->squarePixelSize)
+    void Board::setPixelSize(int newPixelSize) {
+        if (newPixelSize <= 0 || newPixelSize == this->pixelSize)
             return;
 
-        this->squarePixelSize = newSquarePixelSize;
+        this->pixelSize = newPixelSize;
 
-        setFixedSize(SIZE * this->squarePixelSize, SIZE * this->squarePixelSize);
+        setFixedSize(this->pixelSize, this->pixelSize);
     }
 }
