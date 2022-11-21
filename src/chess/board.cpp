@@ -59,6 +59,10 @@ namespace Chess {
         this->playerTurn = Color::White;
     }
 
+    void Board::clear() {
+        this->bitboards = {};
+    }
+
     void Board::performMove(Move move) {
         assert(isMovePseudoLegal(move));
 
@@ -112,6 +116,8 @@ namespace Chess {
                     return PieceType::Pawn;
             }
         };
+
+        clear();
 
         auto itr = fen.begin();
 
