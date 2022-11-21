@@ -262,8 +262,10 @@ namespace Chess {
     }
 
     bool Board::isValidFen(const std::string &fen) {
+
+        // https://regex101.com/r/zDBOFz/2
         static const std::regex fenRegex(
-                R"(^((?:[pnbrqkPNBRQK1-8]{1,8}\/){7}[pnbrqkPNBRQK1-8]{1,8})\s+(b|w)\s+(-|K?Q?k?q)\s+(-|[a-h][3-6])\s+(\d+)\s+(\d+)\s*$)");
+                R"(^((?:[pnbrqkPNBRQK1-8]{1,8}\/){7}[pnbrqkPNBRQK1-8]{1,8})\s+(b|w)\s+(-|K?Q?k?q?)\s+(-|[a-h][3-6])\s+(\d+)\s+(\d+)\s*$)");
 
         std::smatch fenMatches;
         if (!std::regex_match(fen, fenMatches, fenRegex))
