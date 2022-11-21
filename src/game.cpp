@@ -120,13 +120,13 @@ void Game::squarePressed(Gui::Square &square) {
 }
 
 /**
- * Restart the game, so all pieces are standing at their starting positions,
+ * Reset the game, so all pieces are standing at their starting positions,
  * and it is white's turn to move.
  */
 void Game::reset() {
     setTurn(Chess::Color::White);
 
-    this->highlightedSquare = nullptr;
+    clearHighlights();
 
     this->chessBoard.reset();
     this->guiBoard->set(this->chessBoard);
