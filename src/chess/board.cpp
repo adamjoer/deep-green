@@ -1,6 +1,7 @@
 #include "board.h"
 
 #include <sstream>
+#include <regex>
 
 namespace Chess {
     static constexpr Bitboard twoRank{Square::A2, Square::B2, Square::C2, Square::D2,
@@ -258,6 +259,49 @@ namespace Chess {
         result << halfMoveCounter << ' ' << fullMoveCounter;
 
         return result.str();
+    }
+
+    bool Board::isValidFen(const std::string &fen) {
+        static const std::regex fenRegex(
+                R"(^((?:[pnbrqkPNBRQK1-8]{1,8}\/){7}[pnbrqkPNBRQK1-8]{1,8})\s+(b|w)\s+(-|K?Q?k?q)\s+(-|[a-h][3-6])\s+(\d+)\s+(\d+)\s*$)");
+
+        std::smatch fenMatches;
+        if (!std::regex_match(fen, fenMatches, fenRegex))
+            return false;
+
+        const auto pieces = fenMatches[1].str();
+
+        bool isWhiteKingPresent = false;
+        bool isBlackKingPresent = false;
+
+        int rankLength = 0;
+        for (auto c : pieces) {
+            if (c == '/') {
+                if (rankLength != 8)
+                    return false;
+                rankLength = 0;
+                continue;
+            }
+
+            if (std::isdigit(c))
+                rankLength += c - '0';
+            else {
+                if (c == 'K') {
+                    if (isWhiteKingPresent)
+                        return false;
+                    isWhiteKingPresent = true;
+
+                } else if (c == 'k') {
+                    if (isBlackKingPresent)
+                        return false;
+                    isBlackKingPresent = true;
+                }
+
+                ++rankLength;
+            }
+        }
+
+        return (rankLength == 8 && isWhiteKingPresent && isBlackKingPresent);
     }
 
     std::vector<Move> Board::pseudoLegalMoves() const {

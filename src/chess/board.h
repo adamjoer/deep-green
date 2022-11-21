@@ -57,6 +57,9 @@ namespace Chess {
         std::string generateFen() const;
 
         [[nodiscard]]
+        static bool isValidFen(const std::string &fen) ;
+
+        [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
 
         [[nodiscard]]
