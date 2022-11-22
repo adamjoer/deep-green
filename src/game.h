@@ -29,6 +29,8 @@ private slots:
 
     void clearHighlights();
 
+    void flipBoard();
+
     void zoomIn();
 
     void zoomOut();
@@ -48,6 +50,7 @@ private:
     QAction *outputFenAction{nullptr};
     QAction *resetAction{nullptr};
     QAction *clearHighlightsAction{nullptr};
+    QAction *flipBoardAction{nullptr};
     QAction *zoomInAction{nullptr};
     QAction *zoomOutAction{nullptr};
 

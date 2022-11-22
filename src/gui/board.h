@@ -20,6 +20,8 @@ namespace Gui {
 
         void clearHighlights();
 
+        void flip();
+
         void highlightPossibleMoves(const std::vector<Chess::Move> &possibleMoves);
 
         [[nodiscard]]
@@ -32,12 +34,21 @@ namespace Gui {
             return this->squares;
         }
 
+        [[nodiscard]]
+        Qt::Corner getBoardOriginCorner() const {
+            return this->boardOriginCorner;
+        }
+
+        void setBoardOriginCorner(Qt::Corner newBoardOriginCorner);
+
     private:
         static constexpr int DEFAULT_PIXEL_SIZE = 600;
 
         int pixelSize{DEFAULT_PIXEL_SIZE};
 
         std::array<Square *, 64> squares{nullptr};
+
+        Qt::Corner boardOriginCorner{Qt::Corner::BottomLeftCorner};
 
         void createLayout();
     };
