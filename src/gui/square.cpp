@@ -21,17 +21,36 @@ namespace Gui {
 
         switch (this->state) {
             case State::Default:
+            case State::PossibleMove:
                 painter.setBrush(this->defaultColor);
                 break;
             case State::Highlighted:
-                painter.setBrush(QColor(HIGHLIGHT_COLOR));
-                break;
-            case State::PossibleMove:
-                painter.setBrush(QColor(POSSIBLE_MOVE_COLOR));
+                painter.setBrush(QColor(defaultColor.rgb() == DEFAULT_LIGHT_COLOR ? HIGHLIGHT_LIGHT_COLOR
+                                                                                  : HIGHLIGHT_DARK_COLOR));
                 break;
         }
-
         painter.drawRect(contentsRect);
+
+        if (this->state == State::PossibleMove) {
+            // If a destination square is empty, it should contain a circle.
+            // If it is occupied, it should contain a ring.
+
+            painter.setBrush(QColor(defaultColor.rgb() == DEFAULT_LIGHT_COLOR ? POSSIBLE_MOVE_LIGHT_COLOR
+                                                                              : POSSIBLE_MOVE_DARK_COLOR));
+            if (isEmpty()) {
+                painter.drawEllipse(contentsRect.center(),
+                                    contentsRect.width() / 6, contentsRect.height() / 6);
+
+            } else {
+                painter.drawEllipse(contentsRect.center(),
+                                    contentsRect.width() / 2, contentsRect.height() / 2);
+
+                painter.setBrush(this->defaultColor);
+                painter.drawEllipse(contentsRect.center(),
+                                    (contentsRect.width() / 2) - (contentsRect.width() / 10),
+                                    (contentsRect.height() / 2) - (contentsRect.height() / 10));
+            }
+        }
 
         auto font = painter.font();
 
