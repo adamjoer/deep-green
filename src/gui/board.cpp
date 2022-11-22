@@ -30,6 +30,11 @@ namespace Gui {
         setFixedSize(this->pixelSize, this->pixelSize);
     }
 
+    Board::~Board() {
+        for (auto square: this->squares)
+            delete square;
+    }
+
     void Board::createLayout() {
         auto *newLayout = new QGridLayout;
         newLayout->setSpacing(0);
