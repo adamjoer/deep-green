@@ -60,6 +60,13 @@ namespace Gui {
         void setState(State newState);
 
         [[nodiscard]]
+        bool isRecentMove() const {
+            return this->recentMove;
+        }
+
+        void setRecentMove(bool isRecentMove);
+
+        [[nodiscard]]
         bool isEmpty() const { return this->piece == std::nullopt; }
 
     signals:
@@ -86,6 +93,8 @@ namespace Gui {
         const QColor possibleMoveColor;
 
         State state{State::Default};
+
+        bool recentMove{false};
 
         void mousePressEvent(QMouseEvent *event) override;
 

@@ -26,8 +26,10 @@ namespace Gui {
         switch (this->state) {
             case State::Default:
             case State::PossibleMove:
-                painter.setBrush(this->defaultColor);
-                break;
+                if (!this->isRecentMove()) {
+                    painter.setBrush(this->defaultColor);
+                    break;
+                }
 
             case State::Highlighted:
                 painter.setBrush(this->highlightColor);
@@ -48,7 +50,7 @@ namespace Gui {
                 painter.drawEllipse(contentsRect.center(),
                                     contentsRect.width() / 2, contentsRect.height() / 2);
 
-                painter.setBrush(this->defaultColor);
+                painter.setBrush(!this->isRecentMove() ? this->defaultColor : this->highlightColor);
                 painter.drawEllipse(contentsRect.center(),
                                     (contentsRect.width() / 2) - (contentsRect.width() / 10),
                                     (contentsRect.height() / 2) - (contentsRect.height() / 10));
@@ -105,6 +107,14 @@ namespace Gui {
 
         this->state = newState;
 
+        update();
+    }
+
+    void Square::setRecentMove(bool isRecentMove) {
+        if (isRecentMove == this->recentMove)
+            return;
+
+        this->recentMove = isRecentMove;
         update();
     }
 

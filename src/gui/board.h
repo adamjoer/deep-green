@@ -20,6 +20,8 @@ namespace Gui {
 
         void clearHighlights();
 
+        void clearRecentMoves();
+
         void highlightPossibleMoves(const std::vector<Chess::Move> &possibleMoves);
 
         [[nodiscard]]
