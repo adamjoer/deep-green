@@ -82,6 +82,8 @@ namespace Gui {
         const int file;
 
         const QColor defaultColor;
+        const QColor highlightColor;
+        const QColor possibleMoveColor;
 
         State state{State::Default};
 

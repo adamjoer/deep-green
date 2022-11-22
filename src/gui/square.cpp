@@ -8,7 +8,11 @@ namespace Gui {
               rank(rank),
               file(file),
               defaultColor((file + rank) % 2 == 0 ? DEFAULT_DARK_COLOR
-                                                  : DEFAULT_LIGHT_COLOR) {
+                                                  : DEFAULT_LIGHT_COLOR),
+              highlightColor((file + rank) % 2 == 0 ? HIGHLIGHT_DARK_COLOR
+                                                    : HIGHLIGHT_LIGHT_COLOR),
+              possibleMoveColor((file + rank) % 2 == 0 ? POSSIBLE_MOVE_DARK_COLOR
+                                                       : POSSIBLE_MOVE_LIGHT_COLOR) {
     }
 
     void Square::paintEvent(QPaintEvent *event) {
@@ -24,9 +28,9 @@ namespace Gui {
             case State::PossibleMove:
                 painter.setBrush(this->defaultColor);
                 break;
+
             case State::Highlighted:
-                painter.setBrush(QColor(defaultColor.rgb() == DEFAULT_LIGHT_COLOR ? HIGHLIGHT_LIGHT_COLOR
-                                                                                  : HIGHLIGHT_DARK_COLOR));
+                painter.setBrush(this->highlightColor);
                 break;
         }
         painter.drawRect(contentsRect);
@@ -35,8 +39,7 @@ namespace Gui {
             // If a destination square is empty, it should contain a circle.
             // If it is occupied, it should contain a ring.
 
-            painter.setBrush(QColor(defaultColor.rgb() == DEFAULT_LIGHT_COLOR ? POSSIBLE_MOVE_LIGHT_COLOR
-                                                                              : POSSIBLE_MOVE_DARK_COLOR));
+            painter.setBrush(this->possibleMoveColor);
             if (isEmpty()) {
                 painter.drawEllipse(contentsRect.center(),
                                     contentsRect.width() / 6, contentsRect.height() / 6);
