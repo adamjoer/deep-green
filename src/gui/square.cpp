@@ -54,14 +54,6 @@ namespace Gui {
 
         auto font = painter.font();
 
-        if (!isEmpty()) {
-            font.setPixelSize(contentsRect.height());
-            painter.setFont(font);
-            painter.setPen(QColorConstants::Black);
-            painter.drawText(contentsRect, Qt::AlignCenter,
-                             QString(QChar(this->piece->symbol())));
-        }
-
         if (this->file == 0 || this->rank == 0) {
             font.setPixelSize(contentsRect.height() / 3);
             painter.setFont(font);
@@ -79,6 +71,14 @@ namespace Gui {
                 painter.drawText(contentsRect, Qt::AlignRight | Qt::AlignBottom,
                                  QString(QChar('a' + this->file)));
             }
+        }
+
+        if (!isEmpty()) {
+            font.setPixelSize(contentsRect.height());
+            painter.setFont(font);
+            painter.setPen(QColorConstants::Black);
+            painter.drawText(contentsRect, Qt::AlignCenter,
+                             QString(QChar(this->piece->symbol())));
         }
     }
 
