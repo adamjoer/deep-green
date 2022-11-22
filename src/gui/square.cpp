@@ -48,7 +48,7 @@ namespace Gui {
         if (!parentBoard)
             return;
 
-        const auto boardOrigin = parentBoard->getBoardOriginCorner();
+        const auto boardOrigin = parentBoard->getOriginCorner();
         const int algebraicNotationFile = boardOrigin == Qt::Corner::BottomLeftCorner ? 0 : 7;
         const int algebraicNotationRank = boardOrigin == Qt::Corner::BottomLeftCorner ? 0 : 7;
 

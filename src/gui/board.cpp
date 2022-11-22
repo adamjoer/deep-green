@@ -39,7 +39,7 @@ namespace Gui {
         auto *newLayout = new QGridLayout;
         newLayout->setSpacing(0);
         newLayout->setContentsMargins(0, 0, 0, 0);
-        newLayout->setOriginCorner(this->boardOriginCorner);
+        newLayout->setOriginCorner(this->originCorner);
 
         for (int rank = 0; rank < 8; ++rank) {
             for (int file = 0; file < 8; ++file) {
@@ -91,17 +91,8 @@ namespace Gui {
     }
 
     void Board::flip() {
-        setBoardOriginCorner(
-                this->boardOriginCorner == Qt::BottomLeftCorner ? Qt::TopRightCorner
-                                                                : Qt::BottomLeftCorner);
-    }
-
-    void Board::setBoardOriginCorner(Qt::Corner newBoardOriginCorner) {
-        if (newBoardOriginCorner == this->boardOriginCorner)
-            return;
-
-        this->boardOriginCorner = newBoardOriginCorner;
-
+        this->originCorner = (this->originCorner == Qt::BottomLeftCorner) ? Qt::TopRightCorner
+                                                                          : Qt::BottomLeftCorner;
         createLayout();
     }
 

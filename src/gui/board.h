@@ -37,11 +37,9 @@ namespace Gui {
         }
 
         [[nodiscard]]
-        Qt::Corner getBoardOriginCorner() const {
-            return this->boardOriginCorner;
+        Qt::Corner getOriginCorner() const {
+            return this->originCorner;
         }
-
-        void setBoardOriginCorner(Qt::Corner newBoardOriginCorner);
 
     private:
         static constexpr int DEFAULT_PIXEL_SIZE = 600;
@@ -50,7 +48,7 @@ namespace Gui {
 
         std::array<Square *, 64> squares{nullptr};
 
-        Qt::Corner boardOriginCorner{Qt::Corner::BottomLeftCorner};
+        Qt::Corner originCorner{Qt::Corner::BottomLeftCorner};
 
         void createLayout();
     };
