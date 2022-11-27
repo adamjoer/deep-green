@@ -55,8 +55,13 @@ namespace Gui {
         auto origin = this->squares[static_cast<int>(from)];
         auto destination = this->squares[static_cast<int>(to)];
 
+        clearRecentMoves();
+
         destination->setPiece(origin->getPiece());
+        destination->setRecentMove(true);
+
         origin->setPiece(std::nullopt);
+        origin->setRecentMove(true);
     }
 
     void Board::set(const Chess::Board &chessBoard) {
@@ -78,11 +83,20 @@ namespace Gui {
                 squares[i]->setPiece(std::nullopt);
             }
         }
+
+        clearHighlights();
+        clearRecentMoves();
     }
 
     void Board::clearHighlights() {
         for (auto square: squares)
             square->setState(Square::State::Default);
+    }
+
+    void Board::clearRecentMoves() {
+        for (auto square : squares) {
+            square->setRecentMove(false);
+        }
     }
 
     void Board::highlightPossibleMoves(const std::vector<Chess::Move> &possibleMoves) {

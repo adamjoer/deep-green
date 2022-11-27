@@ -60,6 +60,13 @@ namespace Gui {
         void setState(State newState);
 
         [[nodiscard]]
+        bool isRecentMove() const {
+            return this->recentMove;
+        }
+
+        void setRecentMove(bool isRecentMove);
+
+        [[nodiscard]]
         bool isEmpty() const { return this->piece == std::nullopt; }
 
     signals:
@@ -67,12 +74,14 @@ namespace Gui {
         void pressed(Gui::Square &square);
 
     private:
-        static const QRgb DEFAULT_LIGHT_COLOR = 0xFFD6B18B;
-        static const QRgb DEFAULT_DARK_COLOR = 0xFFA57A60;
+        static constexpr QRgb DEFAULT_LIGHT_COLOR = 0xFFF0D9B5;
+        static constexpr QRgb DEFAULT_DARK_COLOR = 0xFFB58863;
 
-        // FIXME: Find prettier colors
-        static const QRgb HIGHLIGHT_COLOR = 0xFFFF0000;
-        static const QRgb POSSIBLE_MOVE_COLOR = 0xFF0000FF;
+        static constexpr QRgb HIGHLIGHT_LIGHT_COLOR = 0xFFF7EC59;
+        static constexpr QRgb HIGHLIGHT_DARK_COLOR =  0xFFDAC331;
+
+        static constexpr QRgb POSSIBLE_MOVE_LIGHT_COLOR = 0xFFD8C3A3;
+        static constexpr QRgb POSSIBLE_MOVE_DARK_COLOR = 0xFFA37A59;
 
         std::optional<Piece> piece{std::nullopt};
 
@@ -80,8 +89,12 @@ namespace Gui {
         const int file;
 
         const QColor defaultColor;
+        const QColor highlightColor;
+        const QColor possibleMoveColor;
 
         State state{State::Default};
+
+        bool recentMove{false};
 
         void mousePressEvent(QMouseEvent *event) override;
 

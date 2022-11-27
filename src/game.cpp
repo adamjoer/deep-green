@@ -148,7 +148,7 @@ void Game::inputFen() {
 
     chessBoard.parseFen(inputStd);
 
-    clearHighlights();
+    this->highlightedSquare = nullptr;
     this->guiBoard->set(this->chessBoard);
     setTurn(chessBoard.turnToMove());
 }
@@ -168,8 +168,9 @@ void Game::outputFen() {
 void Game::reset() {
     this->chessBoard.reset();
 
-    clearHighlights();
     this->guiBoard->set(this->chessBoard);
+
+    this->highlightedSquare = nullptr;
     setTurn(chessBoard.turnToMove());
 
     statusBar()->showMessage("Game reset", 2000);
