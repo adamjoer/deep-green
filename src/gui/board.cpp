@@ -6,31 +6,49 @@ namespace Gui {
 
     Board::Board(QWidget *parent, const Chess::Board &chessBoard)
             : QWidget(parent) {
-        createLayout();
+        for (int rank = 0; rank < 8; ++rank) {
+            for (int file = 0; file < 8; ++file) {
+                this->squares[rank * 8 + file] = new Square(this, rank, file);
+            }
+        }
+
         set(chessBoard);
+
+        createLayout();
+        setFixedSize(this->pixelSize, this->pixelSize);
     }
 
     Board::Board(QWidget *parent)
             : QWidget(parent) {
+        for (int rank = 0; rank < 8; ++rank) {
+            for (int file = 0; file < 8; ++file) {
+                this->squares[rank * 8 + file] = new Square(this, rank, file);
+            }
+        }
+
         createLayout();
+        setFixedSize(this->pixelSize, this->pixelSize);
+    }
+
+    Board::~Board() {
+        for (auto square: this->squares)
+            delete square;
     }
 
     void Board::createLayout() {
-        auto *layout = new QGridLayout;
-        layout->setSpacing(0);
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setOriginCorner(Qt::Corner::BottomLeftCorner);
+        auto *newLayout = new QGridLayout;
+        newLayout->setSpacing(0);
+        newLayout->setContentsMargins(0, 0, 0, 0);
+        newLayout->setOriginCorner(this->originCorner);
 
         for (int rank = 0; rank < 8; ++rank) {
             for (int file = 0; file < 8; ++file) {
-                auto square = this->squares[rank * 8 + file]
-                                      = new Square(this, rank, file);
-                layout->addWidget(square, rank, file);
+                newLayout->addWidget(this->squares[rank * 8 + file], rank, file);
             }
         }
-        setLayout(layout);
 
-        setFixedSize(this->pixelSize, this->pixelSize);
+        delete layout();
+        setLayout(newLayout);
     }
 
     void Board::performMove(Chess::Square from, Chess::Square to) {
@@ -71,9 +89,8 @@ namespace Gui {
     }
 
     void Board::clearHighlights() {
-        for (auto square: squares) {
+        for (auto square: squares)
             square->setState(Square::State::Default);
-        }
     }
 
     void Board::clearRecentMoves() {
@@ -85,6 +102,12 @@ namespace Gui {
     void Board::highlightPossibleMoves(const std::vector<Chess::Move> &possibleMoves) {
         for (const auto move: possibleMoves)
             this->squares[static_cast<int>(move.to)]->setState(Square::State::PossibleMove);
+    }
+
+    void Board::flip() {
+        this->originCorner = (this->originCorner == Qt::BottomLeftCorner) ? Qt::TopRightCorner
+                                                                          : Qt::BottomLeftCorner;
+        createLayout();
     }
 
     void Board::setPixelSize(int newPixelSize) {

@@ -1,4 +1,5 @@
 #include "square.h"
+#include "board.h"
 
 #include <QPainter>
 
@@ -59,22 +60,28 @@ namespace Gui {
 
         auto font = painter.font();
 
-        if (this->file == 0 || this->rank == 0) {
-            font.setPixelSize(contentsRect.height() / 3);
-            painter.setFont(font);
-            painter.setPen(defaultColor.rgb() == DEFAULT_DARK_COLOR ? DEFAULT_LIGHT_COLOR
-                                                                    : DEFAULT_DARK_COLOR);
+        if (const auto *parentBoard = dynamic_cast<Board *>(parent())) {
+            const auto boardOrigin = parentBoard->getOriginCorner();
+            const int algebraicNotationFile = boardOrigin == Qt::Corner::BottomLeftCorner ? 0 : 7;
+            const int algebraicNotationRank = boardOrigin == Qt::Corner::BottomLeftCorner ? 0 : 7;
 
-            contentsRect -= {2, 0, 2, 0};
+            if (this->file == algebraicNotationFile || this->rank == algebraicNotationRank) {
+                font.setPixelSize(contentsRect.height() / 3);
+                painter.setFont(font);
+                painter.setPen(defaultColor.rgb() == DEFAULT_DARK_COLOR ? DEFAULT_LIGHT_COLOR
+                                                                        : DEFAULT_DARK_COLOR);
 
-            if (this->file == 0) {
-                painter.drawText(contentsRect, Qt::AlignLeft | Qt::AlignTop,
-                                 QString(QChar('1' + this->rank)));
-            }
+                contentsRect -= {2, 0, 2, 0};
 
-            if (this->rank == 0) {
-                painter.drawText(contentsRect, Qt::AlignRight | Qt::AlignBottom,
-                                 QString(QChar('a' + this->file)));
+                if (this->file == algebraicNotationFile) {
+                    painter.drawText(contentsRect, Qt::AlignLeft | Qt::AlignTop,
+                                     QString(QChar('1' + this->rank)));
+                }
+
+                if (this->rank == algebraicNotationRank) {
+                    painter.drawText(contentsRect, Qt::AlignRight | Qt::AlignBottom,
+                                     QString(QChar('a' + this->file)));
+                }
             }
         }
 

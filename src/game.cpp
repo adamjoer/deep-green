@@ -49,7 +49,7 @@ void Game::createActions() {
     QMenu *editMenu = menuBar()->addMenu("&Edit");
 
     this->inputFenAction = editMenu->addAction("&Input FEN", this, &Game::inputFen);
-    this->inputFenAction->setShortcut(Qt::CTRL | Qt::Key_F);
+    this->inputFenAction->setShortcut(Qt::CTRL | Qt::Key_I);
 
     this->outputFenAction = editMenu->addAction("&Output FEN", this, &Game::outputFen);
     this->outputFenAction->setShortcut(Qt::CTRL | Qt::Key_O);
@@ -64,6 +64,9 @@ void Game::createActions() {
     this->clearHighlightsAction
             = viewMenu->addAction("&Clear Highlights", this, &Game::clearHighlights);
     this->clearHighlightsAction->setShortcut(Qt::ALT | Qt::SHIFT | Qt::Key_X);
+
+    this->flipBoardAction = viewMenu->addAction("&Flip Board", this, &Game::flipBoard);
+    this->flipBoardAction->setShortcut(Qt::CTRL | Qt::Key_F);
 
     viewMenu->addSeparator();
 
@@ -179,6 +182,10 @@ void Game::clearHighlights() {
 
     this->guiBoard->clearHighlights();
     this->highlightedSquare = nullptr;
+}
+
+void Game::flipBoard() {
+    this->guiBoard->flip();
 }
 
 void Game::zoomIn() {
