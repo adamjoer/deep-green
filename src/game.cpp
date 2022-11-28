@@ -2,6 +2,7 @@
 
 #include <QLayout>
 #include <QMenuBar>
+#include <QActionGroup>
 #include <QStatusBar>
 #include <QMessageBox>
 #include <QInputDialog>
@@ -57,6 +58,14 @@ void Game::createActions() {
 
     editMenu->addSeparator();
 
+    auto *playAsWhiteAction = editMenu->addAction("Play as White", this, &Game::playAsWhite);
+    playAsWhiteAction->setCheckable(true);
+
+    auto *playAsBlackAction = editMenu->addAction("Play as Black", this, &Game::playAsBlack);
+    playAsBlackAction->setCheckable(true);
+
+    editMenu->addSeparator();
+
     this->resetAction = editMenu->addAction("&Reset Game", this, &Game::reset);
     this->resetAction->setShortcut(Qt::CTRL | Qt::Key_R);
 
@@ -80,6 +89,11 @@ void Game::createActions() {
     QMenu *helpMenu = menuBar()->addMenu("&Help");
 
     helpMenu->addAction("&About", this, &Game::about);
+
+    auto *teamColorGroup = new QActionGroup(this);
+    teamColorGroup->addAction(playAsWhiteAction);
+    teamColorGroup->addAction(playAsBlackAction);
+    playAsWhiteAction->setChecked(true);
 }
 
 /**
@@ -105,7 +119,7 @@ void Game::squarePressed(Gui::Square &square) {
         assert(highlightedSquare != nullptr);
         assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color == this->chessBoard.turnToMove()) {
+        if (highlightedSquare->getPiece()->color == this->playerColor) {
             performMove(Chess::Move(highlightedSquare->getPosition(), square.getPosition(),
                                     square.isEmpty() ? std::nullopt
                                                      : std::make_optional(square.getPiece()->type)));
@@ -173,6 +187,28 @@ void Game::outputFen() {
     messageBox.exec();
 }
 
+void Game::playAsWhite() {
+    setPlayerColor(Chess::Color::White);
+}
+
+void Game::playAsBlack() {
+    setPlayerColor(Chess::Color::Black);
+}
+
+void Game::setPlayerColor(Chess::Color color) {
+    if (this->playerColor == color)
+        return;
+
+    this->playerColor = color;
+
+    auto targetOriginCorner = (this->playerColor == Chess::Color::White) ? Qt::BottomLeftCorner
+                                                                         : Qt::TopRightCorner;
+    if (this->guiBoard->getOriginCorner() != targetOriginCorner)
+        this->guiBoard->flip();
+
+    reset();
+}
+
 /**
  * Reset the game, so all pieces are standing at their starting positions,
  * and it is white's turn to move.
@@ -233,7 +269,8 @@ void Game::updateTurn() {
 
     } else {
         this->turnLabel->setText("It is Black's turn to move");
-
-        performAiMove();
     }
+
+    if (this->chessBoard.turnToMove() != this->playerColor)
+        performAiMove();
 }

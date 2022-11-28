@@ -25,6 +25,10 @@ private slots:
 
     void outputFen();
 
+    void playAsWhite();
+
+    void playAsBlack();
+
     void reset();
 
     void clearHighlights();
@@ -43,6 +47,8 @@ private:
     Chess::Board chessBoard;
 
     Gui::Board *guiBoard;
+
+    Chess::Color playerColor{Chess::Color::White};
 
     QLabel *turnLabel;
 
@@ -63,4 +69,6 @@ private:
     void performAiMove();
 
     void updateTurn();
+
+    void setPlayerColor(Chess::Color color);
 };
