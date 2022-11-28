@@ -474,6 +474,39 @@ namespace Chess {
                 attacks = knightAttacks(square);
                 break;
             case PieceType::Pawn:
+                if (enPassant != Square::None) {
+                    switch (color) {
+                        case Color::White:
+                            if (square == Bitboard::squareToThe(Direction::SouthWest, enPassant) ||
+                                square == Bitboard::squareToThe(Direction::SouthEast, enPassant))
+                                moves.emplace_back(square, enPassant, true, PieceType::Pawn);
+                            break;
+                        case Color::Black:
+                            if (square == Bitboard::squareToThe(Direction::NorthWest, enPassant) ||
+                                square == Bitboard::squareToThe(Direction::NorthEast, enPassant))
+                                moves.emplace_back(square, enPassant, true, PieceType::Pawn);
+                            break;
+                    }
+                }
+                Bitboard startRank;
+                Direction attackDirection;
+                switch (color) {
+                    case Color::White:
+                        startRank = twoRank;
+                        attackDirection = Direction::North;
+                        break;
+                    case Color::Black:
+                        startRank = sevenRank;
+                        attackDirection = Direction::South;
+                        break;
+                }
+                if (startRank.isOccupiedAt(square)) {
+                    Square firstSquare = Bitboard::squareToThe(attackDirection, square);
+                    Square secondSquare = Bitboard::squareToThe(attackDirection, firstSquare);
+                    if (!(occupiedSquares.isOccupiedAt(firstSquare) or occupiedSquares.isOccupiedAt(secondSquare))) {
+                        moves.emplace_back(square, secondSquare, firstSquare);
+                    }
+                }
                 attacks = pawnAttacks(square, occupiedSquares, color);
                 break;
         }
@@ -589,10 +622,6 @@ namespace Chess {
 
     Bitboard Board::kingAttacks(Square square) {
         // TODO: Add castling moves, if castling bits are 1. Use playerTurn variable to switch.
-        // TODO: All other attack methods need to check if square is threatened by BRQ, then check possible pin.
-        // TODO: King may not move into check or stay in check. Suggestion: Check all legal moves generated and
-        //  see whether the move makes king non-threatened. This is also an alternative to pin checks, and provides
-        //  a clear end condition - if no move exists after this check, then it's checkmate and opposing player wins.
         return kingAttackMasks[static_cast<int>(square)];
     }
 
@@ -808,25 +837,13 @@ namespace Chess {
     }
 
     Bitboard Board::generatePawnAttackMask(Square square, Color color) {
-        Direction attackDirection;
-        switch (color) {
-            case Color::Black:
-                attackDirection = Direction::South;
-                break;
-            case Color::White:
-                attackDirection = Direction::North;
-                break;
-        }
+        Direction attackDirection = (color == Color::White) ? Direction::North : Direction::South;
 
         Bitboard attack;
 
         auto attackSquare = Bitboard::squareToThe(attackDirection, square);
         if (attackSquare != Square::None)
             attack.setOccupancyAt(attackSquare);
-
-        auto startRank = (color == Color::White) ? twoRank : sevenRank;
-        if (startRank.isOccupiedAt(square))
-            attack.setOccupancyAt(Bitboard::squareToThe(attackDirection, attackSquare));
 
         return attack;
     }
