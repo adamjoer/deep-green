@@ -120,7 +120,7 @@ void Game::squarePressed(Gui::Square &square) {
     highlightedSquare = &square;
     square.setState(Gui::Square::State::Highlighted);
 
-    const auto moves = chessBoard.pseudoLegalMoves(square.getPosition(), square.getPiece()->color);
+    const auto moves = chessBoard.legalMoves(square.getPosition());
     guiBoard->highlightPossibleMoves(moves);
 }
 

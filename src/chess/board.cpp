@@ -90,10 +90,30 @@ namespace Chess {
         this->enPassant = Square::None;
 
         this->playerTurn = oppositeTeam(playerTurn);
+
+        this->moves.push_back(move);
     }
 
-    void Board::undoMove(Move move) {
-        // TODO
+    void Board::undoMove() {
+        auto move = this->moves.back();
+        moves.pop_back();
+        this->playerTurn = oppositeTeam(playerTurn);
+
+        auto &team = this->bitboards[static_cast<int>(this->playerTurn)];
+
+        auto piece = removePieceAt(move.to, this->playerTurn);
+        team[static_cast<int>(piece)].setOccupancyAt(move.from);
+
+        if (move.dropPiece) {
+            auto &enemyTeam
+                    = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
+            enemyTeam[static_cast<int>(*move.dropPiece)].setOccupancyAt(move.to);
+        }
+
+        --this->halfMoveCounter;
+        if (this->playerTurn == Color::Black)
+            --this->fullMoveCounter;
+
     }
 
     Color Board::turnToMove() const {
@@ -277,7 +297,7 @@ namespace Chess {
         bool isBlackKingPresent = false;
 
         int rankLength = 0;
-        for (auto c : pieces) {
+        for (auto c: pieces) {
             if (c == '/') {
                 if (rankLength != 8)
                     return false;
@@ -304,6 +324,30 @@ namespace Chess {
         }
 
         return (rankLength == 8 && isWhiteKingPresent && isBlackKingPresent);
+    }
+
+    bool Board::isLegal() const {
+        return true; // TODO: Make squareThreatened method
+    }
+
+    std::vector<Move> Board::legalMoves(Square square) {
+        std::vector<Move> movesToFilter = pseudoLegalMoves(square);
+        std::vector<Move> resultVector;
+
+
+
+        for (auto move : movesToFilter) {
+            this->performMove(move);
+            if (this->isLegal()) {
+                resultVector.emplace_back(move);
+            }
+            this->undoMove();
+        }
+        if (resultVector.empty()) {
+            // TODO: End condition.
+        }
+
+        return resultVector;
     }
 
     std::vector<Move> Board::pseudoLegalMoves() const {
@@ -353,6 +397,10 @@ namespace Chess {
         const auto ourSquares = teamOccupiedSquares(color);
         const auto enemySquares = teamOccupiedSquares(oppositeTeam(color));
         const auto occupiedSquares = ourSquares | enemySquares;
+
+        // If the selected square isn't from the current player, there are no valid moves
+        if (!(ourSquares & Bitboard(square)))
+            return;
 
         const auto piece = pieceAt(square);
 

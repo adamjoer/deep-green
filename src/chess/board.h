@@ -46,7 +46,7 @@ namespace Chess {
 
         void performMove(Move move);
 
-        void undoMove(Move move);
+        void undoMove();
 
         [[nodiscard]]
         Color turnToMove() const;
@@ -57,7 +57,13 @@ namespace Chess {
         std::string generateFen() const;
 
         [[nodiscard]]
-        static bool isValidFen(const std::string &fen) ;
+        static bool isValidFen(const std::string &fen);
+
+        [[nodiscard]]
+        bool isLegal() const;
+
+        [[nodiscard]]
+        std::vector<Move> legalMoves(Square square);
 
         [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
@@ -104,6 +110,8 @@ namespace Chess {
         Square enPassant{Square::None};
         int halfMoveCounter{0};
         int fullMoveCounter{0};
+
+        std::vector<Move> moves;
 
         /**
          * The color of the team whose turn to move it currently is
