@@ -127,13 +127,16 @@ void Game::squarePressed(Gui::Square &square) {
         assert(highlightedSquare != nullptr);
         assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color == this->playerColor) {
+        if (highlightedSquare->getPiece()->color != this->playerColor) {
+            statusBar()->showMessage("You cannot move pieces not belonging to your set", 2000);
+
+        } else if (highlightedSquare->getPiece()->color != this->chessBoard.turnToMove()) {
+            statusBar()->showMessage("You cannot move when it is your opponent's turn to move", 2000);
+
+        } else {
             performMove(Chess::Move(highlightedSquare->getPosition(), square.getPosition(),
                                     square.isEmpty() ? std::nullopt
                                                      : std::make_optional(square.getPiece()->type)));
-
-        } else {
-            statusBar()->showMessage("It is not this team's turn to move right now", 2000);
         }
         return;
     }
