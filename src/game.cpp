@@ -179,7 +179,7 @@ void Game::performAiMove() {
                 node.chessBoard.performMove(moves[j]);
                 node.move = moves[j];
 
-                auto value = Ai::Brain::negaMax(node, i, std::numeric_limits<int>::min(), largestNegamaxValue, -1);
+                auto value = Ai::negaMax(node, i, std::numeric_limits<int>::min(), largestNegamaxValue, -1);
                 if (value > largestNegamaxValue) {
                     largestNegamaxValue = value;
                     largestNegamaxValueIndex = j;
