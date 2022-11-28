@@ -6,6 +6,7 @@
 #include <QStatusBar>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QtConcurrent>
 
 #include "config.h"
 #include "ai/brain.h"
@@ -40,6 +41,13 @@ Game::Game(QWidget *parent)
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     adjustSize();
     setFixedSize(size());
+}
+
+Game::~Game() {
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
+    }
 }
 
 void Game::createActions() {
@@ -151,10 +159,15 @@ void Game::performMove(const Chess::Move &move) {
 }
 
 void Game::performAiMove() {
-    this->repaint();
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
+    }
 
-    const auto aiMove = Ai::selectMove(this->chessBoard);
-    performMove(aiMove);
+    (this->aiFuture = QtConcurrent::run(Ai::selectMove, this->chessBoard))
+            .then([&](Chess::Move move) {
+                Game::performMove(move);
+            });
 }
 
 void Game::inputFen() {
@@ -170,6 +183,11 @@ void Game::inputFen() {
         // FIXME: Notify user in a bit more elegant way?
         statusBar()->showMessage("Invalid FEN", 2000);
         return;
+    }
+
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
     }
 
     chessBoard.parseFen(inputStd);
@@ -214,6 +232,11 @@ void Game::setPlayerColor(Chess::Color color) {
  * and it is white's turn to move.
  */
 void Game::reset() {
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
+    }
+
     this->chessBoard.reset();
 
     this->guiBoard->set(this->chessBoard);

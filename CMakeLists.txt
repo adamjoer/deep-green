@@ -16,6 +16,7 @@ find_package(Qt6 COMPONENTS
     Core
     Gui
     Widgets
+    Concurrent
     REQUIRED
 )
 
@@ -26,6 +27,7 @@ target_link_libraries(DeepGreen
     Qt::Core
     Qt::Gui
     Qt::Widgets
+    Qt::Concurrent
 )
 
 # Assign executable as a GUI application instead of a console application

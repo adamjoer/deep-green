@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QAction>
+#include <QFuture>
 
 #include "chess/board.h"
 #include "gui/board.h"
@@ -15,7 +16,7 @@ Q_OBJECT
 public:
     explicit Game(QWidget *parent = nullptr);
 
-    ~Game() override = default;
+    ~Game() override;
 
 private slots:
 
@@ -61,6 +62,8 @@ private:
     QAction *zoomOutAction{nullptr};
 
     Gui::Square *highlightedSquare{nullptr};
+
+    QFuture<Chess::Move> aiFuture;
 
     void createActions();
 
