@@ -14,11 +14,17 @@ namespace Gui {
 
         explicit Board(QWidget *parent, const Chess::Board &chessBoard);
 
+        ~Board() override;
+
         void performMove(Chess::Square from, Chess::Square to);
 
         void set(const Chess::Board &chessBoard);
 
         void clearHighlights();
+
+        void clearRecentMoves();
+
+        void flip();
 
         void highlightPossibleMoves(const std::vector<Chess::Move> &possibleMoves);
 
@@ -32,12 +38,19 @@ namespace Gui {
             return this->squares;
         }
 
+        [[nodiscard]]
+        Qt::Corner getOriginCorner() const {
+            return this->originCorner;
+        }
+
     private:
         static constexpr int DEFAULT_PIXEL_SIZE = 600;
 
         int pixelSize{DEFAULT_PIXEL_SIZE};
 
         std::array<Square *, 64> squares{nullptr};
+
+        Qt::Corner originCorner{Qt::Corner::BottomLeftCorner};
 
         void createLayout();
     };

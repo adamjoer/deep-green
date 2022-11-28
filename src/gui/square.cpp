@@ -1,4 +1,5 @@
 #include "square.h"
+#include "board.h"
 
 #include <QPainter>
 
@@ -8,7 +9,11 @@ namespace Gui {
               rank(rank),
               file(file),
               defaultColor((file + rank) % 2 == 0 ? DEFAULT_DARK_COLOR
-                                                  : DEFAULT_LIGHT_COLOR) {
+                                                  : DEFAULT_LIGHT_COLOR),
+              highlightColor((file + rank) % 2 == 0 ? HIGHLIGHT_DARK_COLOR
+                                                    : HIGHLIGHT_LIGHT_COLOR),
+              possibleMoveColor((file + rank) % 2 == 0 ? POSSIBLE_MOVE_DARK_COLOR
+                                                       : POSSIBLE_MOVE_LIGHT_COLOR) {
     }
 
     void Square::paintEvent(QPaintEvent *event) {
@@ -21,19 +26,64 @@ namespace Gui {
 
         switch (this->state) {
             case State::Default:
-                painter.setBrush(this->defaultColor);
-                break;
-            case State::Highlighted:
-                painter.setBrush(QColor(HIGHLIGHT_COLOR));
-                break;
             case State::PossibleMove:
-                painter.setBrush(QColor(POSSIBLE_MOVE_COLOR));
+                if (!this->isRecentMove()) {
+                    painter.setBrush(this->defaultColor);
+                    break;
+                }
+
+            case State::Highlighted:
+                painter.setBrush(this->highlightColor);
                 break;
         }
-
         painter.drawRect(contentsRect);
 
+        if (this->state == State::PossibleMove) {
+            // If a destination square is empty, it should contain a circle.
+            // If it is occupied, it should contain a ring.
+
+            painter.setBrush(this->possibleMoveColor);
+            if (isEmpty()) {
+                painter.drawEllipse(contentsRect.center(),
+                                    contentsRect.width() / 6, contentsRect.height() / 6);
+
+            } else {
+                painter.drawEllipse(contentsRect.center(),
+                                    contentsRect.width() / 2, contentsRect.height() / 2);
+
+                painter.setBrush(!this->isRecentMove() ? this->defaultColor : this->highlightColor);
+                painter.drawEllipse(contentsRect.center(),
+                                    (contentsRect.width() / 2) - (contentsRect.width() / 10),
+                                    (contentsRect.height() / 2) - (contentsRect.height() / 10));
+            }
+        }
+
         auto font = painter.font();
+
+        if (const auto *parentBoard = dynamic_cast<Board *>(parent())) {
+            const auto boardOrigin = parentBoard->getOriginCorner();
+            const int algebraicNotationFile = boardOrigin == Qt::Corner::BottomLeftCorner ? 0 : 7;
+            const int algebraicNotationRank = boardOrigin == Qt::Corner::BottomLeftCorner ? 0 : 7;
+
+            if (this->file == algebraicNotationFile || this->rank == algebraicNotationRank) {
+                font.setPixelSize(contentsRect.height() / 3);
+                painter.setFont(font);
+                painter.setPen(defaultColor.rgb() == DEFAULT_DARK_COLOR ? DEFAULT_LIGHT_COLOR
+                                                                        : DEFAULT_DARK_COLOR);
+
+                contentsRect -= {2, 0, 2, 0};
+
+                if (this->file == algebraicNotationFile) {
+                    painter.drawText(contentsRect, Qt::AlignLeft | Qt::AlignTop,
+                                     QString(QChar('1' + this->rank)));
+                }
+
+                if (this->rank == algebraicNotationRank) {
+                    painter.drawText(contentsRect, Qt::AlignRight | Qt::AlignBottom,
+                                     QString(QChar('a' + this->file)));
+                }
+            }
+        }
 
         if (!isEmpty()) {
             font.setPixelSize(contentsRect.height());
@@ -41,25 +91,6 @@ namespace Gui {
             painter.setPen(QColorConstants::Black);
             painter.drawText(contentsRect, Qt::AlignCenter,
                              QString(QChar(this->piece->symbol())));
-        }
-
-        if (this->file == 0 || this->rank == 0) {
-            font.setPixelSize(contentsRect.height() / 3);
-            painter.setFont(font);
-            painter.setPen(defaultColor.rgb() == DEFAULT_DARK_COLOR ? DEFAULT_LIGHT_COLOR
-                                                                    : DEFAULT_DARK_COLOR);
-
-            contentsRect -= {2, 0, 2, 0};
-
-            if (this->file == 0) {
-                painter.drawText(contentsRect, Qt::AlignLeft | Qt::AlignTop,
-                                 QString(QChar('1' + this->rank)));
-            }
-
-            if (this->rank == 0) {
-                painter.drawText(contentsRect, Qt::AlignRight | Qt::AlignBottom,
-                                 QString(QChar('a' + this->file)));
-            }
         }
     }
 
@@ -83,6 +114,14 @@ namespace Gui {
 
         this->state = newState;
 
+        update();
+    }
+
+    void Square::setRecentMove(bool isRecentMove) {
+        if (isRecentMove == this->recentMove)
+            return;
+
+        this->recentMove = isRecentMove;
         update();
     }
 
