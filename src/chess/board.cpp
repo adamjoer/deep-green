@@ -71,24 +71,34 @@ namespace Chess {
 
         // TODO: Check for "en passant" square
 
-        auto &team = this->bitboards[static_cast<int>(this->playerTurn)];
+        int playerIndex = static_cast<int>(this->playerTurn);
+
+        auto &team = this->bitboards[playerIndex];
 
         auto piece = removePieceAt(move.from, this->playerTurn);
         team[static_cast<int>(piece)].setOccupancyAt(move.to);
 
         if (piece == PieceType::King)
-            kings[static_cast<int>(playerTurn)] = move.to;
+            kings[playerIndex] = move.to;
+
 
         if (move.dropPiece) {
+            Square dropSquare = move.to;
+            if (move.enPassantCapture)
+                dropSquare = (this->playerTurn == Color::White) ?
+                             Bitboard::squareToThe(Direction::South, dropSquare) :
+                             Bitboard::squareToThe(Direction::North, dropSquare);
+
             auto &enemyTeam
                     = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
-            enemyTeam[static_cast<int>(*move.dropPiece)].clearOccupancyAt(move.to);
+            enemyTeam[static_cast<int>(*move.dropPiece)].clearOccupancyAt(dropSquare);
         }
 
-        // TODO: Set "en passant" square if relevant
+        enPassant = move.enPassant;
 
-        // TODO: Reset halfMoveCounter if capture or pawn performMove.
-        ++this->halfMoveCounter;
+
+        ++this->halfMoveCounter; // TODO: How do we reset this properly when using undoMove to check legal moves?
+
         if (this->playerTurn == Color::Black)
             ++this->fullMoveCounter;
 
@@ -96,12 +106,12 @@ namespace Chess {
 
         this->playerTurn = oppositeTeam(playerTurn);
 
-        this->moves.push_back(move);
+        this->movesMade.push_back(move);
     }
 
     void Board::undoMove() {
-        auto move = this->moves.back();
-        moves.pop_back();
+        auto move = this->movesMade.back();
+        movesMade.pop_back();
         this->playerTurn = oppositeTeam(playerTurn);
 
         auto &team = this->bitboards[static_cast<int>(this->playerTurn)];
@@ -113,10 +123,21 @@ namespace Chess {
             kings[static_cast<int>(playerTurn)] = move.from;
 
         if (move.dropPiece) {
+            Square dropSquare = move.to;
+
+            if (move.enPassantCapture)
+                dropSquare = (this->playerTurn == Color::White) ?
+                             Bitboard::squareToThe(Direction::South, dropSquare) :
+                             Bitboard::squareToThe(Direction::North, dropSquare);
+
             auto &enemyTeam
                     = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
-            enemyTeam[static_cast<int>(*move.dropPiece)].setOccupancyAt(move.to);
+            enemyTeam[static_cast<int>(*move.dropPiece)].setOccupancyAt(dropSquare);
         }
+        if (movesMade.empty())
+            this->enPassant = Square::None;
+        else
+            this->enPassant = movesMade.back().enPassant;
 
         --this->halfMoveCounter;
         if (this->playerTurn == Color::Black)

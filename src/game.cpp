@@ -126,6 +126,7 @@ void Game::squarePressed(Gui::Square &square) {
 
 void Game::performMove(const Chess::Move &move) {
     this->chessBoard.performMove(move);
+    // TODO: Pass move as parameter to fix enPassant capture.
     this->guiBoard->performMove(move.from, move.to);
 
     clearHighlights();

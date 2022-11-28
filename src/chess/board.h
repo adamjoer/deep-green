@@ -118,7 +118,7 @@ namespace Chess {
         int fullMoveCounter{0};
         Square kings[2] {Square::None, Square::None};
 
-        std::vector<Move> moves;
+        std::vector<Move> movesMade;
 
         /**
          * The color of the team whose turn to move it currently is
