@@ -21,8 +21,6 @@ private slots:
 
     void squarePressed(Gui::Square &square);
 
-    void performMove(const Chess::Move &move);
-
     void inputFen();
 
     void outputFen();
@@ -60,5 +58,9 @@ private:
 
     void createActions();
 
-    void setTurn(Chess::Color newTurn);
+    void performMove(const Chess::Move &move);
+
+    void performAiMove();
+
+    void updateTurn();
 };

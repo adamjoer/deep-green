@@ -32,7 +32,7 @@ Game::Game(QWidget *parent)
 
     this->turnLabel = new QLabel();
     statusBar()->addPermanentWidget(this->turnLabel);
-    setTurn(this->chessBoard.turnToMove());
+    updateTurn();
 
     statusBar()->setSizeGripEnabled(false);
 
@@ -133,15 +133,14 @@ void Game::performMove(const Chess::Move &move) {
 
     clearHighlights();
 
-    setTurn(this->chessBoard.turnToMove());
+    updateTurn();
+}
 
-    if (this->chessBoard.turnToMove() == Chess::Color::Black) {
-        this->repaint();
+void Game::performAiMove() {
+    this->repaint();
 
-        // Perform move with AI
-        const auto aiMove = Ai::selectMove(this->chessBoard);
-        performMove(aiMove);
-    }
+    const auto aiMove = Ai::selectMove(this->chessBoard);
+    performMove(aiMove);
 }
 
 void Game::inputFen() {
@@ -163,7 +162,7 @@ void Game::inputFen() {
 
     this->highlightedSquare = nullptr;
     this->guiBoard->set(this->chessBoard);
-    setTurn(chessBoard.turnToMove());
+    updateTurn();
 }
 
 void Game::outputFen() {
@@ -184,7 +183,7 @@ void Game::reset() {
     this->guiBoard->set(this->chessBoard);
 
     this->highlightedSquare = nullptr;
-    setTurn(chessBoard.turnToMove());
+    updateTurn();
 
     statusBar()->showMessage("Game reset", 2000);
 }
@@ -228,9 +227,13 @@ void Game::about() {
                        "<p>" TO_STRING(DESCRIPTION) "</p>");
 }
 
-void Game::setTurn(Chess::Color newTurn) {
-    if (newTurn == Chess::Color::White)
+void Game::updateTurn() {
+    if (this->chessBoard.turnToMove() == Chess::Color::White) {
         this->turnLabel->setText("It is White's turn to move");
-    else
+
+    } else {
         this->turnLabel->setText("It is Black's turn to move");
+
+        performAiMove();
+    }
 }
