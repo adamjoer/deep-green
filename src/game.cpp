@@ -164,8 +164,34 @@ void Game::performAiMove() {
         this->aiFuture.waitForFinished();
     }
 
-    (this->aiFuture = QtConcurrent::run(Ai::selectMove, this->chessBoard))
-            .then([&](Chess::Move move) {
+    (this->aiFuture = QtConcurrent::run([](QPromise<Chess::Move> &promise, Chess::Board board) {
+        auto moves = board.pseudoLegalMoves();
+
+        int largestNegamaxValue = std::numeric_limits<int>::min();
+        int largestNegamaxValueIndex = -1;
+
+        for (int i = 0; i < 6; i += 2) {
+            for (int j = 0; j < moves.size(); ++j) {
+                if (promise.isCanceled())
+                    return;
+
+                Ai::Node node(board);
+                node.chessBoard.performMove(moves[j]);
+                node.move = moves[j];
+
+                auto value = Ai::Brain::negaMax(node, i, std::numeric_limits<int>::min(), largestNegamaxValue, -1);
+                if (value > largestNegamaxValue) {
+                    largestNegamaxValue = value;
+                    largestNegamaxValueIndex = j;
+                }
+            }
+        }
+
+        assert(largestNegamaxValueIndex != -1);
+        promise.addResult(moves[largestNegamaxValueIndex]);
+
+    }, this->chessBoard))
+            .then([this](Chess::Move move) {
                 Game::performMove(move);
             });
 }
