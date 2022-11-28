@@ -57,6 +57,8 @@ namespace Chess {
 
     void Board::reset() {
         this->bitboards = startingPosition;
+        this->kings[0] = Square::E1;
+        this->kings[1] = Square::E8;
         this->playerTurn = Color::White;
     }
 
@@ -73,6 +75,9 @@ namespace Chess {
 
         auto piece = removePieceAt(move.from, this->playerTurn);
         team[static_cast<int>(piece)].setOccupancyAt(move.to);
+
+        if (piece == PieceType::King)
+            kings[static_cast<int>(playerTurn)] = move.to;
 
         if (move.dropPiece) {
             auto &enemyTeam
@@ -103,6 +108,9 @@ namespace Chess {
 
         auto piece = removePieceAt(move.to, this->playerTurn);
         team[static_cast<int>(piece)].setOccupancyAt(move.from);
+
+        if (piece == PieceType::King)
+            kings[static_cast<int>(playerTurn)] = move.from;
 
         if (move.dropPiece) {
             auto &enemyTeam
@@ -145,9 +153,11 @@ namespace Chess {
         for (int rank = 7; rank >= 0; --rank) {
             for (int file = 0; file < 8; ++file) {
                 if (std::isupper(*itr)) { // White piece
+                    if (*itr == 'K') kings[0] = Square(rank * 8 + file);
                     bitboards[0][static_cast<int>(charToPiece(*itr))].setOccupancyAt(Square(rank * 8 + file));
 
                 } else if (std::islower(*itr)) { // Black piece
+                    if (*itr == 'k') kings[1] = Square(rank * 8 + file);
                     bitboards[1][static_cast<int>(charToPiece(*itr))].setOccupancyAt(Square(rank * 8 + file));
 
                 } else if (std::isdigit(*itr)) { // Empty squares
@@ -326,8 +336,51 @@ namespace Chess {
         return (rankLength == 8 && isWhiteKingPresent && isBlackKingPresent);
     }
 
+
     bool Board::isLegal() const {
-        return true; // TODO: Make squareThreatened method
+        return !squareThreatened(kings[static_cast<int>(oppositeTeam(playerTurn))], playerTurn);
+    }
+
+    bool Board::squareThreatened(Chess::Square square, Chess::Color opponentColor) const {
+        return squaresThreatened(opponentColor).isOccupiedAt(square);
+    }
+
+    Bitboard Board::squaresThreatened(Chess::Color opponentColor) const {
+        Bitboard occupiedSquares = teamOccupiedSquares(Color::White) | teamOccupiedSquares(Color::Black);
+        Bitboard targetedSquares;
+
+        auto addAttackMasks = [&](Bitboard bitboard, PieceType piece) -> void {
+            for (int i = 0; i < 64; ++i) {
+                if (bitboard.isOccupiedAt(Square(i))) {
+                    Bitboard attacks;
+                    switch (piece) {
+                        case PieceType::King:
+                            attacks = kingAttacks(Square(i));
+                            break;
+                        case PieceType::Queen:
+                            attacks = queenAttacks(Square(i), occupiedSquares);
+                            break;
+                        case PieceType::Rook:
+                            attacks = rookAttacks(Square(i), occupiedSquares);
+                            break;
+                        case PieceType::Bishop:
+                            attacks = bishopAttacks(Square(i), occupiedSquares);
+                            break;
+                        case PieceType::Knight:
+                            attacks = knightAttacks(Square(i));
+                            break;
+                        case PieceType::Pawn:
+                            attacks = pawnThreatens(Square(i), opponentColor);
+                            break;
+                    }
+                    targetedSquares |= attacks;
+                }
+            }
+        };
+
+        for (int i = 0; i < 6; ++i)
+            addAttackMasks(bitboards[static_cast<int>(opponentColor)][i], PieceType(i));
+        return targetedSquares;
     }
 
     std::vector<Move> Board::legalMoves(Square square) {
@@ -335,8 +388,7 @@ namespace Chess {
         std::vector<Move> resultVector;
 
 
-
-        for (auto move : movesToFilter) {
+        for (auto move: movesToFilter) {
             this->performMove(move);
             if (this->isLegal()) {
                 resultVector.emplace_back(move);
@@ -399,7 +451,7 @@ namespace Chess {
         const auto occupiedSquares = ourSquares | enemySquares;
 
         // If the selected square isn't from the current player, there are no valid moves
-        if (!(ourSquares & Bitboard(square)))
+        if (!ourSquares.isOccupiedAt(square))
             return;
 
         const auto piece = pieceAt(square);
@@ -590,6 +642,22 @@ namespace Chess {
 
         if (captureWest != Square::None && occupiedSquares.isOccupiedAt(captureWest))
             attacks.setOccupancyAt(captureWest);
+
+        return attacks;
+    }
+
+    Bitboard Board::pawnThreatens(Chess::Square square, Chess::Color color) {
+        Square captureWest = (color == Color::White) ? Bitboard::squareToThe(Direction::NorthWest, square)
+                                                     : Bitboard::squareToThe(Direction::SouthWest, square);
+        Square captureEast = (color == Color::White) ? Bitboard::squareToThe(Direction::NorthEast, square)
+                                                     : Bitboard::squareToThe(Direction::SouthEast, square);
+
+        Bitboard attacks;
+
+        if (captureWest != Square::None)
+            attacks.setOccupancyAt(captureWest);
+        if (captureEast != Square::None)
+            attacks.setOccupancyAt(captureEast);
 
         return attacks;
     }

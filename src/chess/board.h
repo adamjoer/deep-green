@@ -63,6 +63,12 @@ namespace Chess {
         bool isLegal() const;
 
         [[nodiscard]]
+        bool squareThreatened(Square square, Color opponentColor) const;
+
+        [[nodiscard]]
+        Bitboard squaresThreatened(Color opponentColor) const;
+
+        [[nodiscard]]
         std::vector<Move> legalMoves(Square square);
 
         [[nodiscard]]
@@ -110,6 +116,7 @@ namespace Chess {
         Square enPassant{Square::None};
         int halfMoveCounter{0};
         int fullMoveCounter{0};
+        Square kings[2] {Square::None, Square::None};
 
         std::vector<Move> moves;
 
@@ -133,6 +140,8 @@ namespace Chess {
         static Bitboard queenAttacks(Square square, Bitboard occupiedSquares);
 
         static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
+
+        static Bitboard pawnThreatens(Square square, Color color);
 
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
