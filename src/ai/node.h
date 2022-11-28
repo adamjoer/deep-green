@@ -6,20 +6,23 @@
 #include "../chess/board.h"
 #include "../chess/move.h"
 
-struct Node {
-    explicit Node(Chess::Board chessBoard)
-            : chessBoard(chessBoard) {
-    }
+namespace Ai {
 
-    Node(Chess::Board chessBoard, Node *parent, Chess::Move move)
-            : chessBoard(chessBoard),
-              parent(parent),
-              move(move) {
-    }
+    struct Node {
+        explicit Node(Chess::Board chessBoard)
+                : chessBoard(chessBoard) {
+        }
 
-    Chess::Board chessBoard;
-    Node *parent{nullptr};
-    std::vector<Node> children;
+        Node(Chess::Board chessBoard, Node *parent, Chess::Move move)
+                : chessBoard(chessBoard),
+                  parent(parent),
+                  move(move) {
+        }
 
-    std::optional<Chess::Move> move;
-};
+        Chess::Board chessBoard;
+        Node *parent{nullptr};
+        std::vector<Node> children;
+
+        std::optional<Chess::Move> move;
+    };
+}

@@ -7,6 +7,7 @@
 #include <QInputDialog>
 
 #include "config.h"
+#include "ai/brain.h"
 
 // See https://stackoverflow.com/a/6852937/18713517
 #define QUOTE(x) #x
@@ -102,14 +103,9 @@ void Game::squarePressed(Gui::Square &square) {
         assert(!highlightedSquare->isEmpty());
 
         if (highlightedSquare->getPiece()->color == this->chessBoard.turnToMove()) {
-            chessBoard.performMove(Chess::Move(highlightedSquare->getPosition(), square.getPosition(),
-                                               square.isEmpty() ? std::nullopt
-                                                                : std::make_optional(square.getPiece()->type)));
-            guiBoard->performMove(highlightedSquare->getPosition(), square.getPosition());
-
-            clearHighlights();
-
-            setTurn(this->chessBoard.turnToMove());
+            performMove(Chess::Move(highlightedSquare->getPosition(), square.getPosition(),
+                                    square.isEmpty() ? std::nullopt
+                                                     : std::make_optional(square.getPiece()->type)));
 
         } else {
             statusBar()->showMessage("It is not this team's turn to move right now", 2000);
@@ -126,6 +122,23 @@ void Game::squarePressed(Gui::Square &square) {
 
     const auto moves = chessBoard.pseudoLegalMoves(square.getPosition(), square.getPiece()->color);
     guiBoard->highlightPossibleMoves(moves);
+}
+
+void Game::performMove(const Chess::Move &move) {
+    this->chessBoard.performMove(move);
+    this->guiBoard->performMove(move.from, move.to);
+
+    clearHighlights();
+
+    setTurn(this->chessBoard.turnToMove());
+
+    if (this->chessBoard.turnToMove() == Chess::Color::Black) {
+        this->repaint();
+
+        // Perform move with AI
+        const auto aiMove = Ai::selectMove(this->chessBoard);
+        performMove(aiMove);
+    }
 }
 
 void Game::inputFen() {

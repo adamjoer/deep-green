@@ -1,10 +1,36 @@
 #include "brain.h"
 
+#include <cassert>
 #include <limits>
 #include <array>
 #include <algorithm>
 
 namespace Ai {
+
+    Chess::Move selectMove(const Chess::Board &board) {
+        auto moves = board.pseudoLegalMoves();
+
+        int largestNegamaxValue = std::numeric_limits<int>::min();
+        int largestNegamaxValueIndex = -1;
+
+        for (int i = 0; i < 6; i += 2) {
+            for (int j = 0; j < moves.size(); ++j) {
+                Node node(board);
+                node.chessBoard.performMove(moves[j]);
+                node.move = moves[j];
+
+                auto value = Brain::negaMax(node, i, std::numeric_limits<int>::min(), largestNegamaxValue, -1);
+                if (value > largestNegamaxValue) {
+                    largestNegamaxValue = value;
+                    largestNegamaxValueIndex = j;
+                }
+            }
+        }
+
+        assert(largestNegamaxValueIndex != -1);
+        return moves[largestNegamaxValueIndex];
+    }
+
     int Brain::negaMax(Node &node, int depth, int alpha, int beta, int color) {
         // if depth is 0 or node has no children return static evaluation * color.
         if (depth == 0)

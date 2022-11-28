@@ -24,9 +24,9 @@ namespace Chess {
             assert(to != Square::None);
         }
 
-        const Square from;
-        const Square to;
-        const std::optional<PieceType> dropPiece{std::nullopt};
+        Square from;
+        Square to;
+        std::optional<PieceType> dropPiece{std::nullopt};
 
         bool operator==(const Move &rhs) const {
             return from == rhs.from &&

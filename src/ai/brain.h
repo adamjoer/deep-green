@@ -5,9 +5,12 @@
 
 namespace Ai {
 
+    Chess::Move selectMove(const Chess::Board &board);
+
     class Brain {
     public:
-        int negaMax(Node &node, int depth, int alpha, int beta, int color);
+
+        static int negaMax(Node &node, int depth, int alpha, int beta, int color = 1);
 
         static int staticEvaluation(const Chess::Board &chessBoard);
 
