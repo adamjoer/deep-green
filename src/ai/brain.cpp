@@ -144,9 +144,11 @@ namespace Ai {
     };
     //@formatter:on
 
+    int negaMax(Node &node, int depth, int alpha, int beta, int color = 1);
+
     int staticEvaluation(const Chess::Board &chessBoard);
 
-    Chess::Move selectMove(const Chess::Board &board) {
+    void selectMove(QPromise<Chess::Move> &promise, const Chess::Board &board) {
         auto moves = board.pseudoLegalMoves();
 
         int largestNegamaxValue = std::numeric_limits<int>::min();
@@ -154,6 +156,10 @@ namespace Ai {
 
         for (int i = 0; i < 6; i += 2) {
             for (int j = 0; j < moves.size(); ++j) {
+                promise.suspendIfRequested();
+                if (promise.isCanceled())
+                    return;
+
                 Node node(board);
                 node.chessBoard.performMove(moves[j]);
                 node.move = moves[j];
@@ -167,7 +173,7 @@ namespace Ai {
         }
 
         assert(largestNegamaxValueIndex != -1);
-        return moves[largestNegamaxValueIndex];
+        promise.addResult(moves[largestNegamaxValueIndex]);
     }
 
     int negaMax(Node &node, int depth, int alpha, int beta, int color) {
