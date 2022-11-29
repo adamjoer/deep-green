@@ -163,7 +163,12 @@ namespace Chess {
         enPassant = move.enPassant;
 
 
-        ++this->halfMoveCounter; // TODO: How do we reset this properly when using undoMove to check legal moves?
+        ++this->halfMoveCounter;
+
+        if (move.dropPiece or piece == PieceType::Pawn) {
+            previousResetValue = counterReset;
+            counterReset = halfMoveCounter;
+        }
 
         if (this->playerTurn == Color::Black)
             ++this->fullMoveCounter;
@@ -280,6 +285,10 @@ namespace Chess {
             this->enPassant = movesMade.back().enPassant;
 
         --this->halfMoveCounter;
+
+        if (move.dropPiece or piece == PieceType::Pawn) {
+            counterReset = previousResetValue;
+        }
     }
 
     Color Board::turnToMove() const {

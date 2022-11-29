@@ -130,6 +130,8 @@ namespace Chess {
                                     0}; // Keeps track of when castling rights were revoked (move number)
         Square enPassant{Square::None};
         int halfMoveCounter{0};
+        int counterReset;
+        int previousResetValue;
         int fullMoveCounter{0};
         Square kings[2]{Square::None, Square::None};
 
