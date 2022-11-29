@@ -8,7 +8,8 @@
 namespace Ai {
 
     Chess::Move selectMove(const Chess::Board &board) {
-        auto moves = board.pseudoLegalMoves();
+        auto chessBoard = Chess::Board(board);
+        auto moves = chessBoard.legalMoves();
 
         int largestNegamaxValue = std::numeric_limits<int>::min();
         int largestNegamaxValueIndex = -1;

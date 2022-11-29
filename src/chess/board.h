@@ -69,6 +69,9 @@ namespace Chess {
         Bitboard squaresThreatened(Color opponentColor) const;
 
         [[nodiscard]]
+        std::vector<Move> legalMoves();
+
+        [[nodiscard]]
         std::vector<Move> legalMoves(Square square);
 
         [[nodiscard]]
@@ -116,7 +119,7 @@ namespace Chess {
         Square enPassant{Square::None};
         int halfMoveCounter{0};
         int fullMoveCounter{0};
-        Square kings[2] {Square::None, Square::None};
+        Square kings[2]{Square::None, Square::None};
 
         std::vector<Move> movesMade;
 

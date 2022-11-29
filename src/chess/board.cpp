@@ -69,8 +69,6 @@ namespace Chess {
     void Board::performMove(Move move) {
         assert(isMovePseudoLegal(move));
 
-        // TODO: Check for "en passant" square
-
         int playerIndex = static_cast<int>(this->playerTurn);
 
         auto &team = this->bitboards[playerIndex];
@@ -404,6 +402,26 @@ namespace Chess {
         for (int i = 0; i < 6; ++i)
             addAttackMasks(bitboards[static_cast<int>(opponentColor)][i], PieceType(i));
         return targetedSquares;
+    }
+
+
+    std::vector<Move> Board::legalMoves() {
+        std::vector<Move> movesToFilter = pseudoLegalMoves();
+        std::vector<Move> resultVector;
+
+
+        for (auto move: movesToFilter) {
+            this->performMove(move);
+            if (this->isLegal()) {
+                resultVector.emplace_back(move);
+            }
+            this->undoMove();
+        }
+        if (resultVector.empty()) {
+            // TODO: End condition.
+        }
+
+        return resultVector;
     }
 
     std::vector<Move> Board::legalMoves(Square square) {
