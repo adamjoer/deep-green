@@ -3,6 +3,7 @@
 #include <cassert>
 #include <limits>
 #include <algorithm>
+#include <iostream>
 
 namespace Ai {
 
@@ -178,12 +179,17 @@ namespace Ai {
 
     int negaMax(Node &node, int depth, int alpha, int beta, int color) {
         // if depth is 0 or node has no children return static evaluation * color.
-        if (depth == 0)
-            return staticEvaluation(node.chessBoard);
+        if (depth <= 0)
+            return color * staticEvaluation(node.chessBoard);
 
         // Child nodes = generateMoves(node)
         auto moves = node.chessBoard.pseudoLegalMoves();
 
+        // Order child nodes by move priority:
+        // Best move from grandparent node - later
+        // > capture last piece moved
+        // > other captures
+        // > center of the board
         if (node.move) {
             std::sort(moves.begin(), moves.end(), [&](Chess::Move a, Chess::Move b) {
                 if (a.to == node.move->to) {
@@ -201,32 +207,15 @@ namespace Ai {
             // Perform move
             // Create node
             // Add to children vector
-
             Chess::Board chessBoard(node.chessBoard); // TODO: Needs constructor without copying move vector
             chessBoard.performMove(move);
             node.children.emplace_back(chessBoard, &node, move);
         }
 
         if (node.children.empty())
-            return staticEvaluation(node.chessBoard);
+            return color * staticEvaluation(node.chessBoard);
 
-        // Order child nodes by move priority:
-        // Best move from grandparent node - later
-        // > capture last piece moved
-        // > other captures
-        // > center of the board
-
-
-        // value = INT32_MIN;
         int value = std::numeric_limits<int>::min();
-
-        /*
-         * for child in child nodes do
-         *      value = max(value, -negamax(child, depth - 1, -beta, -alpha, -color)
-         *      alpha = max(alpha, value)
-         *      if alpha >= beta then
-         *          break;
-         */
 
         for (auto child: node.children) {
             value = std::max(value, -negaMax(child, depth - 1, -beta, -alpha, -color));
@@ -244,22 +233,20 @@ namespace Ai {
         int evaluation = 0;
 
         // Material count + modifiers
-        const Chess::Color color = chessBoard.turnToMove();
-        const auto teamOccupiedSquares = chessBoard.teamOccupiedSquares(color);
+        const auto whiteOccupiedSquares = chessBoard.teamOccupiedSquares(Chess::Color::White);
 
-        const Chess::Color opponent = Chess::oppositeTeam(color);
-        const auto opponentOccupiedSquares = chessBoard.teamOccupiedSquares(opponent);
+        const auto blackOccupiedSquares = chessBoard.teamOccupiedSquares(Chess::Color::Black);
 
         for (int j = 0; j < 64; ++j) {
             const auto square = Chess::Square(j);
 
-            if (teamOccupiedSquares.isOccupiedAt(square)) {
-                auto piece = static_cast<int>(chessBoard.pieceAt(square, color));
-                evaluation -= pieceWeights[piece] + positionWeights[static_cast<int>(color)][piece][j];
+            if (whiteOccupiedSquares.isOccupiedAt(square)) {
+                auto piece = static_cast<int>(chessBoard.pieceAt(square, Chess::Color::White));
+                evaluation += (pieceWeights[piece] + positionWeights[0][piece][j]);
 
-            } else if (opponentOccupiedSquares.isOccupiedAt(square)) {
-                auto piece = static_cast<int>(chessBoard.pieceAt(square, opponent));
-                evaluation += pieceWeights[piece] + positionWeights[static_cast<int>(opponent)][piece][j];
+            } else if (blackOccupiedSquares.isOccupiedAt(square)) {
+                auto piece = static_cast<int>(chessBoard.pieceAt(square, Chess::Color::Black));
+                evaluation -= (pieceWeights[piece] + positionWeights[1][piece][j]);
             }
         }
 
