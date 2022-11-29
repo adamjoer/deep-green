@@ -76,8 +76,19 @@ namespace Chess {
         auto piece = removePieceAt(move.from, this->playerTurn);
         team[static_cast<int>(piece)].setOccupancyAt(move.to);
 
-        if (piece == PieceType::King)
+        if (piece == PieceType::King) {
             kings[playerIndex] = move.to;
+            switch (playerTurn) {
+                case Color::White:
+                    if (castlingRights[playerIndex][0] == 0 and move.from == Square::E1)
+                        castlingRights[playerIndex][0] = fullMoveCounter;
+                    break;
+                case Color::Black:
+                    if (castlingRights[playerIndex][0] == 0 and move.from == Square::E8)
+                        castlingRights[playerIndex][0] = fullMoveCounter;
+                    break;
+            }
+        }
 
         if (piece == PieceType::Rook) {
             switch (playerTurn) {
