@@ -2,9 +2,11 @@
 
 #include <QLayout>
 #include <QMenuBar>
+#include <QActionGroup>
 #include <QStatusBar>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <QtConcurrent>
 
 #include "config.h"
 #include "ai/brain.h"
@@ -32,13 +34,20 @@ Game::Game(QWidget *parent)
 
     this->turnLabel = new QLabel();
     statusBar()->addPermanentWidget(this->turnLabel);
-    setTurn(this->chessBoard.turnToMove());
+    updateTurn();
 
     statusBar()->setSizeGripEnabled(false);
 
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     adjustSize();
     setFixedSize(size());
+}
+
+Game::~Game() {
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
+    }
 }
 
 void Game::createActions() {
@@ -50,10 +59,18 @@ void Game::createActions() {
     QMenu *editMenu = menuBar()->addMenu("&Edit");
 
     this->inputFenAction = editMenu->addAction("&Input FEN", this, &Game::inputFen);
-    this->inputFenAction->setShortcut(Qt::CTRL | Qt::Key_F);
+    this->inputFenAction->setShortcut(Qt::CTRL | Qt::Key_I);
 
     this->outputFenAction = editMenu->addAction("&Output FEN", this, &Game::outputFen);
     this->outputFenAction->setShortcut(Qt::CTRL | Qt::Key_O);
+
+    editMenu->addSeparator();
+
+    auto *playAsWhiteAction = editMenu->addAction("Play as White", this, &Game::playAsWhite);
+    playAsWhiteAction->setCheckable(true);
+
+    auto *playAsBlackAction = editMenu->addAction("Play as Black", this, &Game::playAsBlack);
+    playAsBlackAction->setCheckable(true);
 
     editMenu->addSeparator();
 
@@ -66,6 +83,9 @@ void Game::createActions() {
             = viewMenu->addAction("&Clear Highlights", this, &Game::clearHighlights);
     this->clearHighlightsAction->setShortcut(Qt::ALT | Qt::SHIFT | Qt::Key_X);
 
+    this->flipBoardAction = viewMenu->addAction("&Flip Board", this, &Game::flipBoard);
+    this->flipBoardAction->setShortcut(Qt::CTRL | Qt::Key_F);
+
     viewMenu->addSeparator();
 
     this->zoomInAction = viewMenu->addAction("Zoom &In", this, &Game::zoomIn);
@@ -77,6 +97,11 @@ void Game::createActions() {
     QMenu *helpMenu = menuBar()->addMenu("&Help");
 
     helpMenu->addAction("&About", this, &Game::about);
+
+    auto *teamColorGroup = new QActionGroup(this);
+    teamColorGroup->addAction(playAsWhiteAction);
+    teamColorGroup->addAction(playAsBlackAction);
+    playAsWhiteAction->setChecked(true);
 }
 
 /**
@@ -104,20 +129,25 @@ void Game::squarePressed(Gui::Square &square) {
             assert(highlightedSquare != nullptr);
             assert(!highlightedSquare->isEmpty());
 
-            if (highlightedSquare->getPiece()->color == this->chessBoard.turnToMove()) {
+            if (highlightedSquare->getPiece()->color != this->playerColor) {
+                statusBar()->showMessage("You cannot move pieces not belonging to your set", 2000);
+
+            } else if (highlightedSquare->getPiece()->color != this->chessBoard.turnToMove()) {
+                statusBar()->showMessage("You cannot move when it is your opponent's turn to move", 2000);
+
+            } else {
+
                 for (auto move: moves) {
                     if (move.to == square.getPosition()) {
                         performMove(move);
                         break;
                     }
                 }
-
-            } else {
-                statusBar()->showMessage("It is not this team's turn to move right now", 2000);
             }
             return;
         }
     }
+
     clearHighlights();
     if (square.isEmpty())
         return;
@@ -136,15 +166,19 @@ void Game::performMove(const Chess::Move &move) {
 
     clearHighlights();
 
-    setTurn(this->chessBoard.turnToMove());
+    updateTurn();
+}
 
-    if (this->chessBoard.turnToMove() == Chess::Color::Black) {
-        this->repaint();
-
-        // Perform move with AI
-        const auto aiMove = Ai::selectMove(this->chessBoard);
-        performMove(aiMove);
+void Game::performAiMove() {
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
     }
+
+    (this->aiFuture = QtConcurrent::run(Ai::selectMove, this->chessBoard))
+            .then([this](Chess::Move move) {
+                Game::performMove(move);
+            });
 }
 
 void Game::inputFen() {
@@ -162,11 +196,16 @@ void Game::inputFen() {
         return;
     }
 
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
+    }
+
     chessBoard.parseFen(inputStd);
 
-    clearHighlights();
+    this->highlightedSquare = nullptr;
     this->guiBoard->set(this->chessBoard);
-    setTurn(chessBoard.turnToMove());
+    updateTurn();
 }
 
 void Game::outputFen() {
@@ -177,16 +216,44 @@ void Game::outputFen() {
     messageBox.exec();
 }
 
+void Game::playAsWhite() {
+    setPlayerColor(Chess::Color::White);
+}
+
+void Game::playAsBlack() {
+    setPlayerColor(Chess::Color::Black);
+}
+
+void Game::setPlayerColor(Chess::Color color) {
+    if (this->playerColor == color)
+        return;
+
+    this->playerColor = color;
+
+    auto targetOriginCorner = (this->playerColor == Chess::Color::White) ? Qt::BottomLeftCorner
+                                                                         : Qt::TopRightCorner;
+    if (this->guiBoard->getOriginCorner() != targetOriginCorner)
+        this->guiBoard->flip();
+
+    reset();
+}
+
 /**
  * Reset the game, so all pieces are standing at their starting positions,
  * and it is white's turn to move.
  */
 void Game::reset() {
+    if (this->aiFuture.isRunning()) {
+        this->aiFuture.cancel();
+        this->aiFuture.waitForFinished();
+    }
+
     this->chessBoard.reset();
 
-    clearHighlights();
     this->guiBoard->set(this->chessBoard);
-    setTurn(chessBoard.turnToMove());
+
+    this->highlightedSquare = nullptr;
+    updateTurn();
 
     statusBar()->showMessage("Game reset", 2000);
 }
@@ -197,6 +264,10 @@ void Game::clearHighlights() {
 
     this->guiBoard->clearHighlights();
     this->highlightedSquare = nullptr;
+}
+
+void Game::flipBoard() {
+    this->guiBoard->flip();
 }
 
 void Game::zoomIn() {
@@ -226,9 +297,14 @@ void Game::about() {
                        "<p>" TO_STRING(DESCRIPTION) "</p>");
 }
 
-void Game::setTurn(Chess::Color newTurn) {
-    if (newTurn == Chess::Color::White)
+void Game::updateTurn() {
+    if (this->chessBoard.turnToMove() == Chess::Color::White) {
         this->turnLabel->setText("It is White's turn to move");
-    else
+
+    } else {
         this->turnLabel->setText("It is Black's turn to move");
+    }
+
+    if (this->chessBoard.turnToMove() != this->playerColor)
+        performAiMove();
 }
