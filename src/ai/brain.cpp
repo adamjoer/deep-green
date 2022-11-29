@@ -3,7 +3,8 @@
 #include <cassert>
 #include <limits>
 #include <algorithm>
-#include <iostream>
+#include <chrono>
+#include <utility>
 
 namespace Ai {
 
@@ -145,39 +146,79 @@ namespace Ai {
     };
     //@formatter:on
 
-    int negaMax(Node &node, int depth, int alpha, int beta, int color = 1);
+    std::chrono::time_point<std::chrono::steady_clock> start;
+
+    static constexpr std::chrono::milliseconds timeLimit{15000};
+
+    std::pair<int, int> negaMaxRoot(const std::vector<Node> &rootChildren, int depth, int color);
+
+    int negaMax(Node &node, int depth, int alpha, int beta, int color, bool &isOverTime);
 
     int staticEvaluation(const Chess::Board &chessBoard);
 
     void selectMove(QPromise<Chess::Move> &promise, const Chess::Board &board) {
         auto moves = board.pseudoLegalMoves();
+        assert(!moves.empty());
 
-        int largestNegamaxValue = std::numeric_limits<int>::min();
-        int largestNegamaxValueIndex = -1;
+        int largestValue = std::numeric_limits<int>::min();
+        int largestValueIndex = -1;
 
-        for (int i = 0; i < 6; i += 2) {
-            for (int j = 0; j < moves.size(); ++j) {
-                promise.suspendIfRequested();
-                if (promise.isCanceled())
-                    return;
+        int depth = 1;
 
-                Node node(board);
-                node.chessBoard.performMove(moves[j]);
-                node.move = moves[j];
+        start = std::chrono::steady_clock::now();
 
-                auto value = negaMax(node, i, std::numeric_limits<int>::min(), largestNegamaxValue, -1);
-                if (value > largestNegamaxValue) {
-                    largestNegamaxValue = value;
-                    largestNegamaxValueIndex = j;
-                }
+        std::vector<Node> rootChildren;
+        rootChildren.reserve(moves.size());
+        for (auto move: moves) {
+            Chess::Board newBoard(board);
+            newBoard.performMove(move);
+
+            rootChildren.emplace_back(newBoard, nullptr, move);
+        }
+
+        const int color = (board.turnToMove() == Chess::Color::White) ? 1 : -1;
+
+        while (std::chrono::steady_clock::now() - start < timeLimit) {
+            promise.suspendIfRequested();
+            if (promise.isCanceled())
+                return;
+
+            auto value = negaMaxRoot(rootChildren, depth++, color);
+            if (value.first > largestValue) {
+                largestValue = value.first;
+                largestValueIndex = value.second;
             }
         }
 
-        assert(largestNegamaxValueIndex != -1);
-        promise.addResult(moves[largestNegamaxValueIndex]);
+        assert(largestValueIndex != -1);
+        promise.addResult(moves[largestValueIndex]);
     }
 
-    int negaMax(Node &node, int depth, int alpha, int beta, int color) {
+    std::pair<int, int> negaMaxRoot(const std::vector<Node> &rootChildren, int depth, int color) {
+        if (depth <= 0)
+            return {0, 0};
+
+        std::pair<int, int> ret{std::numeric_limits<int>::min(), -1};
+
+        bool isOverTime = false;
+
+        for (int i = 0; i < rootChildren.size(); ++i) {
+            Node node(rootChildren[i]);
+
+            auto value = negaMax(node, depth, std::numeric_limits<int>::min(),
+                                 std::numeric_limits<int>::max(), color, isOverTime);
+            if (isOverTime)
+                break;
+
+            if (value > ret.first) {
+                ret = {value, i};
+            }
+        }
+
+        return ret;
+    }
+
+    int negaMax(Node &node, int depth, int alpha, int beta, int color, bool &isOverTime) {
         // if depth is 0 or node has no children return static evaluation * color.
         if (depth <= 0)
             return color * staticEvaluation(node.chessBoard);
@@ -218,7 +259,14 @@ namespace Ai {
         int value = std::numeric_limits<int>::min();
 
         for (auto child: node.children) {
-            value = std::max(value, -negaMax(child, depth - 1, -beta, -alpha, -color));
+            if (std::chrono::steady_clock::now() - start >= timeLimit) {
+                isOverTime = true;
+                break;
+            }
+
+            value = std::max(value, -negaMax(child, depth - 1, -beta, -alpha, -color, isOverTime));
+            if (isOverTime)
+                break;
 
             alpha = std::max(alpha, value);
             if (alpha >= beta)
