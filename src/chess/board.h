@@ -34,6 +34,20 @@ namespace Chess {
 
         Board();
 
+        Board(const Board &other)
+            : bitboards(other.bitboards),
+              enPassant(other.enPassant),
+              halfMoveCounter(other.halfMoveCounter),
+              fullMoveCounter(other.fullMoveCounter),
+              playerTurn(other.playerTurn) {
+            for (int i = 0; i < 3; ++i) {
+                castlingRights[0][i] = other.castlingRights[0][i];
+                castlingRights[1][i] = other.castlingRights[1][i];
+            }
+            kings[0] = other.kings[0];
+            kings[1] = other.kings[1];
+        };
+
         void reset();
 
         void clear();
