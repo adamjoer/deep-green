@@ -150,7 +150,7 @@ namespace Ai {
 
     static constexpr std::chrono::milliseconds timeLimit{15000};
 
-    std::pair<int, int> negaMaxRoot(const std::vector<Node> &rootChildren, int depth, int color);
+    std::pair<int, int> negaMaxRoot(const QPromise<Chess::Move> &promise, const std::vector<Node> &rootChildren, int depth, int color);
 
     int negaMax(Node &node, int depth, int alpha, int beta, int color, bool &isOverTime);
 
@@ -183,7 +183,7 @@ namespace Ai {
             if (promise.isCanceled())
                 return;
 
-            auto value = negaMaxRoot(rootChildren, depth++, color);
+            auto value = negaMaxRoot(promise, rootChildren, depth++, color);
             if (value.first > largestValue) {
                 largestValue = value.first;
                 largestValueIndex = value.second;
@@ -194,7 +194,7 @@ namespace Ai {
         promise.addResult(moves[largestValueIndex]);
     }
 
-    std::pair<int, int> negaMaxRoot(const std::vector<Node> &rootChildren, int depth, int color) {
+    std::pair<int, int> negaMaxRoot(const QPromise<Chess::Move> &promise, const std::vector<Node> &rootChildren, int depth, int color) {
         if (depth <= 0)
             return {0, 0};
 
@@ -203,6 +203,9 @@ namespace Ai {
         bool isOverTime = false;
 
         for (int i = 0; i < rootChildren.size(); ++i) {
+            if (promise.isCanceled())
+                break;
+
             Node node(rootChildren[i]);
 
             auto value = negaMax(node, depth, std::numeric_limits<int>::min(),
