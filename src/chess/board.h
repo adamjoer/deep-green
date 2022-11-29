@@ -52,6 +52,9 @@ namespace Chess {
 
         void clear();
 
+        [[nodiscard]]
+        int gameStatus();
+
         void performMove(Move move);
 
         void undoMove();
@@ -130,8 +133,8 @@ namespace Chess {
                                     0}; // Keeps track of when castling rights were revoked (move number)
         Square enPassant{Square::None};
         int halfMoveCounter{0};
-        int counterReset;
-        int previousResetValue;
+        int counterReset{0};
+        int previousResetValue{0};
         int fullMoveCounter{0};
         Square kings[2]{Square::None, Square::None};
 
