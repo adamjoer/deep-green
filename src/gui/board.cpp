@@ -33,12 +33,17 @@ namespace Gui {
         setFixedSize(this->pixelSize, this->pixelSize);
     }
 
-    void Board::performMove(Chess::Square from, Chess::Square to) {
-        auto origin = this->squares[static_cast<int>(from)];
-        auto destination = this->squares[static_cast<int>(to)];
+    void Board::performMove(Chess::Move move) {
+        auto origin = this->squares[static_cast<int>(move.from)];
+        auto destination = this->squares[static_cast<int>(move.to)];
 
         destination->setPiece(origin->getPiece());
         origin->setPiece(std::nullopt);
+
+        if (move.enPassantCapture) {
+            auto dropSquare = move.dropSquare.value();
+            this->squares[static_cast<int>(dropSquare)]->setPiece(std::nullopt);
+        }
     }
 
     void Board::set(const Chess::Board &chessBoard) {

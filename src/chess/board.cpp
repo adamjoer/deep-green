@@ -217,6 +217,7 @@ namespace Chess {
         // En passant parsing.
         if (*itr == '-') {
             enPassant = Square::None;
+
             itr += 2;
 
         } else {
@@ -224,6 +225,7 @@ namespace Chess {
             itr++;
             int rank = *itr - '1'; // Zero indexed rank number
             enPassant = Square(rank * 8 + file);
+            movesMade.emplace_back(Square::A1, Square::A1, enPassant);
             itr += 2;
         }
 
@@ -496,16 +498,19 @@ namespace Chess {
                 break;
             case PieceType::Pawn:
                 if (enPassant != Square::None) {
+                    Square dropSquare;
                     switch (color) {
                         case Color::White:
+                            dropSquare = Bitboard::squareToThe(Direction::South, enPassant);
                             if (square == Bitboard::squareToThe(Direction::SouthWest, enPassant) ||
                                 square == Bitboard::squareToThe(Direction::SouthEast, enPassant))
-                                moves.emplace_back(square, enPassant, true, PieceType::Pawn);
+                                moves.emplace_back(square, enPassant, true, dropSquare);
                             break;
                         case Color::Black:
+                            dropSquare = Bitboard::squareToThe(Direction::North, enPassant);
                             if (square == Bitboard::squareToThe(Direction::NorthWest, enPassant) ||
                                 square == Bitboard::squareToThe(Direction::NorthEast, enPassant))
-                                moves.emplace_back(square, enPassant, true, PieceType::Pawn);
+                                moves.emplace_back(square, enPassant, true, dropSquare);
                             break;
                     }
                 }

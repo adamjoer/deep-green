@@ -97,22 +97,27 @@ void Game::squarePressed(Gui::Square &square) {
         clearHighlights();
         return;
     }
+    if (highlightedSquare) {
+        const auto moves = chessBoard.legalMoves(highlightedSquare->getPosition());
 
-    if (square.getState() == Gui::Square::State::PossibleMove) {
-        assert(highlightedSquare != nullptr);
-        assert(!highlightedSquare->isEmpty());
+        if (square.getState() == Gui::Square::State::PossibleMove) {
+            assert(highlightedSquare != nullptr);
+            assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color == this->chessBoard.turnToMove()) {
-            performMove(Chess::Move(highlightedSquare->getPosition(), square.getPosition(),
-                                    square.isEmpty() ? std::nullopt
-                                                     : std::make_optional(square.getPiece()->type)));
+            if (highlightedSquare->getPiece()->color == this->chessBoard.turnToMove()) {
+                for (auto move: moves) {
+                    if (move.to == square.getPosition()) {
+                        performMove(move);
+                        break;
+                    }
+                }
 
-        } else {
-            statusBar()->showMessage("It is not this team's turn to move right now", 2000);
+            } else {
+                statusBar()->showMessage("It is not this team's turn to move right now", 2000);
+            }
+            return;
         }
-        return;
     }
-
     clearHighlights();
     if (square.isEmpty())
         return;
@@ -120,14 +125,14 @@ void Game::squarePressed(Gui::Square &square) {
     highlightedSquare = &square;
     square.setState(Gui::Square::State::Highlighted);
 
-    const auto moves = chessBoard.legalMoves(square.getPosition());
+    const auto moves = chessBoard.legalMoves(highlightedSquare->getPosition());
     guiBoard->highlightPossibleMoves(moves);
 }
 
 void Game::performMove(const Chess::Move &move) {
     this->chessBoard.performMove(move);
-    // TODO: Pass move as parameter to fix enPassant capture.
-    this->guiBoard->performMove(move.from, move.to);
+
+    this->guiBoard->performMove(move);
 
     clearHighlights();
 

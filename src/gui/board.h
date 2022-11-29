@@ -14,7 +14,7 @@ namespace Gui {
 
         explicit Board(QWidget *parent, const Chess::Board &chessBoard);
 
-        void performMove(Chess::Square from, Chess::Square to);
+        void performMove(Chess::Move move);
 
         void set(const Chess::Board &chessBoard);
 
