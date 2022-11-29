@@ -147,6 +147,17 @@ namespace Chess {
             auto &enemyTeam
                     = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
             enemyTeam[static_cast<int>(*move.dropPiece)].clearOccupancyAt(dropSquare);
+
+            if (move.dropPiece == PieceType::Rook) {
+                if (dropSquare == Square::A1)
+                    castlingRights[0][1] = fullMoveCounter;
+                else if (dropSquare == Square::A8)
+                    castlingRights[1][1] = fullMoveCounter;
+                else if (dropSquare == Square::H1)
+                    castlingRights[0][2] = fullMoveCounter;
+                else if (dropSquare == Square::H8)
+                    castlingRights[1][2] = fullMoveCounter;
+            }
         }
 
         enPassant = move.enPassant;
@@ -236,6 +247,9 @@ namespace Chess {
                 castlingRights[1][2] = 0;
         }
 
+        if (this->playerTurn == Color::Black)
+            --this->fullMoveCounter;
+
         if (move.dropPiece) {
             Square dropSquare = move.to;
 
@@ -247,6 +261,17 @@ namespace Chess {
             auto &enemyTeam
                     = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
             enemyTeam[static_cast<int>(*move.dropPiece)].setOccupancyAt(dropSquare);
+
+            if (move.dropPiece == PieceType::Rook) {
+                if (dropSquare == Square::A1 && castlingRights[0][1] == fullMoveCounter)
+                    castlingRights[0][1] = 0;
+                else if (dropSquare == Square::A8 && castlingRights[1][1] == fullMoveCounter)
+                    castlingRights[1][1] = 0;
+                else if (dropSquare == Square::H1 && castlingRights[0][2] == fullMoveCounter)
+                    castlingRights[0][2] = 0;
+                else if (dropSquare == Square::H8 && castlingRights[1][2] == fullMoveCounter)
+                    castlingRights[1][2] = 0;
+            }
         }
 
         if (movesMade.empty())
@@ -255,9 +280,6 @@ namespace Chess {
             this->enPassant = movesMade.back().enPassant;
 
         --this->halfMoveCounter;
-        if (this->playerTurn == Color::Black)
-            --this->fullMoveCounter;
-
     }
 
     Color Board::turnToMove() const {
