@@ -51,9 +51,9 @@ namespace Gui {
         setLayout(newLayout);
     }
 
-    void Board::performMove(Chess::Square from, Chess::Square to) {
-        auto origin = this->squares[static_cast<int>(from)];
-        auto destination = this->squares[static_cast<int>(to)];
+    void Board::performMove(Chess::Move move) {
+        auto origin = this->squares[static_cast<int>(move.from)];
+        auto destination = this->squares[static_cast<int>(move.to)];
 
         clearRecentMoves();
 
@@ -62,6 +62,36 @@ namespace Gui {
 
         origin->setPiece(std::nullopt);
         origin->setRecentMove(true);
+
+        if (move.enPassantCapture) {
+            auto dropSquare = move.dropSquare.value();
+            this->squares[static_cast<int>(dropSquare)]->setPiece(std::nullopt);
+        }
+
+        switch (Chess::Castling(move.castle)) {
+            case Chess::Castling::WhiteKing:
+                this->squares[static_cast<int>(Chess::Square::H1)]->setPiece(std::nullopt);
+                this->squares[static_cast<int>(Chess::Square::F1)]->setPiece(std::make_optional(
+                        Piece(Chess::PieceType::Rook, Chess::Color::White)));
+                break;
+            case Chess::Castling::WhiteQueen:
+                this->squares[static_cast<int>(Chess::Square::A1)]->setPiece(std::nullopt);
+                this->squares[static_cast<int>(Chess::Square::D1)]->setPiece(std::make_optional(
+                        Piece(Chess::PieceType::Rook, Chess::Color::White)));
+                break;
+            case Chess::Castling::BlackKing:
+                this->squares[static_cast<int>(Chess::Square::H8)]->setPiece(std::nullopt);
+                this->squares[static_cast<int>(Chess::Square::F8)]->setPiece(std::make_optional(
+                        Piece(Chess::PieceType::Rook, Chess::Color::Black)));
+                break;
+            case Chess::Castling::BlackQueen:
+                this->squares[static_cast<int>(Chess::Square::A8)]->setPiece(std::nullopt);
+                this->squares[static_cast<int>(Chess::Square::D8)]->setPiece(std::make_optional(
+                        Piece(Chess::PieceType::Rook, Chess::Color::Black)));
+                break;
+            case Chess::Castling::None:
+                break;
+        }
     }
 
     void Board::set(const Chess::Board &chessBoard) {

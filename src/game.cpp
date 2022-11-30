@@ -122,23 +122,30 @@ void Game::squarePressed(Gui::Square &square) {
         clearHighlights();
         return;
     }
+    if (highlightedSquare) {
+        const auto moves = chessBoard.legalMoves(highlightedSquare->getPosition());
 
-    if (square.getState() == Gui::Square::State::PossibleMove) {
-        assert(highlightedSquare != nullptr);
-        assert(!highlightedSquare->isEmpty());
+        if (square.getState() == Gui::Square::State::PossibleMove) {
+            assert(highlightedSquare != nullptr);
+            assert(!highlightedSquare->isEmpty());
 
-        if (highlightedSquare->getPiece()->color != this->playerColor) {
-            statusBar()->showMessage("You cannot move pieces not belonging to your set", 2000);
+            if (highlightedSquare->getPiece()->color != this->playerColor) {
+                statusBar()->showMessage("You cannot move pieces not belonging to your set", 2000);
 
-        } else if (highlightedSquare->getPiece()->color != this->chessBoard.turnToMove()) {
-            statusBar()->showMessage("You cannot move when it is your opponent's turn to move", 2000);
+            } else if (highlightedSquare->getPiece()->color != this->chessBoard.turnToMove()) {
+                statusBar()->showMessage("You cannot move when it is your opponent's turn to move", 2000);
 
-        } else {
-            performMove(Chess::Move(highlightedSquare->getPosition(), square.getPosition(),
-                                    square.isEmpty() ? std::nullopt
-                                                     : std::make_optional(square.getPiece()->type)));
+            } else {
+
+                for (auto move: moves) {
+                    if (move.to == square.getPosition()) {
+                        performMove(move);
+                        break;
+                    }
+                }
+            }
+            return;
         }
-        return;
     }
 
     clearHighlights();
@@ -148,13 +155,14 @@ void Game::squarePressed(Gui::Square &square) {
     highlightedSquare = &square;
     square.setState(Gui::Square::State::Highlighted);
 
-    const auto moves = chessBoard.pseudoLegalMoves(square.getPosition(), square.getPiece()->color);
+    const auto moves = chessBoard.legalMoves(highlightedSquare->getPosition());
     guiBoard->highlightPossibleMoves(moves);
 }
 
 void Game::performMove(const Chess::Move &move) {
     this->chessBoard.performMove(move);
-    this->guiBoard->performMove(move.from, move.to);
+
+    this->guiBoard->performMove(move);
 
     clearHighlights();
 

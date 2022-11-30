@@ -157,7 +157,8 @@ namespace Ai {
     int staticEvaluation(const Chess::Board &chessBoard);
 
     void selectMove(QPromise<Chess::Move> &promise, const Chess::Board &board) {
-        auto moves = board.pseudoLegalMoves();
+        auto chessBoard = Chess::Board(board);
+        auto moves = chessBoard.legalMoves();
         assert(!moves.empty());
 
         int largestValue = std::numeric_limits<int>::min();

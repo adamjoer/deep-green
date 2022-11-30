@@ -24,9 +24,38 @@ namespace Chess {
             assert(to != Square::None);
         }
 
+        Move(Square from, Square to, Square enPassant)
+                : from(from),
+                  to(to),
+                  enPassant(enPassant) {
+            assert(from != Square::None);
+            assert(to != Square::None);
+        }
+
+        Move(Square from, Square to, int castle)
+                : from(from),
+                  to(to),
+                  castle(castle) {
+            assert(from != Square::None);
+            assert(to != Square::None);
+        }
+
+        Move(Square from, Square to, bool enPassantCapture, Square dropSquare)
+                : from(from),
+                  to(to),
+                  enPassantCapture(enPassantCapture),
+                  dropSquare(dropSquare) {
+            assert(from != Square::None);
+            assert(to != Square::None);
+        }
+
         Square from;
         Square to;
         std::optional<PieceType> dropPiece{std::nullopt};
+        std::optional<Square> dropSquare{std::nullopt};
+        int castle{0};
+        Square enPassant{Square::None};
+        bool enPassantCapture{false};
 
         bool operator==(const Move &rhs) const {
             return from == rhs.from &&

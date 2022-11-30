@@ -20,18 +20,12 @@ namespace Chess {
         return color == Color::White ? Color::Black : Color::White;
     }
 
-    enum class CastlingRightFlag : uint8_t {
-        WhiteKing = 0x01,
-        WhiteQueen = 0x02,
-        BlackKing = 0x04,
-        BlackQueen = 0x08,
-    };
-
     enum class Castling {
+        None = 0,
         WhiteKing = 1,
         WhiteQueen = 2,
-        BlackKing = 4,
-        BlackQueen = 8
+        BlackKing = 3,
+        BlackQueen = 4,
     };
 
     class Board {
@@ -40,13 +34,30 @@ namespace Chess {
 
         Board();
 
+        Board(const Board &other)
+            : bitboards(other.bitboards),
+              enPassant(other.enPassant),
+              halfMoveCounter(other.halfMoveCounter),
+              fullMoveCounter(other.fullMoveCounter),
+              playerTurn(other.playerTurn) {
+            for (int i = 0; i < 3; ++i) {
+                castlingRights[0][i] = other.castlingRights[0][i];
+                castlingRights[1][i] = other.castlingRights[1][i];
+            }
+            kings[0] = other.kings[0];
+            kings[1] = other.kings[1];
+        };
+
         void reset();
 
         void clear();
 
+        [[nodiscard]]
+        int gameStatus();
+
         void performMove(Move move);
 
-        void undoMove(Move move);
+        void undoMove();
 
         [[nodiscard]]
         Color turnToMove() const;
@@ -57,7 +68,25 @@ namespace Chess {
         std::string generateFen() const;
 
         [[nodiscard]]
-        static bool isValidFen(const std::string &fen) ;
+        static bool isValidFen(const std::string &fen);
+
+        [[nodiscard]]
+        bool isLegal() const;
+
+        [[nodiscard]]
+        bool squareThreatened(Square square, Color opponentColor) const;
+
+        [[nodiscard]]
+        Bitboard squaresThreatened(Color opponentColor) const;
+
+        [[nodiscard]]
+        bool canCastleThrough(Square square, Bitboard occupiedSquares) const;
+
+        [[nodiscard]]
+        std::vector<Move> legalMoves();
+
+        [[nodiscard]]
+        std::vector<Move> legalMoves(Square square);
 
         [[nodiscard]]
         std::vector<Move> pseudoLegalMoves() const;
@@ -100,10 +129,16 @@ namespace Chess {
         /**
          * Variables pertaining to current game state.
          */
-        uint8_t castlingRights{};
+        int castlingRights[2][3] = {0, 0, 0, 0, 0,
+                                    0}; // Keeps track of when castling rights were revoked (move number)
         Square enPassant{Square::None};
         int halfMoveCounter{0};
+        int counterReset{0};
+        int previousResetValue{0};
         int fullMoveCounter{0};
+        Square kings[2]{Square::None, Square::None};
+
+        std::vector<Move> movesMade;
 
         /**
          * The color of the team whose turn to move it currently is
@@ -125,6 +160,8 @@ namespace Chess {
         static Bitboard queenAttacks(Square square, Bitboard occupiedSquares);
 
         static Bitboard pawnAttacks(Square square, Bitboard occupiedSquares, Color color);
+
+        static Bitboard pawnThreatens(Square square, Color color);
 
         /**
          * Bitboards with attack rays for sliding pieces, indexed by enums (Direction and Square)
