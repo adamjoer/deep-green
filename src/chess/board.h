@@ -20,14 +20,6 @@ namespace Chess {
         return color == Color::White ? Color::Black : Color::White;
     }
 
-    enum class Castling {
-        None = 0,
-        WhiteKing = 1,
-        WhiteQueen = 2,
-        BlackKing = 3,
-        BlackQueen = 4,
-    };
-
     enum class State {
         On,
         WhiteWinner,

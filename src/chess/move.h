@@ -8,6 +8,14 @@
 
 namespace Chess {
 
+    enum class Castling {
+        None = 0,
+        WhiteKing = 1,
+        WhiteQueen = 2,
+        BlackKing = 3,
+        BlackQueen = 4,
+    };
+
     struct Move {
         Move(Square from, Square to)
                 : from(from),
@@ -32,12 +40,13 @@ namespace Chess {
             assert(to != Square::None);
         }
 
-        Move(Square from, Square to, int castle)
+        Move(Square from, Square to, Castling castle)
                 : from(from),
                   to(to),
                   castle(castle) {
             assert(from != Square::None);
             assert(to != Square::None);
+            assert(castle != Castling::None);
         }
 
         Move(Square from, Square to, bool enPassantCapture, Square dropSquare)
@@ -53,7 +62,7 @@ namespace Chess {
         Square to;
         std::optional<PieceType> dropPiece{std::nullopt};
         std::optional<Square> dropSquare{std::nullopt};
-        int castle{0};
+        Castling castle{Castling::None};
         Square enPassant{Square::None};
         bool enPassantCapture{false};
 
