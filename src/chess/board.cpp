@@ -70,15 +70,14 @@ namespace Chess {
         this->bitboards = {};
     }
 
-    int Board::gameStatus() { // Returns: 0 if game is on. 1 or 2, if White or Black has won, respectively, -1 if tied.
-        // Check if current player has no moves left
+    State Board::state() {
         auto moves = legalMoves();
         if (moves.empty()) {
             // Check if current player is checkmate
             if (squareThreatened(kings[static_cast<int>(turnToMove())], oppositeTeam(turnToMove())))
-                return static_cast<int>(oppositeTeam(turnToMove())) + 1;
+                return turnToMove() == Color::White ? State::BlackWinner : State::WhiteWinner;
             else
-                return -1;
+                return State::Tied;
         }
 
         bool kingsOnly{true};
@@ -88,14 +87,13 @@ namespace Chess {
                     kingsOnly = false;
 
         if (kingsOnly)
-            return -1;
-
+            return State::Tied;
 
         // Check if 50 move rule is in effect
         if (halfMoveCounter - counterReset >= 50)
-            return -1;
+            return State::Tied;
 
-        return 0;
+        return State::On;
     }
 
     void Board::performMove(Move move) {
@@ -112,11 +110,11 @@ namespace Chess {
             kings[playerIndex] = move.to;
             switch (playerTurn) {
                 case Color::White:
-                    if (castlingRights[playerIndex][0] == 0 and move.from == Square::E1)
+                    if (castlingRights[playerIndex][0] == 0 && move.from == Square::E1)
                         castlingRights[playerIndex][0] = fullMoveCounter;
                     break;
                 case Color::Black:
-                    if (castlingRights[playerIndex][0] == 0 and move.from == Square::E8)
+                    if (castlingRights[playerIndex][0] == 0 && move.from == Square::E8)
                         castlingRights[playerIndex][0] = fullMoveCounter;
                     break;
             }
@@ -125,21 +123,21 @@ namespace Chess {
         if (piece == PieceType::Rook) {
             switch (playerTurn) {
                 case Color::White:
-                    if (castlingRights[playerIndex][1] == 0 and move.from == Square::A1)
+                    if (castlingRights[playerIndex][1] == 0 && move.from == Square::A1)
                         castlingRights[playerIndex][1] = fullMoveCounter;
-                    else if (castlingRights[playerIndex][2] == 0 and move.from == Square::H1)
+                    else if (castlingRights[playerIndex][2] == 0 && move.from == Square::H1)
                         castlingRights[playerIndex][2] = fullMoveCounter;
                     break;
                 case Color::Black:
-                    if (castlingRights[playerIndex][1] == 0 and move.from == Square::A8)
+                    if (castlingRights[playerIndex][1] == 0 && move.from == Square::A8)
                         castlingRights[playerIndex][1] = fullMoveCounter;
-                    else if (castlingRights[playerIndex][2] == 0 and move.from == Square::H8)
+                    else if (castlingRights[playerIndex][2] == 0 && move.from == Square::H8)
                         castlingRights[playerIndex][2] = fullMoveCounter;
                     break;
             }
         }
 
-        switch (Castling(move.castle)) {
+        switch (move.castle) {
             case Castling::WhiteKing:
                 this->bitboards[playerIndex][static_cast<int>(PieceType::Rook)].clearOccupancyAt(
                         Square::H1);
@@ -173,7 +171,6 @@ namespace Chess {
             team[static_cast<int>(PieceType::Queen)].setOccupancyAt(move.to);
         }
 
-
         if (move.dropPiece) {
             Square dropSquare = move.to;
             if (move.enPassantCapture)
@@ -199,10 +196,9 @@ namespace Chess {
 
         enPassant = move.enPassant;
 
-
         ++this->halfMoveCounter;
 
-        if (move.dropPiece or piece == PieceType::Pawn) {
+        if (move.dropPiece || piece == PieceType::Pawn) {
             previousResetValue = counterReset;
             counterReset = halfMoveCounter;
         }
@@ -244,7 +240,7 @@ namespace Chess {
         }
 
         // Castling
-        switch (Castling(move.castle)) {
+        switch (move.castle) {
             case Castling::WhiteKing:
                 this->bitboards[playerIndex][static_cast<int>(PieceType::Rook)].clearOccupancyAt(
                         Square::F1);
@@ -328,7 +324,7 @@ namespace Chess {
 
         --this->halfMoveCounter;
 
-        if (move.dropPiece or piece == PieceType::Pawn) {
+        if (move.dropPiece || piece == PieceType::Pawn) {
             counterReset = previousResetValue;
         }
     }
@@ -469,7 +465,7 @@ namespace Chess {
 
                 else {
                     char blankSpaceCounter{'0'};
-                    while (!fullBoard.isOccupiedAt(square) and file < 8) {
+                    while (!fullBoard.isOccupiedAt(square) && file < 8) {
                         ++blankSpaceCounter;
                         ++file;
                         square = Square(rank * 8 + file);
@@ -714,35 +710,31 @@ namespace Chess {
                 if (!squareThreatened(kings[static_cast<int>(playerTurn)],
                                       oppositeTeam(playerTurn))) {
                     if (playerTurn == Color::White) {
-                        if (!castlingRights[0][0] and !castlingRights[0][2]) {
+                        if (!castlingRights[0][0] && !castlingRights[0][2]) {
                             if (canCastleThrough(Square::F1, occupiedSquares) &&
                                 canCastleThrough(Square::G1, occupiedSquares)) {
-                                moves.emplace_back(square, Square::G1,
-                                                   static_cast<int>(Castling::WhiteKing));
+                                moves.emplace_back(square, Square::G1, Castling::WhiteKing);
                             }
                         }
-                        if (!castlingRights[0][0] and !castlingRights[0][1]) {
+                        if (!castlingRights[0][0] && !castlingRights[0][1]) {
                             if (canCastleThrough(Square::D1, occupiedSquares) &&
                                 canCastleThrough(Square::C1, occupiedSquares) &&
                                 !occupiedSquares.isOccupiedAt(Square::B1)) {
-                                moves.emplace_back(square, Square::C1,
-                                                   static_cast<int>(Castling::WhiteQueen));
+                                moves.emplace_back(square, Square::C1, Castling::WhiteQueen);
                             }
                         }
                     } else {
-                        if (!castlingRights[1][0] and !castlingRights[1][2]) {
+                        if (!castlingRights[1][0] && !castlingRights[1][2]) {
                             if (canCastleThrough(Square::F8, occupiedSquares) &&
                                 canCastleThrough(Square::G8, occupiedSquares)) {
-                                moves.emplace_back(square, Square::G8,
-                                                   static_cast<int>(Castling::BlackKing));
+                                moves.emplace_back(square, Square::G8, Castling::BlackKing);
                             }
                         }
-                        if (!castlingRights[1][0] and !castlingRights[1][1]) {
+                        if (!castlingRights[1][0] && !castlingRights[1][1]) {
                             if (canCastleThrough(Square::D8, occupiedSquares) &&
                                 canCastleThrough(Square::C8, occupiedSquares) &&
                                 !occupiedSquares.isOccupiedAt(Square::B8)) {
-                                moves.emplace_back(square, Square::C8,
-                                                   static_cast<int>(Castling::BlackQueen));
+                                moves.emplace_back(square, Square::C8, Castling::BlackQueen);
                             }
                         }
                     }
@@ -796,7 +788,7 @@ namespace Chess {
                 if (startRank.isOccupiedAt(square)) {
                     Square firstSquare = Bitboard::squareToThe(attackDirection, square);
                     Square secondSquare = Bitboard::squareToThe(attackDirection, firstSquare);
-                    if (!(occupiedSquares.isOccupiedAt(firstSquare) or occupiedSquares.isOccupiedAt(secondSquare))) {
+                    if (!(occupiedSquares.isOccupiedAt(firstSquare) || occupiedSquares.isOccupiedAt(secondSquare))) {
                         moves.emplace_back(square, secondSquare, firstSquare);
                     }
                 }
@@ -1165,13 +1157,13 @@ namespace Chess {
         os << "Full moves:\t" << board.fullMoveCounter << '\n';
         os << "En passant:\t" << board.enPassant << '\n';
         os << "Castling:\t";
-        if (!board.castlingRights[0][0] and !board.castlingRights[0][2])
+        if (!board.castlingRights[0][0] && !board.castlingRights[0][2])
             os << 'K';
-        if (!board.castlingRights[0][0] and !board.castlingRights[0][1])
+        if (!board.castlingRights[0][0] && !board.castlingRights[0][1])
             os << 'Q';
-        if (!board.castlingRights[1][0] and !board.castlingRights[1][2])
+        if (!board.castlingRights[1][0] && !board.castlingRights[1][2])
             os << 'k';
-        if (!board.castlingRights[1][0] and !board.castlingRights[1][1])
+        if (!board.castlingRights[1][0] && !board.castlingRights[1][1])
             os << 'q';
         os << '\n';
 

@@ -298,6 +298,26 @@ void Game::about() {
 }
 
 void Game::updateTurn() {
+    if (auto state = this->chessBoard.state(); state != Chess::State::On) {
+        switch (state) {
+            case Chess::State::WhiteWinner:
+                this->turnLabel->setText("White won the game!");
+                break;
+            case Chess::State::BlackWinner:
+                this->turnLabel->setText("Black won the game!");
+                break;
+            case Chess::State::Tied:
+                this->turnLabel->setText("The game is tied!");
+                break;
+            default:
+                break;
+        }
+
+        this->guiBoard->setDisabled(true);
+
+        return;
+    }
+
     if (this->chessBoard.turnToMove() == Chess::Color::White) {
         this->turnLabel->setText("It is White's turn to move");
 

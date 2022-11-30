@@ -72,7 +72,7 @@ namespace Gui {
             this->squares[static_cast<int>(dropSquare)]->setPiece(std::nullopt);
         }
 
-        switch (Chess::Castling(move.castle)) {
+        switch (move.castle) {
             case Chess::Castling::WhiteKing:
                 this->squares[static_cast<int>(Chess::Square::H1)]->setPiece(std::nullopt);
                 this->squares[static_cast<int>(Chess::Square::F1)]->setPiece(std::make_optional(
@@ -120,6 +120,8 @@ namespace Gui {
 
         clearHighlights();
         clearRecentMoves();
+
+        setDisabled(false);
     }
 
     void Board::clearHighlights() {
