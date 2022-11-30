@@ -148,7 +148,7 @@ namespace Ai {
 
     std::chrono::time_point<std::chrono::steady_clock> start;
 
-    static constexpr std::chrono::milliseconds timeLimit{15000};
+    static constexpr std::chrono::milliseconds timeLimit{1000};
 
     std::pair<int, int> negaMaxRoot(const QPromise<Chess::Move> &promise, const std::vector<Node> &rootChildren, int depth, int color);
 

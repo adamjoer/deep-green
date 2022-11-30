@@ -59,6 +59,10 @@ namespace Chess {
         this->bitboards = startingPosition;
         this->kings[0] = Square::E1;
         this->kings[1] = Square::E8;
+        for (int i = 0; i < 3; ++i) {
+            castlingRights[0][i] = 0;
+            castlingRights[1][i] = 0;
+        }
         this->playerTurn = Color::White;
     }
 
@@ -234,7 +238,7 @@ namespace Chess {
             kings[playerIndex] = move.from;
             if (move.from == Square::E1 && castlingRights[0][0] == fullMoveCounter)
                 castlingRights[0][0] = 0;
-            if (move.from == Square::E8 && castlingRights[1][0] == fullMoveCounter)
+            if (move.from == Square::E8 && castlingRights[1][0] == fullMoveCounter - 1)
                 castlingRights[1][0] = 0;
 
         }
@@ -271,11 +275,12 @@ namespace Chess {
                 this->bitboards[playerIndex][static_cast<int>(PieceType::Rook)].setOccupancyAt(
                         Square::A8);
                 castlingRights[1][0] = 0;
-                castlingRights[1][2] = 0;
+                castlingRights[1][1] = 0;
                 break;
             case Castling::None:
                 break;
         }
+
 
         if (piece == PieceType::Rook) {
             if (move.from == Square::A1 && castlingRights[0][1] == fullMoveCounter)
@@ -288,8 +293,6 @@ namespace Chess {
                 castlingRights[1][2] = 0;
         }
 
-        if (this->playerTurn == Color::Black)
-            --this->fullMoveCounter;
 
         if (move.dropPiece) {
             Square dropSquare = move.to;
@@ -314,6 +317,9 @@ namespace Chess {
                     castlingRights[1][2] = 0;
             }
         }
+
+        if (this->playerTurn == Color::Black)
+            --this->fullMoveCounter;
 
         if (movesMade.empty())
             this->enPassant = Square::None;
