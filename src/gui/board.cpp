@@ -116,6 +116,8 @@ namespace Gui {
 
         clearHighlights();
         clearRecentMoves();
+
+        setDisabled(false);
     }
 
     void Board::clearHighlights() {

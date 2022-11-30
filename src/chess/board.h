@@ -28,6 +28,13 @@ namespace Chess {
         BlackQueen = 4,
     };
 
+    enum class State {
+        On,
+        WhiteWinner,
+        BlackWinner,
+        Tied,
+    };
+
     class Board {
     public:
         explicit Board(const std::string &fen);
@@ -53,7 +60,7 @@ namespace Chess {
         void clear();
 
         [[nodiscard]]
-        int gameStatus();
+        State state();
 
         void performMove(Move move);
 

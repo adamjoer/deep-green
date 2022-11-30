@@ -66,24 +66,22 @@ namespace Chess {
         this->bitboards = {};
     }
 
-    int Board::gameStatus() { // Returns: 0 if game is on. 1 or 2, if White or Black has won, respectively, -1 if tied.
-        // Check if current player has no moves left
+    State Board::state() {
         auto moves = legalMoves();
         if (moves.empty()) {
             // Check if current player is checkmate
             if (squareThreatened(kings[static_cast<int>(turnToMove())], oppositeTeam(turnToMove())))
-                return static_cast<int>(oppositeTeam(turnToMove())) + 1;
+                return turnToMove() == Color::White ? State::BlackWinner : State::WhiteWinner;
             else
-                return -1;
+                return State::Tied;
         }
         // TODO: Check if only kings remain
 
-
         // Check if 50 move rule is in effect
         if (halfMoveCounter - counterReset >= 50)
-            return -1;
+            return State::Tied;
 
-        return 0;
+        return State::On;
     }
 
     void Board::performMove(Move move) {
