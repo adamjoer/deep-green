@@ -9,17 +9,19 @@
 namespace Chess {
 
     struct Move {
-        Move(Square from, Square to)
+        Move(Square from, Square to, bool promotion = false)
                 : from(from),
-                  to(to) {
+                  to(to),
+                  promotion(promotion) {
             assert(from != Square::None);
             assert(to != Square::None);
         }
 
-        Move(Square from, Square to, std::optional<PieceType> dropPiece)
+        Move(Square from, Square to, std::optional<PieceType> dropPiece, bool promotion)
                 : from(from),
                   to(to),
-                  dropPiece(dropPiece) {
+                  dropPiece(dropPiece),
+                  promotion(promotion) {
             assert(from != Square::None);
             assert(to != Square::None);
         }
@@ -56,6 +58,7 @@ namespace Chess {
         int castle{0};
         Square enPassant{Square::None};
         bool enPassantCapture{false};
+        bool promotion{false};
 
         bool operator==(const Move &rhs) const {
             return from == rhs.from &&

@@ -57,7 +57,11 @@ namespace Gui {
 
         clearRecentMoves();
 
-        destination->setPiece(origin->getPiece());
+        if (move.promotion) {
+            destination->setPiece(std::make_optional(Piece(Chess::PieceType::Queen, origin->getPiece()->color)));
+        } else {
+            destination->setPiece(origin->getPiece());
+        }
         destination->setRecentMove(true);
 
         origin->setPiece(std::nullopt);
@@ -124,7 +128,7 @@ namespace Gui {
     }
 
     void Board::clearRecentMoves() {
-        for (auto square : squares) {
+        for (auto square: squares) {
             square->setRecentMove(false);
         }
     }

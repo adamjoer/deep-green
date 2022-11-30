@@ -76,7 +76,15 @@ namespace Chess {
             else
                 return -1;
         }
-        // TODO: Check if only kings remain
+
+        bool kingsOnly{true};
+        for (int i = 0; i < 2; ++i)
+            for (int j = 1; j < 6; ++j)
+                if (bitboards[i][j])
+                    kingsOnly = false;
+
+        if (kingsOnly)
+            return -1;
 
 
         // Check if 50 move rule is in effect
@@ -156,6 +164,11 @@ namespace Chess {
                 break;
         }
 
+        if (move.promotion) {
+            removePieceAt(move.to, this->playerTurn);
+            team[static_cast<int>(PieceType::Queen)].setOccupancyAt(move.to);
+        }
+
 
         if (move.dropPiece) {
             Square dropSquare = move.to;
@@ -207,10 +220,13 @@ namespace Chess {
         int playerIndex = static_cast<int>(playerTurn);
 
         auto &team = this->bitboards[static_cast<int>(this->playerTurn)];
-
         auto piece = removePieceAt(move.to, this->playerTurn);
-        team[static_cast<int>(piece)].setOccupancyAt(move.from);
 
+        if (move.promotion) {
+            team[static_cast<int>(PieceType::Pawn)].setOccupancyAt(move.from);
+        } else {
+            team[static_cast<int>(piece)].setOccupancyAt(move.from);
+        }
         if (piece == PieceType::King)
             kings[playerIndex] = move.from;
 
@@ -684,6 +700,7 @@ namespace Chess {
         const auto piece = pieceAt(square);
 
         Bitboard attacks;
+        bool promotion{false};
         switch (piece) {
             case PieceType::King:
                 attacks = kingAttacks(square);
@@ -756,14 +773,17 @@ namespace Chess {
                     }
                 }
                 Bitboard startRank;
+                Bitboard promotionRank;
                 Direction attackDirection;
                 switch (color) {
                     case Color::White:
                         startRank = twoRank;
+                        promotionRank = sevenRank;
                         attackDirection = Direction::North;
                         break;
                     case Color::Black:
                         startRank = sevenRank;
+                        promotionRank = twoRank;
                         attackDirection = Direction::South;
                         break;
                 }
@@ -774,6 +794,8 @@ namespace Chess {
                         moves.emplace_back(square, secondSquare, firstSquare);
                     }
                 }
+                if (promotionRank.isOccupiedAt(square))
+                    promotion = true;
                 attacks = pawnAttacks(square, occupiedSquares, color);
                 break;
         }
@@ -790,7 +812,7 @@ namespace Chess {
 
             moves.emplace_back(square, to, enemySquares.isOccupiedAt(to)
                                            ? std::make_optional(pieceAt(to))
-                                           : std::nullopt);
+                                           : std::nullopt, promotion);
         }
     }
 
