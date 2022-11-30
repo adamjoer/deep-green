@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(DeepGreen
-    VERSION 0.1.6
+    VERSION 0.3.1
     LANGUAGES CXX
-    DESCRIPTION "Chess game with a simple GUI"
+    DESCRIPTION "Chess AI with a simple GUI"
 )
 
 configure_file(src/config.h.in config.h)
