@@ -30,6 +30,7 @@ namespace Chess {
                   to(to),
                   dropPiece(dropPiece),
                   promotion(promotion) {
+            dropSquare = to;
             assert(from != Square::None);
             assert(to != Square::None);
         }
@@ -56,6 +57,7 @@ namespace Chess {
                   to(to),
                   enPassantCapture(enPassantCapture),
                   dropSquare(dropSquare) {
+            dropPiece = PieceType::Pawn;
             assert(from != Square::None);
             assert(to != Square::None);
         }
@@ -63,7 +65,7 @@ namespace Chess {
         Square from;
         Square to;
         std::optional<PieceType> dropPiece{std::nullopt};
-        std::optional<Square> dropSquare{std::nullopt};
+        Square dropSquare{Square::None};
         Castling castle{Castling::None};
         Square enPassant{Square::None};
         bool enPassantCapture{false};

@@ -172,11 +172,7 @@ namespace Chess {
         }
 
         if (move.dropPiece) {
-            Square dropSquare = move.to;
-            if (move.enPassantCapture)
-                dropSquare = (this->playerTurn == Color::White) ?
-                             Bitboard::squareToThe(Direction::South, dropSquare) :
-                             Bitboard::squareToThe(Direction::North, dropSquare);
+            Square dropSquare = move.dropSquare;
 
             auto &enemyTeam
                     = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
@@ -194,7 +190,6 @@ namespace Chess {
             }
         }
 
-        enPassant = move.enPassant;
 
         ++this->halfMoveCounter;
 
@@ -206,11 +201,16 @@ namespace Chess {
         if (this->playerTurn == Color::Black)
             ++this->fullMoveCounter;
 
-        this->enPassant = Square::None;
+        if (move.dropPiece) {
+            bool isDropped = pieceWasDropped(move);
+            assert(isDropped);
+        }
+        this->enPassant = move.enPassant;
 
         this->playerTurn = oppositeTeam(playerTurn);
 
         this->movesMade.push_back(move);
+
     }
 
     void Board::undoMove() {
@@ -291,12 +291,7 @@ namespace Chess {
 
 
         if (move.dropPiece) {
-            Square dropSquare = move.to;
-
-            if (move.enPassantCapture)
-                dropSquare = (this->playerTurn == Color::White) ?
-                             Bitboard::squareToThe(Direction::South, dropSquare) :
-                             Bitboard::squareToThe(Direction::North, dropSquare);
+            Square dropSquare = move.dropSquare;
 
             auto &enemyTeam
                     = this->bitboards[static_cast<int>(oppositeTeam(this->playerTurn))];
@@ -812,6 +807,14 @@ namespace Chess {
                                            ? std::make_optional(pieceAt(to))
                                            : std::nullopt, promotion);
         }
+    }
+
+    bool Board::pieceWasDropped(Move move) const {
+        Bitboard opponentOccupiedSquares = teamOccupiedSquares(oppositeTeam(playerTurn));
+        if (move.enPassantCapture) {
+            int x = 0;
+        }
+        return !(opponentOccupiedSquares.isOccupiedAt(move.dropSquare));
     }
 
     bool Board::isMovePseudoLegal(Move move) const {

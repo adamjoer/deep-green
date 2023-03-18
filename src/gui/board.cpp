@@ -68,7 +68,7 @@ namespace Gui {
         origin->setRecentMove(true);
 
         if (move.enPassantCapture) {
-            auto dropSquare = move.dropSquare.value();
+            auto dropSquare = move.dropSquare;
             this->squares[static_cast<int>(dropSquare)]->setPiece(std::nullopt);
         }
 

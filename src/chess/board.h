@@ -109,6 +109,9 @@ namespace Chess {
         bool isMovePseudoLegal(Move move) const;
 
         [[nodiscard]]
+        bool pieceWasDropped(Move move) const;
+
+        [[nodiscard]]
         Bitboard teamOccupiedSquares(Color color) const;
 
         [[nodiscard]]
